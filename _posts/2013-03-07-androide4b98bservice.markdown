@@ -1,0 +1,511 @@
+---
+author: gavin
+comments: true
+date: 2013-03-07 13:02:03
+layout: post
+slug: android%e4%b9%8bservice
+title: Android之Service
+wordpress_id: 87
+categories:
+- Android
+tags:
+- Android
+- Bound Service
+- IntentService
+- onBind()
+- onStartCommand()
+- Service
+---
+
+### 
+	Service简介：
+
+
+
+
+
+
+	Service是一种可以在后台长时间执行操作并且不提供用户界面的应用组件。当Service被其它应用组件启动后，它将一直在后台运行，即使用户切换到了其它应用。另外，组件也可以绑定到一个Service与它交互，甚至执行进程间通信（InterProcess Communication，IPC）。例如，Service可以用于网络通信、播放音乐、执行文件I/O、或者与Content Provider交互，所有的操作都发生在后台。
+
+
+
+
+
+
+	警告：Service是运行在它宿主进程的主线程，它不会创建它自己的线程并且不能在其它进程运行（除非另有指定）。这意味着，如果Service要做任何CPU密集型工作或阻塞操作（比如MP3播放或网络连接）时，必须在Service中创建一个新的线程来做这些工作。这样可以减少应用程序无响应（ANR）错误发生的风险，并且可以使主线程专门处理Activity与用户的交互。
+
+
+
+
+
+### 
+	Service的两种工作方式：
+
+
+
+
+
+
+	这里许多人都称之为Service的“启动”方式，由于Service分为启动的（Started）Service和绑定的（Bound）Service，为避免歧义和错误理解，我一般都称之为“工作方式”。
+
+
+
+
+
+
+	**启动的Service（Started Service）**：当Service是由其它组件（比如一个Activity）调用startService()启动的时，这个Service就是Started Service。在这种情况下，一旦Service被启动，即使启动它的那个组件已经被销毁，它也会在后台无限期地运行。通常，Started Service执行的是不向调用者返回结果的单独的操作。例如使用网络下载或上传一个文件。当操作结束时，这个Service需要自己调用stopSelf()结束，或由其它组件调用stopService()结束。
+
+
+
+
+
+
+	**绑定的Service（Bound Service）**：当其它组件调用bindService()绑定到一个Service时，这个Service就是一个“Bound Service”。Bound Service提供一个允许组件与Service交互的C/S接口，使用这个接口可以发送请求、得到返回结果、甚至跨进程通信。当有另外的组件绑定到它时Bound Service才会运行，并且多个组件可以绑定到同一个Service。这种情况下，当所有的组件都取消和它绑定后，这个Bound Service才会被销毁。
+
+
+
+
+
+
+	实际上，Service可以同时有两种工作途径——可以是被启动的（Started，此时会无限期运行），也可以允许绑定。要达成这样的目的只要实现一对回调方法即可:
+
+
+
+
+
+
+	onStartCommand()和onBind()。前者允许组件启动Service，后者允许组件绑定到Service。
+
+
+
+
+
+### 
+	几个重要的回调方法：
+
+
+
+
+
+
+	**onStartCommand()**：当其它组件（比如Activity）调用startService()启动Service时，系统就会调用这个方法。一旦这个方法执行，这个Service就是一个“Started Service”，可以无限期在后台运行。此时要停止它就需要自己调用stopSelf()，或者由其它组件调用stopService()。
+
+
+
+
+
+
+	需要注意的是，onStartCommand()必须返回一个整数，这个整数代表的是Service被系统杀死时的后续行为。这个值必须是下面三个常量中的一个：
+
+
+
+
+
+
+	START_NOT_STICKY：如果系统在onStartCommand()返回后杀死了Service，除非还有等待接收的Intent，否则不会重新创建Service。如果应用可以非常简单地重启所有未完成的任务，那么这种方式是最安全的，它可以避免你的Service在不需要时运行。
+
+
+
+
+
+
+	START_STICKY：如果系统在onStartCommand()返回后杀死了Service，会重新创建Service，此时系统不会提供上次的intent，如果没有等待接收的intent，则使用空的intent调用onStartCommand()，否则使用接收到的intent启动Service。这种情况适用于音乐播放器或类似的不需要执行命令，但是要无限期运行以等待工作的服务。
+
+
+
+
+
+
+	START_REDELIVER_INTENT：如果系统在onStartCommand()返回后杀死了Service，会重新创建Service并使用上次提供的intent调用onStartCommand()，其它所有等待接收的intent会依次提供给Service。这种情况适合于像下载文件等需要立即恢复的服务。
+
+
+
+
+
+
+	**onBind()**：当其它组件调用bindService()与Service绑定（比如执行Remote Procedure Call Protocol，RPC）时，系统就会调用这个方法。无论是否允许绑定，这个方法都必须实现，如不允许绑定，必须返回null；否则这个方法返回一个提供客户端与Service交互接口的IBinder。
+
+
+
+
+
+
+	**onCreate()**：Service的一次性安装过程，当Service第一次创建时，系统会调用这个方法（在onStartService()或onBind()之前）。如果Service已经是运行状态，则这个方法不会执行。
+
+
+
+
+
+
+	**onDestroy()**：当Service不再使用，并且即将被销毁时，系统就会调用这个方法。Service使用这个方法来清理所有资源，比如线程、已注册的监听者、接收者等。这是Service能接收到的最后一个调用。
+
+
+
+
+
+### 
+	在manifest文件中声明Service：
+
+
+
+
+
+
+	与其他应用组件一样，必须在应用的manifest文件中声明所有Service：
+
+
+
+
+
+
+	  
+
+
+
+
+
+    
+    <manifest ... >
+      ...
+      <application ... >
+          <service android:name=".ExampleService" />
+          ...
+      </application>
+    </manifest>
+
+
+android:name是唯一必需的属性，它指定了Service的名字。一旦你的应用发布了的话，就不应该更改这个属性。因为如果这么做的话，可能会影响一些需要使用显式intent引用Service的功能。
+
+
+
+	  
+
+
+
+
+
+
+
+	其次，跟Activity一样，Service也可以定义一个Intent Filter，使其它组件可以使用隐式意图运行这个Service。需要注意的是，如果这里声明的Intent Filter与其它应用通过startService()传递的intent匹配的话，其它应用程序就可能会启动这个Service。因此，如果Service只是用于本地（不允许其它应用使用），就不需要也不应该有任何intent Filter。
+
+
+
+
+
+
+	另外，如果将android:export属性设置为"false"，Service就会确保为应用私有的。
+
+
+
+
+
+### 
+	创建一个Started Service：
+
+
+
+
+
+
+	一般来说，创建一个Started Service有两种途径：
+
+
+
+
+
+
+	**继承Service类**：Service类是所有服务的基类，继承该类时，由于Service默认是运行在应用的主线程的，所以应该创建一个新线程来做Service的工作。
+
+
+
+
+
+
+	**继承IntentService类**：IntentService是Service的一个子类，它使用一个工作线程处理所有的启动请求。如果不需要同时处理多个请求的话，继承IntentService类是最好的选择。此时需要做的只是实现onHandleIntent()方法，这个方法接收每一个启动请求的intent，并且在后台处理请求。
+
+
+
+
+
+
+	**IntentService：** 
+
+
+
+
+
+
+	IntentService做的事情：
+
+
+
+
+
+
+	  
+
+
+
+
+
+
+
+	
+  * 
+		创建一个默认的工作者线程，这个线程处理所有来自于主线程onStartCommand()提供的intent。 
+	
+
+	
+  * 
+		创建一个工作队列，这个工作队列同一时间只会给onHandleIntent()实现传递一个intent，所以不必担心多线程。 
+	
+
+	
+  * 
+		当所有的启动请求都处理完成后停止自己，所以不需要调用stopSelf()。 
+	
+
+	
+  * 
+		提供一个默认的onBind()实现，默认返回null。 
+	
+
+	
+  * 
+		提供一个默认的onStartCommand()实现，它会将启动请求的intent发送给工作队列。  
+
+
+	
+
+
+实际上，继承IntentService时，只需要提供一个onHandleIntent()实现，并且提供一个很小的构造方法（调用super IntentService(String)，这个String就是工作者线程的名字）。 
+
+
+
+	  
+
+
+
+
+
+
+
+	注意：如果需要重写其它回调方法，比如onCreate()、onStartCommand()、或者onDestroy()，为了保证IntentService能正确处理自己的生命周期，就要确保这些回调方法都调用了父类的实现。（除了onHandleIntent()，另一个不需要调用父类的是onBind()。） 
+
+
+
+
+
+
+	从上面可以看到，使用IntentService实现一个Started Service是非常简单的。但是如果你的Service不想使用工作队列处理启动请求，而是使用多线程时，就要继承Service基类。但是，由于Service默认是运行在应用主线程的，所以应该针对每一个启动请求都创建一条新的线程。  
+
+
+
+
+
+
+	**启动服务：** 
+
+
+
+
+
+
+	可以在Activity或其它组件中调用startService()传递一个指定了要启动的Service的Intent来启动Service，系统会将这个Intent传递给指定的Service的onStartCommand()方法。如果Service之前没有启动，调用onStartCommand()之前会首先调用Service的onCreate()方法。
+
+
+
+
+
+
+	  
+
+
+
+
+
+    
+    Intent intent = new Intent(this, HelloService.class);
+    startService(intent);
+
+
+如果Service不允许绑定，且想要给调用者传送结果，可以创建一个PendingIntent，并放入用于启动Service的Intent中。
+
+
+
+	  
+
+
+
+
+
+
+
+	**停止服务：** 
+
+
+
+
+
+
+	Started Service必须自己管理生命周期。也就是说，除非当Service的onStartCommand()返回并且继续运行时遇到了系统内存不足，否则系统不会停止或销毁Service。因此，Service必须自己调用stopSelf()或由其它组件通过调用stopService()结束。一旦接收到stopSelf()或stopService()请求，系统会尽快地销毁Service。
+
+
+
+
+
+
+	不过，在Service同时处理多个请求的情况下，就不能在完成一个请求后结束Service，因为这可能会影响到其它请求。为避免这个问题，可以使用stopSelf(int)。参数int是结束请求对应的启动请求的ID，如果ID不匹配则Service不会停止。
+
+
+
+
+
+### 
+	创建一个Bound Service：
+
+
+
+
+
+
+	Bound Service允许应用组件调用bindService()与Service绑定，以便于创建一个两者之间的长链接（此时一般不允许组件调用startService()启动它）。Bound Service只服务于绑定到它的应用组件，所以当没有组件绑定到它时，系统就会销毁它。
+
+
+
+
+
+
+	Bound Service一般用在想要应用中的其它组件与Service交互，或者通过IPC为其它应用程序暴露一些功能的情况下。创建Bound Service时，只需要实现onBind()回调方法并返回一个定义了与Service交互接口的IBinder即可。其它应用组件可以调用bindService()得到这个IBinder并通过它调用Service中的方法。
+
+
+
+
+
+
+	同时可以有多个客户端绑定到Service，当一个客户端完成与Service的交互时，它可以调用unbindService()解除与Service的绑定。
+
+
+
+
+
+### 
+	向用户发送通知：
+
+
+
+
+
+
+	Service在运行过程中可以使用Toast通知或状态栏通知向用户通知事件。Toast通知会在用户的当前屏幕上停留片刻并随后消失；状态栏通知会在用户的状态栏显示一个关于事件信息的图标，用户选择这个图标会触发一个动作（比如启动一个Activity）。
+
+
+
+
+
+
+	通常来说，当后台任务完成后，使用状态栏通知是最好的技术。
+
+
+
+
+
+### 
+	运行一个前台服务：
+
+
+
+
+
+
+	前台服务（Foreground Service）是考虑到了用户的积极行为的一种服务，并因此在内存不足时几乎不可能被杀死。前台服务必须提供一个状态栏通知，这个通知属于持续通知，也就是说，除非服务停止或服务从前台移出，否则这个状态栏通知不能取消显示。
+
+
+
+
+
+
+	要让一个Service成为前台服务，只需要调用startForeground()。这个方法需要两个参数：一个int（要显示的状态栏通知的ID）和一个Notification（要显示的状态栏通知）。例如：
+
+
+
+
+
+
+
+    
+    Notification notification = new Notification(R.drawable.icon, getText(R.string.ticker_text),
+            System.currentTimeMillis());
+    Intent notificationIntent = new Intent(this, ExampleActivity.class);
+    PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+    notification.setLatestEventInfo(this, getText(R.string.notification_title),
+            getText(R.string.notification_message), pendingIntent);
+    startForeground(ONGOING_NOTIFICATION, notification);
+
+
+调用stopForeground()将Service从前台移除。这个方法需要一个boolean参数，这个参数指的是在将Service从前台移除时是否同时移除状态栏通知。这个方法并不停止Service。不过，在停止Service时，如果Service仍然在前台运行，那么状态栏通知也会被移除。
+
+
+
+
+
+
+	注意：startForeground()和stopForeground()是Android 2.0（API 5）新加入的，在之前的版本中需要调用setForeground()。
+
+
+
+
+
+### 
+	管理Service的生命周期：
+
+
+
+
+
+
+	由于Service有两种工作方式，所以它的生命周期也有两种路径：
+
+
+
+
+
+
+	对于Started Service：这种Service由其它组件调用startService()创建，随后会无限期运行，必须自己调用stopSelf()或由其它组件通过stopService()结束。当Service停止时，系统就会销毁它。
+
+
+
+
+
+
+	对于Bound Service：由其它组件（客户端）调用bindService()创建，随后客户端会通过一个IBinder接口与Service交互。客户端使用unbindService()关闭连接。多个客户端绑定到同一个Service时，只有当所有客户端都取消绑定时，系统才会销毁它。
+
+
+
+
+
+
+	不过，这两条路径并不是完全独立的。也就是说，你可以绑定到一个已经通过startService()启动的Service。在这种情况下，如果还有绑定到Service的客户端，那么stopSelf()和stopService()就不能真正地停止Service。
+
+
+
+
+
+
+	注意：与Activity不同，Service不要求在回调方法中调用父类的实现（继承IntentService时需要在部分回调方法中调用父类实现，是为了确保IntentService的生命周期可以正确执行）。
+
+
+
+
+
+
+	![Service生命周期](http://droider-wordpress.stor.sinaapp.com/service_lifecycle.png)
+
+
+
+
+
+
+	  
+
+

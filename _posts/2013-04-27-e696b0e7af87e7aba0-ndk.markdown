@@ -1,0 +1,157 @@
+---
+author: gavin
+comments: true
+date: 2013-04-27 23:06:07
+layout: post
+slug: '%e6%96%b0%e7%af%87%e7%ab%a0-ndk'
+title: 新篇章——NDK
+wordpress_id: 206
+categories:
+- Android
+tags:
+- ndk
+---
+
+[NDK](http://developer.android.com/tools/sdk/ndk/index.html)是从Android 1.5开始支持的，它是一系列工具的集合。它集成了交叉编译器，开发者只需要创建一个mk文件即可生成.so文件，而不用考虑如CPU、ABI、platform等。总而言之，NDK简化了JNI开发的过程。  
+
+我一直不太愿意用NDK，因为在工作中java能应付几乎全部的工作（至少到目前为止，我做的app中没有非得不用java的）。还有一个原因，NDK编程的效率、调试等等也是我不太愿意用NDK的原因。不过现在，越来越多的公司都要求会C/C++开发（这也是不理解的一点，C跟C++真不一样...），迫于求职的压力，我也决定往这方面发展一点。  
+
+开发环境：Windows64+eclipse4.2+ADT21+CDT+NDKr8e+Cygwin  
+
+首先，NDK使用起来还是挺方便的。首先，Java类中定义public native方法：
+
+
+
+
+    
+        public native String stringFromJNI
+
+
+
+
+
+在使用这个本地方法之前，还需要加载库：
+
+
+
+
+    
+        static {
+            System.loadLibrary("hellojni")
+        }
+
+
+
+
+
+这样，Java部分就已经定义好了。  
+
+要开始着手写c部分，首先要了解c中函数与Java方法的对应关系。例如上面的stringFromJNI方法，它在org.gaoxu.example.ndkdemo包下的MainActivity类，它对应的c函数名就应该为：
+
+
+
+
+    
+        Java_org_gaoxu_example_ndkdemo_MainActivity_stringFromJNI(JNIEnv* env, jobject thiz)
+
+
+
+
+
+这个函数的第二个参数先不管，第一个参数为JNIEnv指针类型，它指向了一个可执行的函数表，即可以使用它调用某个函数。实现这个方法的代码（这个文件放在工程根目录的jni目录下，记得必须声明jni.h头文件）：
+
+
+
+
+    
+        #include <string.h>
+        #include <jni.h>
+    
+        jstring Java_org_gaoxu_example_ndkdemo_MainActivity_stringFromJNI(JNIEnv* env, jobject thiz) {
+            return (*env)->NewStringUTF(env, "Hello Gavin!");
+        }
+
+
+
+
+
+文件名为hellojni.c。  
+
+现在，还需要写一个Makefile，命名为Android.mk:
+
+
+
+
+    
+        LOCAL_PATH := $(call my-dir)
+    
+        include $(CLEAR_VARS)
+    
+        LOCAL_MODULE    := hellojni
+        LOCAL_SRC_FILES := hellojni.c
+    
+        include $(BUILD_SHARED_LIBRARY)
+
+
+
+
+
+Android.mk必须在文件的开头定义LOCAL_PATH变量，它被用来定位源文件。在这里我们使用“my-dir”，也就是当前文件夹（包含Android.mk文件的文件夹）。  
+
+第二句中，CLEAR_VARS变量会清除一些LOCAL开头的变量，比如LOCAL_MODULE、LOCAL_SRC_FILES等。  
+
+第三句定义了编译完成后库的名称，这个名称必须是独一无二的，编译系统会自动添加前缀和后缀。在这，LOCAL_MODULE的值为hellojni，生成的文件名就是libhellojni.so。  
+
+第四句定义了需要编译的源文件，很简单。  
+
+第五句，声明需要编译为共享库。  
+
+以上做完，打开Cygwin，进入工程目录，执行
+
+
+
+
+    
+        $NDK_ROOT/ndk-build
+
+
+
+
+
+如果以上步骤没有发生意外，即可完成编译。  
+
+好了，其实整个过程的第二步，即定义c源文件那一步，方法名可以通过javah命令自动生成，这样也能省不少时间。写完java源文件后，eclipse会自动编译工程，并将class文件放入bin/classes文件夹下。执行
+
+
+
+
+    
+        javah -classpath bin/classes -d jni org.gaoxu.example.ndkdemo.MainActivity
+
+
+
+
+
+如果报错，可能是引导类的问题，可以加上-bootclasspath参数：
+
+
+
+
+    
+        javah -classpath bin/classes -bootclasspath D:\android\android-sdk-windows\platforms\android-10\android.jar -d jni org.gaoxu.example.ndkdemo.MainActivity
+
+
+
+
+
+还有个更简单的办法：
+
+
+
+
+    
+        cd src
+        javah -d jni org.gaoxu.example.ndkdemo.MainActivity
+
+
+
