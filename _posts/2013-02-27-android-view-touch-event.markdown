@@ -15,19 +15,7 @@ tags:
 - view
 ---
 
-
-	先看一下ViewGroup的dispatchTouchEvent的关键源码： 
-
-
-
-
-
-
-	 
-
-
-
-
+先看一下ViewGroup的dispatchTouchEvent的关键源码： 
     
     public boolean dispatchTouchEvent(MotionEvent ev) {
         ...
@@ -73,22 +61,7 @@ tags:
         return target.dispatchTouchEvent(ev);
     }
 
-
-
-
-
-	根据以上代码可知，如果onInterceptTouchEvent方法返回true，会直接调用当前ViewGroup的onTouch方法，否则则会依次调用其内包含的子控件的dispatchTouchEvent方法。我写了一个测试用例，ViewGroup的onInterceptTouchEvent方法与所有View的onTouch方法都打了Log： 
-
-
-
-
-
-
-	 
-
-
-
-
+根据以上代码可知，如果onInterceptTouchEvent方法返回true，会直接调用当前ViewGroup的onTouch方法，否则则会依次调用其内包含的子控件的dispatchTouchEvent方法。我写了一个测试用例，ViewGroup的onInterceptTouchEvent方法与所有View的onTouch方法都打了Log： 
     
     <?xml version="1.0" encoding="utf-8"?>
     <org.gavin.test.view.MyScrollView xmlns:android="http://schemas.android.com/apk/res/android"
@@ -108,78 +81,31 @@ tags:
     
     </org.gavin.test.view.MyScrollView>
 
-
-
-
-
-	Log信息： 
-
-
-
-
-
+Log信息： 
 
 	I/MyScrollView(26001): onInterceptTouchEvent:MotionEvent{...}  
+	I/MyLinearLayout(26001): onInterceptTouchEvent:MotionEvent{...}  
+	I/MyImageView(26001): onTouchEvent:MotionEvent{...}  
+	I/MyLinearLayout(26001): onTouchEvent:MotionEvent{...}  
+	I/MyScrollView(26001): onTouchEvent:MotionEvent{...}
 
-I/MyLinearLayout(26001): onInterceptTouchEvent:MotionEvent{...}  
-
-I/MyImageView(26001): onTouchEvent:MotionEvent{...}  
-
-I/MyLinearLayout(26001): onTouchEvent:MotionEvent{...}  
-
-I/MyScrollView(26001): onTouchEvent:MotionEvent{...}
-
-
-
-
-
-
-	如果MyLinearLayout的onInterceptTouchEvent方法返回true： 
-
-
-
-
-
+如果MyLinearLayout的onInterceptTouchEvent方法返回true： 
 
 	11-04 14:05:08.389: I/MyScrollView(26297): onInterceptTouchEvent:MotionEvent{...}  
+	11-04 14:05:08.389: I/MyLinearLayout(26297): onInterceptTouchEvent:MotionEvent{...}  
+	11-04 14:05:08.397: I/MyLinearLayout(26297): onTouchEvent:MotionEvent{...}  
+	11-04 14:05:08.397: I/MyScrollView(26297): onTouchEvent:MotionEvent{...}
 
-11-04 14:05:08.389: I/MyLinearLayout(26297): onInterceptTouchEvent:MotionEvent{...}  
+OK，再看这段代码： 
 
-11-04 14:05:08.397: I/MyLinearLayout(26297): onTouchEvent:MotionEvent{...}  
-
-11-04 14:05:08.397: I/MyScrollView(26297): onTouchEvent:MotionEvent{...}
-
-
-
-
-
-
-	OK，再看这段代码： 
-
-
-
-
-    
     if (child.dispatchTouchEvent(ev))  {
         // Event handled, we have a target now.
         mMotionTarget = child;
         return true;
     }
 
-
-
-
-
-	从这段代码可以看出，如果某个子控件的dispatchTouchEvent方法返回true，则中断以后的消息传递。并在下一个非ACTION_DOWN事件直接调用此子控件的dispatchTouchEvent方法。一个View的dispatchTouchEvent返回true，主要可能是onTouch方法返回true。如果我们把MyImageView的onTouchEvent返回值改为true： 
-
-
-
-
-
+从这段代码可以看出，如果某个子控件的dispatchTouchEvent方法返回true，则中断以后的消息传递。并在下一个非ACTION_DOWN事件直接调用此子控件的dispatchTouchEvent方法。一个View的dispatchTouchEvent返回true，主要可能是onTouch方法返回true。如果我们把MyImageView的onTouchEvent返回值改为true： 
 
 	I/MyScrollView(26393): onInterceptTouchEvent:MotionEvent{...}  
-
-/MyLinearLayout(26393): onInterceptTouchEvent:MotionEvent{...}  
-
-I/MyImageView(26393): onTouchEvent:MotionEvent{...}
-
+	I/MyLinearLayout(26393): onInterceptTouchEvent:MotionEvent{...}  
+	I/MyImageView(26393): onTouchEvent:MotionEvent{...}
