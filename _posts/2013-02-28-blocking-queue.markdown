@@ -1,0 +1,254 @@
+---
+author: gavin
+comments: true
+date: 2013-02-28 13:59:39
+layout: post
+slug: '%e9%98%bb%e5%a1%9e%e9%98%9f%e5%88%97'
+title: 阻塞队列
+wordpress_id: 54
+categories:
+- Java
+- 多线程
+tags:
+- Java
+- 线程
+- 阻塞队列
+---
+
+前面几篇文章看到了形成Java并发程序设计基础的底层构建块。然而，实际编程中，应该尽可能远离底层结构。使用由并发处理的专业人士实现的较高层次的结构要方便的多，而且也安全的多。
+
+对于多线程问题，可以通过使用一个或多个队列以优雅且安全的方式将其形式化。生产者线程向队列插入元素，消费者线程则取出它们。使用队列，可以安全地从一个线程向另一个线程传递数据。例如，考虑银行转帐程序，转账线程将转账指令对象插入一个队列中，而不是直接访问银行对象。另一个线程从队列中取出指令执行转账。只有该线程可以访问该银行对象的内部，因此不需要同步（锁和条件是线程安全的队列类的实现者需要考虑的）。
+
+当试图向队列添加元素而队列已满，或是想从队列移出元素而队列为空的时候，阻塞队列（blocking queue）导致线程阻塞。在协调多个线程之间的合作时，阻塞队列是一个有用的工具。工作者线程可以周期性地将中间结果存储在阻塞队列中。其它的工作者线程移出中间结果并进一步加以修改。队列会自动地平衡负载。如果第一个线程集运行的比第二个慢，第二个线程集在等待结果时会阻塞。如果第一个线程集运行的快，他将等待第二个队列集赶上来。
+
+阻塞队列的方法：
+<table border="1" cellpadding="0" cellspacing="0" style="padding:0px;margin:0px;border:1pt solid #A3A3A3;">
+<tbody>
+<tr>
+<td style="vertical-align:top;">
+<p>&nbsp;方法</p>
+</td>
+<td style="vertical-align:top;">
+<p>正常动作</p>
+</td>
+<td style="vertical-align:top;">
+<p>特殊情况下的动作</p>
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top;">
+<p>add</p>
+</td>
+<td style="vertical-align:top;">
+<p>添加一个元素</p>
+</td>
+<td style="vertical-align:top;">
+<p><span style="font-family:SimSun;">如果队列满，则抛出</span><span style="font-family:Calibri;">IllegalStateException</span><span style="font-family:SimSun;">异常</span></p>
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top;">
+<p>element</p>
+</td>
+<td style="vertical-align:top;">
+<p>返回队列的头元素</p>
+</td>
+<td style="vertical-align:top;">
+<p><span style="font-family:SimSun;">如果队列空，抛出</span><span style="font-family:Calibri;">NoSuchElementException</span><span style="font-family:SimSun;">异常</span></p>
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top;">
+<p>offer</p>
+</td>
+<td style="vertical-align:top;">
+<p><span style="font-family:SimSun;">添加一个元素并返回</span><span style="font-family:Calibri;">true</span></p>
+</td>
+<td style="vertical-align:top;">
+<p><span style="font-family:SimSun;">如果队列满，返回</span><span style="font-family:Calibri;">false</span></p>
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top;">
+<p>peek</p>
+</td>
+<td style="vertical-align:top;">
+<p>返回队列的头元素</p>
+</td>
+<td style="vertical-align:top;">
+<p><span style="font-family:SimSun;">如果队列空，则返回</span><span style="font-family:Calibri;">null</span></p>
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top;">
+<p>poll</p>
+</td>
+<td style="vertical-align:top;">
+<p>移出并返回队列的头元素</p>
+</td>
+<td style="vertical-align:top;">
+<p><span style="font-family:SimSun;">如果队列空，则返回</span><span style="font-family:Calibri;">null</span></p>
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top;">
+<p>put</p>
+</td>
+<td style="vertical-align:top;">
+<p>添加一个元素</p>
+</td>
+<td style="vertical-align:top;">
+<p>如果队列满，则阻塞</p>
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top;">
+<p>remove</p>
+</td>
+<td style="vertical-align:top;">
+<p>移出并返回头元素</p>
+</td>
+<td style="vertical-align:top;">
+<p><span style="font-family:SimSun;">如果队列空，则抛出</span><span style="font-family:Calibri;">NoSuchElementException</span><span style="font-family:SimSun;">异常</span></p>
+</td>
+</tr>
+<tr>
+<td style="vertical-align:top;">
+<p>take</p>
+</td>
+<td style="vertical-align:top;">
+<p>移出并返回头元素</p>
+</td>
+<td style="vertical-align:top;">
+<p>如果队列空，则阻塞</p>
+</td>
+</tr>
+</tbody>
+</table>
+
+如上所述，阻塞队列方法分为3类，这取决于当队列满或空时它们的响应方式。如果将队列当作线程管理工具来使用，将要用到put和take方法。当试图向满的队列中添加或从空的队列中移出元素时，add、remove和element操作抛出异常。当然，在一个多线程程序中，队列会在任何时刻满或空，因此，一定要使用offer、poll和peek方法作为替代。这些方法如果不能完成任务，只是给出一个错误提示而不会抛出异常。需要注意的一点是，poll和peek方法返回null来指示失败，因此，向这些队列中插入null值是非法的。
+
+offer和poll方法还有带有超时的方法变体。例如，下面的调用：
+
+    boolean success = q.offer(x,100,TimeUtil.MILLISECONDS);
+
+尝试在100毫秒的时间内在队列的尾部插入一个元素。如果成功返回true，否则，达到超时时，返回false。类似地，下面的调用：
+
+    Object head = q.poll(100,TimeUnit.MILLISECONDS);
+
+尝试用100毫秒的时间移出队列的头元素，如果成功返回头元素，否则，达到超时时，返回null。
+
+java.util.concurrent包提供了阻塞队列的几个变种。默认情况下，LinkedBlockingQueue的容量是没有上边界的，但是，也可以选择指定最大容量。LinkedBlockingDeque是一个双端的版本。ArrayBlockingQueue在构造时需要指定容量，并且有一个可选的参数来指定是否需要公平性。若设置了公平参数，则那么等待了最长时间的线程会优先得到处理。通常，公平性会降低性能，只有在确实非常需要时才使用它。
+
+PriorityBlockingQueue是一个带优先级的队列，而不是先进先出队列。元素按照它们的优先级顺序被移出。该队列是没有容量上限的，但是，如果队列是空的，取元素的操作会阻塞。
+
+最后，DelayQueue包含实现Delayed接口的对象：
+
+    interface Delayed extends Comparable<Delayed>{
+            long getDelay(TimeUnit unit);
+    }
+
+getDelay方法返回对象的残留延迟。负值表示延迟已经结束。元素只有在延迟用完的情况下才能从DelayQueue移除。还必须实现compareTo方法，DelayQueue使用该方法对元素进行排序。
+
+下面是一个使用阻塞队列来控制线程集的例子，在一个目录及它的所有子目录下搜索所有文件，打印出包含指定关键字的行。
+
+    public class BlockingQueueTest {
+        /**
+          * @param args
+          */
+        public static void main(String[] args) {
+            // TODO Auto-generated method stub
+            Scanner in = new Scanner(System.in);
+            System.out.print("Enter base directory(e.g. /usr/local/jdk1.6.0/src):");
+            String directory = in.nextLine();
+            System.out.print("Enter keyword (e.g. volatile):");
+            String keyword = in.nextLine();
+    
+            final int FILE_QUEUE_SIZE = 10;
+            final int SEARCH_THREADS = 100;
+            BlockingQueue<File> queue = new ArrayBlockingQueue<File>(FILE_QUEUE_SIZE);
+    
+            FileEnumerationTask enumerator = new FileEnumerationTask(queue, new File(directory));
+            new Thread(enumerator).start();
+            for (int i = 1; i <= SEARCH_THREADS; i++) {
+                new Thread(new SearchTask(queue, keyword)).start();
+            }
+        }
+    }
+    
+    public class FileEnumerationTask implements Runnable {
+        private BlockingQueue<File> queue;
+        private File startingDirectory;
+        public static File DUMMY = new File("");
+    
+        public FileEnumerationTask(BlockingQueue<File> queue, File startingDirectory){
+            this.queue = queue;
+            this.startingDirectory = startingDirectory;
+        }
+    
+        @Override
+        public void run() {
+            try {
+                enumerate(startingDirectory);
+                queue.put(DUMMY);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    
+        public void enumerate(File directory) throws InterruptedException{
+            File[] files = directory.listFiles();
+            for(File file : files){
+                if (file.isDirectory()) {
+                    enumerate(file);
+                }else {
+                    queue.put(file);
+                }
+            }
+        }
+    }
+    
+    public class SearchTask implements Runnable {
+        private BlockingQueue<File> queue;
+        private String keyword;
+    
+        public SearchTask(BlockingQueue<File> queue,String keyword){
+            this.queue = queue;
+            this.keyword = keyword;
+        }
+    
+        @Override
+        public void run() {
+            try {
+                boolean done = false;
+                while (!done) {
+                    File file = queue.take();
+                    if (file == FileEnumerationTask.DUMMY) {
+                        queue.put(file);
+                        done = true;
+                    }else {
+                        search(file);
+                    }
+                }
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (FileNotFoundException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+    
+        private void search(File file) throws FileNotFoundException {
+            // TODO Auto-generated method stub
+            Scanner in = new Scanner(new FileInputStream(file));
+            int lineNumber = 0;
+            while (in.hasNextLine()) {
+                lineNumber++;
+                String line = in.nextLine();
+                if(line.contains(keyword))
+                    System.out.printf("%s:%d:%s%n",file.getPath(),lineNumber,line);
+            }
+            in.close();
+        }
+    }
