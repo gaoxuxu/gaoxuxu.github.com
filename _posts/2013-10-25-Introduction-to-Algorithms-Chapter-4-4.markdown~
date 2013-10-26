@@ -10,10 +10,10 @@ categories:
 
 ##4.2 Strassen's algorithm for matrix multiplication
 
-假设$A(a _{ij})$和$B _{ij}$都是$n\times n$矩阵，令$C=A\cdot B$，定义$C$的项为$c _{ij}$
+假设$A(a_{ij})$和$B_{ij}$都是$n\times n$矩阵，令$C=A\cdot B$，定义$C$的项为$c_{ij}$
 
 $$
-c _{ij}=\sum _{k=1}^na _{ik}\cdot b _{kj}
+c_{ij}=\sum_{k=1}^na_{ik}\cdot b_{kj}
 $$
 
 首先，使用通用矩阵乘法算法：
@@ -23,9 +23,9 @@ $$
     2   let C be a new n × n matrix
     3   for i = 1 to n
     4       for j = 1 to n
-    5           c _i _j = 0
+    5           c_i_j = 0
     6           for k = 1 to n
-    7               c _i _j = c _i _j + a _i _k * b _k _j
+    7               c_i_j = c_i_j + a_i_k * b_k_j
     8   return C
 
 SQUARE-MATRIX-MULTIPLY的运行时间很明显是$\Theta(n^3)$
@@ -38,9 +38,9 @@ SQUARE-MATRIX-MULTIPLY的运行时间很明显是$\Theta(n^3)$
 
 $$
 \begin{equation}\
-A=\left(\begin{matrix}A _{11} & A _{12} \\A _{21} & A _{22}\end{matrix}\right),\
-B=\left(\begin{matrix}B _{11} & B _{12} \\B _{21} & B _{22}\end{matrix}\right),\
-C=\left(\begin{matrix}C _{11} & C _{12} \\C _{21} & C _{22}\end{matrix}\right). \label{}(4.9)\
+A=\left(\begin{matrix}A_{11} & A_{12} \\A_{21} & A_{22}\end{matrix}\right),\
+B=\left(\begin{matrix}B_{11} & B_{12} \\B_{21} & B_{22}\end{matrix}\right),\
+C=\left(\begin{matrix}C_{11} & C_{12} \\C_{21} & C_{22}\end{matrix}\right). \label{}(4.9)\
 \end{equation}
 $$
 
@@ -48,7 +48,7 @@ $$
 
 $$
 \begin{equation}\
-\left(\begin{matrix}C _{11} & C _{12} \\C _{21} & C _{22}\end{matrix}\right)=\left(\begin{matrix}A _{11} & A _{12} \\A _{21} & A _{22}\end{matrix}\right)\cdot \left(\begin{matrix}B _{11} & B _{12} \\B _{21} & B _{22}\end{matrix}\right)\
+\left(\begin{matrix}C_{11} & C_{12} \\C_{21} & C_{22}\end{matrix}\right)=\left(\begin{matrix}A_{11} & A_{12} \\A_{21} & A_{22}\end{matrix}\right)\cdot \left(\begin{matrix}B_{11} & B_{12} \\B_{21} & B_{22}\end{matrix}\right)\
 \end{equation}
 $$
 
@@ -56,10 +56,10 @@ $$
 
 $$
 \begin{equation}\begin{split}\
-C _{11}\quad&=\quad A _{11}\cdot B _{11}+A _{12}\cdot B _{21}\\
-C _{12}\quad&=\quad A _{11}\cdot B _{12}+A _{12}\cdot B _{22}\\
-C _{21}\quad&=\quad A _{21}\cdot B _{11}+A _{22}\cdot B _{21}\\
-C _{12}\quad&=\quad A _{21}\cdot B _{12}+A _{22}\cdot B _{22}\
+C_{11}\quad&=\quad A_{11}\cdot B_{11}+A_{12}\cdot B_{21}\\
+C_{12}\quad&=\quad A_{11}\cdot B_{12}+A_{12}\cdot B_{22}\\
+C_{21}\quad&=\quad A_{21}\cdot B_{11}+A_{22}\cdot B_{21}\\
+C_{12}\quad&=\quad A_{21}\cdot B_{12}+A_{22}\cdot B_{22}\
 \end{split}\end{equation}
 $$
 
@@ -97,9 +97,9 @@ $$
 Strassen的方法不太明显，有四步：
 
 1. 将矩阵$A,B,C$分解成$n/2\times n/2$的子矩阵。使用角标换算的话，这一步的消耗是$\Theta(1)$。
-2. 创建10个$n/2\times n/2$矩阵$S _1,S _2,\dots,S _{10}$，其中的每一个都是第一步中两个矩阵的和或者差。创建这10个矩阵的花费是$\Theta(n^2)$。
-3. 使用第一步和第二步中创建的子矩阵，递归计算出7个矩阵$P _1,P _2,\dots,P _7$。每一个矩阵$P _i$都是$n/2\times n/2$的。
-4. 通过加减不同的$P _i$矩阵组合，计算出需要的矩阵$C$的子矩阵$C _{11},C _{12},C _{21},C _{22}$，这一步计算的花费也是$\Theta(n^2)$
+2. 创建10个$n/2\times n/2$矩阵$S_1,S_2,\dots,S_{10}$，其中的每一个都是第一步中两个矩阵的和或者差。创建这10个矩阵的花费是$\Theta(n^2)$。
+3. 使用第一步和第二步中创建的子矩阵，递归计算出7个矩阵$P_1,P_2,\dots,P_7$。每一个矩阵$P_i$都是$n/2\times n/2$的。
+4. 通过加减不同的$P_i$矩阵组合，计算出需要的矩阵$C$的子矩阵$C_{11},C_{12},C_{21},C_{22}$，这一步计算的花费也是$\Theta(n^2)$
 
 因此，Strassen算法的运行时间是
 
@@ -114,16 +114,16 @@ $$
 
 $$
 \begin{equation}\begin{split}\
-&S _1\quad&=\quad B _{12}\ -\ B _{22}\ ,\\
-&S _2\quad&=\quad A _{11}\ +\ A _{12}\ ,\\
-&S _3\quad&=\quad A _{21}\ +\ A _{22}\ ,\\
-&S _4\quad&=\quad B _{21}\ -\ B _{11}\ ,\\
-&S _5\quad&=\quad A _{11}\ +\ A _{22}\ ,\\
-&S _6\quad&=\quad B _{11}\ +\ B _{22}\ ,\\
-&S _7\quad&=\quad A _{12}\ -\ A _{22}\ ,\\
-&S _8\quad&=\quad B _{21}\ +\ B _{22}\ ,\\
-&S _9\quad&=\quad A _{11}\ -\ A _{21}\ ,\\
-&S _{10}\quad&=\quad B _{11}\ +\ B _{12}\ .\\\
+&S_1\quad&=\quad B_{12}\ -\ B_{22}\ ,\\
+&S_2\quad&=\quad A_{11}\ +\ A_{12}\ ,\\
+&S_3\quad&=\quad A_{21}\ +\ A_{22}\ ,\\
+&S_4\quad&=\quad B_{21}\ -\ B_{11}\ ,\\
+&S_5\quad&=\quad A_{11}\ +\ A_{22}\ ,\\
+&S_6\quad&=\quad B_{11}\ +\ B_{22}\ ,\\
+&S_7\quad&=\quad A_{12}\ -\ A_{22}\ ,\\
+&S_8\quad&=\quad B_{21}\ +\ B_{22}\ ,\\
+&S_9\quad&=\quad A_{11}\ -\ A_{21}\ ,\\
+&S_{10}\quad&=\quad B_{11}\ +\ B_{12}\ .\\\
 \end{split}\end{equation}
 $$
 
@@ -131,13 +131,13 @@ $$
 
 $$
 \begin{equation}\begin{split}\
-P _1\quad&=\quad A _{11}\ \cdot\ S _1\ ,\\
-P _2\quad&=\quad S _2\ \cdot\ B _{22}\ ,\\
-P _3\quad&=\quad S _3\ \cdot\ B _{11}\ ,\\
-P _4\quad&=\quad A _{22}\ \cdot\ S _4\ ,\\
-P _5\quad&=\quad S _5\ \cdot\ S _6\ ,\\
-P _6\quad&=\quad S _7\ \cdot\ S _8\ ,\\
-P _7\quad&=\quad S _9\ \cdot\ S _{10}\ .\\\
+P_1\quad&=\quad A_{11}\ \cdot\ S_1\ ,\\
+P_2\quad&=\quad S_2\ \cdot\ B_{22}\ ,\\
+P_3\quad&=\quad S_3\ \cdot\ B_{11}\ ,\\
+P_4\quad&=\quad A_{22}\ \cdot\ S_4\ ,\\
+P_5\quad&=\quad S_5\ \cdot\ S_6\ ,\\
+P_6\quad&=\quad S_7\ \cdot\ S_8\ ,\\
+P_7\quad&=\quad S_9\ \cdot\ S_{10}\ .\\\
 \end{split}\end{equation}
 $$
 
@@ -145,10 +145,10 @@ $$
 
 $$
 \begin{equation}\begin{split}\
-C _{11} &= P _5+P _4-P _2+P _6,\\
-C _{12} &= P _1 + P _2,\\
-C _{21} &= P _3+P _4,\\
-C _{22} &= P _5+P _1-P _3-P _7\
+C_{11} &= P_5+P_4-P_2+P_6,\\
+C_{12} &= P_1 + P_2,\\
+C_{21} &= P_3+P_4,\\
+C_{22} &= P_5+P_1-P_3-P_7\
 \end{split}\end{equation}
 $$
 
@@ -321,17 +321,17 @@ How would you modify Strassen's algorithm to multiply $n\times n$ matrices in wh
 
 What is the largest $k$ such that if you can multiply 3$\times$3 matrices using $k$ multiplications (not assuming commutativity of multiplication), then you can multiply $n\times n$ matrices in time $o(n^{\lg 7})$? What would the running time of this algorithm be?
 
-运行时间为$T(n)=kT(n/3)+\Theta(n^2)$，由题意以及主定理，要$T(n)=\Theta(n^{\log _3k})\le\Theta(n^{\lg 7})$，有$\log _3k\le\lg 7$，$k\le 3^{\lg 7}\approx 21.84$，即$k=21$
+运行时间为$T(n)=kT(n/3)+\Theta(n^2)$，由题意以及主定理，要$T(n)=\Theta(n^{\log_3k})\le\Theta(n^{\lg 7})$，有$\log_3k\le\lg 7$，$k\le 3^{\lg 7}\approx 21.84$，即$k=21$
 
 ###4.2-5
 
 V. Pan has discovered a way of multiplying 68$\times$68 matrices using 132,464 multiplications, a way of multiplying 70$\times$70 matrices using 143,640 multiplications, and a way of multiplying 72$\times$72 matrices using 155,424 multiplications. Which method yields the best asymptotic running time when used in a divide-and-conquer matrix-multiplication algorithm? How does it compare to Strassen’s algorithm?
 
-针对$68\times68$矩阵的情况，运行时间为$T(n)=132646T(n/68)+\Theta(n^2)=\Theta(n^{\log _{68}132646})\approx n^{2.7954538844}$
+针对$68\times68$矩阵的情况，运行时间为$T(n)=132646T(n/68)+\Theta(n^2)=\Theta(n^{\log_{68}132646})\approx n^{2.7954538844}$
 
-针对$70\times70$矩阵的情况，运行时间为$T(n)=143640T(n/70)+\Theta(n^2)=\Theta(n^{\log _{70}143640})\approx n^{2.7951226897}$
+针对$70\times70$矩阵的情况，运行时间为$T(n)=143640T(n/70)+\Theta(n^2)=\Theta(n^{\log_{70}143640})\approx n^{2.7951226897}$
 
-针对$72\times72$矩阵的情况，运行时间为$T(n)=155424T(n/72)+\Theta(n^2)=\Theta(n^{\log _{72}155424})\approx n^{2.7951473911}$
+针对$72\times72$矩阵的情况，运行时间为$T(n)=155424T(n/72)+\Theta(n^2)=\Theta(n^{\log_{72}155424})\approx n^{2.7951473911}$
 
 毫无疑问，这三种途径都比Strassen的算法更快（$n^{\lg 7}\approx n^{2.8073549221}$）
 
