@@ -14,7 +14,7 @@ categories:
 `Collections`类的方法主要有以下几个分类：
 
 *   算法类操作。
-*   不可修改包装器（这部分的API有问题，下一篇写`Google Guava Collections`）。
+*   不可修改包装器（这部分的API有问题，可以参考[Google Guava Collections](https://code.google.com/p/guava-libraries/)）。
 *   同步包装器。
 *   动态类型安全包装器。
 *   空集合。
