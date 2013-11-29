@@ -37,7 +37,7 @@ categories:
 
 ##Java中的HashMap
 
-* `HashMap`处理碰撞使用的是链表法，参考`HashMap$Entry`类。
+* `HashMap`处理碰撞使用的是链表法。
 * `HashMap`类中的许多代码设计得很巧妙。
 
 > Written with [StackEdit](https://stackedit.io/).
