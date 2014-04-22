@@ -1,7 +1,7 @@
 ---
 author: gavin
 comments: true
-date: 2014-03-17 22:43:25
+date: 2014-04-20 22:43:25
 layout: post
 title: Google Android PRNG Entropy Weakness
 categories:
