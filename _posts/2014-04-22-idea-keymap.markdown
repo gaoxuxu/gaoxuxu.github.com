@@ -10,6 +10,7 @@ categories:
 ---
 
 ##Editing
+
 **Ctrl + Space**：Basic code completion (the name of any class,method or variable)  
 **Ctrl + Shift + Space**：Smart code completion (filters the list of methods and variables by expected type)  
 **Ctrl + Shift + Enter**：Complete statement  
@@ -49,7 +50,9 @@ categories:
 **Ctrl + Shift + NumPad+**：Expand all  
 **Ctrl + Shift + NumPad-**：Collapse all  
 **Ctrl + F4**：Close active editor tab  
+
 ##Search/Replace
+
 **Double Shift**：Search everywhere  
 **Ctrl + F**：Find  
 **F3**：Find next  
@@ -59,11 +62,15 @@ categories:
 **Ctrl + Shift + R**：Replace in path  
 **Ctrl + Shift + S**：Search structurally (Ultimate Edition only)  
 **Ctrl + Shift + M**：Replace structurally (Ultimate Edition only)  
+
 ##Usage Search
+
 **Alt + F7 / Ctrl + F7**：Find usages / Find usages in file  
 **Ctrl + Shift + F7**：Highlight usages in file  
 **Ctrl + Alt + F7**：Show usages  
+
 ##Compile and Run
+
 **Ctrl + F9**：Make project (compile modifed and dependent)  
 **Ctrl + Shift + F9**：Compile selected file, package or module  
 **Alt + Shift + F10**：Select configuration and run  
@@ -71,7 +78,9 @@ categories:
 **Shift + F10**：Run  
 **Shift + F9**：Debug  
 **Ctrl + Shift + F10**：Run context configuration from editor  
+
 ##Debugging
+
 **F8**：Step over  
 **F7**：Step into  
 **Shift + F7**：Smart step into  
@@ -81,7 +90,9 @@ categories:
 **F9**：Resume program  
 **Ctrl + F8**：Toggle breakpoint  
 **Ctrl + Shift + F8**：View breakpoints  
+
 ##Navigation
+
 **Ctrl + N**：Go to class  
 **Ctrl + Shift + N**：Go to file  
 **Ctrl + Alt + Shift + N**：Go to symbol  
@@ -113,7 +124,9 @@ categories:
 **Ctrl + F11**：Toggle bookmark with mnemonic  
 **Ctrl + #[0-9]**：Go to numbered bookmark  
 **Shift + F11**：Show bookmarks  
+
 ##Refactoring
+
 **F5**：Copy  
 **F6**：Move  
 **Alt + Delete**：Safe Delete  
@@ -125,12 +138,16 @@ categories:
 **Ctrl + Alt + F**：Extract Field  
 **Ctrl + Alt + C**：Extract Constant  
 **Ctrl + Alt + P**：Extract Parameter  
+
 ##VCS/Local History
+
 **Ctrl + K**：Commit project to VCS  
 **Ctrl + T**：Update project from VCS  
 **Alt + Shift + C**：View recent changes  
 **Alt + BackQuote (`)**：‘VCS’ quick popup  
+
 ##Live Templates
+
 **Ctrl + Alt + J**：Surround with Live Template  
 **Ctrl + J**：Insert Live Template  
 ***iter***：Iteration according to Java SDK 1.5 style  
@@ -140,7 +157,9 @@ categories:
 ***itli***：Iterate elements of java.util.List  
 ***psf***：public static final  
 ***thr***：throw new  
+
 ##General
+
 **Alt + #[0-9]**：Open corresponding tool window  
 **Ctrl + S**：Save all  
 **Ctrl + Alt + Y**：Synchronize  
