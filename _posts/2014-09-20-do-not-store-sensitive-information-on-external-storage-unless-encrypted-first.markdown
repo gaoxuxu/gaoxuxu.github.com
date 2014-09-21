@@ -3,7 +3,7 @@ author: gavin
 comments: true
 date: 2014-09-20 14:11:30
 layout: post
-title: Android代码红线——不要将敏感信息明文保存在外部存储设备（SD卡）上
+title: Android代码红线:不要将敏感信息明文保存在外部存储设备（SD卡）上
 categories:
 - Java
 - Android
