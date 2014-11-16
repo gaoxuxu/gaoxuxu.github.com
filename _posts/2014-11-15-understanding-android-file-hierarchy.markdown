@@ -66,4 +66,4 @@ Android使用的是Linux内核，所有文件和目录都被称之为虚拟文�
 * ***ueventd.goldfish.rc ueventd.rc***：这些文件定义了`/dev`目录的配置规则。
 * ***vendor***：`/system/vendor`的一个符号链接。
 
-上面只是Android文件结构的一个简单描述。要理解桌面之下Android的工作，你需要Linux的基本知识，和Linux命令行。对内核参数，你需要知道Linux内核的工作知识。在以后的文章中我将详细探讨Android文件层次。
+上面只是Android文件结构的一个简单描述。要理解桌面之下Android的工作，你需要了解Linux的基本知识和Linux命令行。对于内核参数，你需要知道Linux内核的工作知识。在以后的文章中我将详细探讨Android文件层次。
