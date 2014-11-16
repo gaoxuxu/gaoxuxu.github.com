@@ -12,7 +12,7 @@ categories:
 
 转载自：[http://agiledon.github.io/blog/2013/04/17/thoughtworks-developer-reading-radar/](http://agiledon.github.io/blog/2013/04/17/thoughtworks-developer-reading-radar/) 
 
-![](http://droider-wordpress.stor.sinaapp.com/reading-radar.jpg) 
+![](http://agiledon.github.io/images/2013/04/reading-radar.jpg) 
 
 软件业的特点是变化。若要提高软件开发的技能，就必须跟上技术发展的步伐。埋首醉心于项目开发与实战，固然能够锤炼自己的开发技巧，却难免受限于经验与学识。世界上并不存在速成的终南捷径，但阅读好的技术书籍，尤其是阅读大师们的经典著作，总能收到事半功倍之效。一位优秀的程序员，或许就是一名好的阅读者。好的阅读者，总是知道如何选择好的书籍。书海浩繁，良莠不齐。阅读技术好书，如与智者交谈，“与君一席话胜读十年书”；遭遇技术烂书，如被拐卖，“少小离家老大回，乡音无改鬓毛衰”。
 
