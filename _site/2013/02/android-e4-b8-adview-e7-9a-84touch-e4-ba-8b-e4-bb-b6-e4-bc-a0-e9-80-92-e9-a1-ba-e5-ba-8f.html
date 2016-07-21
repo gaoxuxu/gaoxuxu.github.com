@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html class="t-blue">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Android中view的Touch事件传递顺序</title>
+  <meta name="description" content="先看一下ViewGroup的dispatchTouchEvent的关键源码：public boolean dispatchTouchEvent(MotionEvent ev) {    ...    if (action == MotionEvent.ACTION_DOWN) {	...       	if (d...">
+
+  <link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic,700|Roboto+Mono:400,500' rel='stylesheet' type='text/css'>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="/material-jekyll-theme/css/main.css">
+  <link rel="canonical" href="http://gaoxuxu.github.io/material-jekyll-theme/2013/02/android-e4-b8-adview-e7-9a-84touch-e4-ba-8b-e4-bb-b6-e4-bc-a0-e9-80-92-e9-a1-ba-e5-ba-8f">
+  <link rel="alternate" type="application/rss+xml" title="Gao Xu" href="http://gaoxuxu.github.io/material-jekyll-theme/feed.xml">
+</head>
+
+  <body>
+    <nav class="c-navigation is-fixed">
+  <div class="c-navigation__container u-container">
+    <a class="c-navigation__item " href="/material-jekyll-theme/">Home</a>
+    <a class="c-navigation__item " href="/material-jekyll-theme/articles/">Articles</a>
+    <a class="c-navigation__item " href="/material-jekyll-theme/about/">About</a>
+  </div>
+</nav>
+
+
+    <article class="c-article">
+  <header class="c-header c-article__header">
+    <div class="u-container">
+      <h1 class="c-header__title">Android中view的Touch事件传递顺序</h1>
+    </div>
+  </header>
+
+  <div class="c-article__main">
+    <p>先看一下ViewGroup的dispatchTouchEvent的关键源码：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>public boolean dispatchTouchEvent(MotionEvent ev) {
+    ...
+    if (action == MotionEvent.ACTION_DOWN) {
+	...
+       	if (disallowIntercept || !onInterceptTouchEvent(ev)) {
+            final View[] children = mChildren;
+            final int count = mChildrenCount;
+            for (int i = count - 1; i &gt;= 0; i--) {
+                final View child = children[i];
+                if ((child.mViewFlags &amp; VISIBILITY_MASK) == VISIBLE
+                        || child.getAnimation() != null) {
+                    ...
+                    if (child.dispatchTouchEvent(ev))  {
+                        // Event handled, we have a target now.
+                        mMotionTarget = child;
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+    ...
+    final View target = mMotionTarget;
+    if (target == null) {
+        ...
+        return super.dispatchTouchEvent(ev);
+    }
+    if (!disallowIntercept &amp;&amp; onInterceptTouchEvent(ev)) {
+        ...
+        if (!target.dispatchTouchEvent(ev)) {
+            // target didn't handle ACTION_CANCEL. not much we can do
+            // but they should have.
+        }
+        // clear the target
+        mMotionTarget = null;
+        // Don't dispatch this event to our own view, because we already
+        // saw it when intercepting; we just want to give the following
+        // event to the normal onTouchEvent().
+        return true;
+    }
+    ...
+    return target.dispatchTouchEvent(ev);
+}
+</code></pre>
+</div>
+
+<p>根据以上代码可知，如果onInterceptTouchEvent方法返回true，会直接调用当前ViewGroup的onTouch方法，否则则会依次调用其内包含的子控件的dispatchTouchEvent方法。我写了一个测试用例，ViewGroup的onInterceptTouchEvent方法与所有View的onTouch方法都打了Log：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="cp">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span>
+<span class="nt">&lt;org.gavin.test.view.MyScrollView</span> <span class="na">xmlns:android=</span><span class="s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="na">android:layout_width=</span><span class="s">"fill_parent"</span>
+    <span class="na">android:layout_height=</span><span class="s">"fill_parent"</span> <span class="nt">&gt;</span>
+
+    <span class="nt">&lt;org.gavin.test.view.MyLinearLayout</span>
+        <span class="na">android:layout_width=</span><span class="s">"fill_parent"</span>
+	<span class="na">android:layout_height=</span><span class="s">"fill_parent"</span>
+	<span class="na">android:orientation=</span><span class="s">"vertical"</span><span class="nt">&gt;</span>
+	<span class="nt">&lt;org.gavin.test.view.MyImageView</span>
+	    <span class="na">android:layout_width=</span><span class="s">"wrap_content"</span>
+	    <span class="na">android:layout_height=</span><span class="s">"wrap_content"</span>
+	    <span class="na">android:src=</span><span class="s">"@drawable/ic_launcher"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;/org.gavin.test.view.MyImageView&gt;</span>
+    <span class="nt">&lt;/org.gavin.test.view.MyLinearLayout&gt;</span>
+
+<span class="nt">&lt;/org.gavin.test.view.MyScrollView&gt;</span>
+</code></pre>
+</div>
+
+<p>Log信息：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>I/MyScrollView(26001): onInterceptTouchEvent:MotionEvent{...}  
+I/MyLinearLayout(26001): onInterceptTouchEvent:MotionEvent{...}  
+I/MyImageView(26001): onTouchEvent:MotionEvent{...}  
+I/MyLinearLayout(26001): onTouchEvent:MotionEvent{...}  
+I/MyScrollView(26001): onTouchEvent:MotionEvent{...}
+</code></pre>
+</div>
+
+<p>如果MyLinearLayout的onInterceptTouchEvent方法返回true：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>11-04 14:05:08.389: I/MyScrollView(26297): onInterceptTouchEvent:MotionEvent{...}  
+11-04 14:05:08.389: I/MyLinearLayout(26297): onInterceptTouchEvent:MotionEvent{...}  
+11-04 14:05:08.397: I/MyLinearLayout(26297): onTouchEvent:MotionEvent{...}  
+11-04 14:05:08.397: I/MyScrollView(26297): onTouchEvent:MotionEvent{...}
+</code></pre>
+</div>
+
+<p>OK，再看这段代码：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>if (child.dispatchTouchEvent(ev))  {
+    // Event handled, we have a target now.
+    mMotionTarget = child;
+    return true;
+}
+</code></pre>
+</div>
+
+<p>从这段代码可以看出，如果某个子控件的dispatchTouchEvent方法返回true，则中断以后的消息传递。并在下一个非ACTION_DOWN事件直接调用此子控件的dispatchTouchEvent方法。一个View的dispatchTouchEvent返回true，主要可能是onTouch方法返回true。如果我们把MyImageView的onTouchEvent返回值改为true：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>I/MyScrollView(26393): onInterceptTouchEvent:MotionEvent{...}  
+I/MyLinearLayout(26393): onInterceptTouchEvent:MotionEvent{...}  
+I/MyImageView(26393): onTouchEvent:MotionEvent{...}
+</code></pre>
+</div>
+
+
+  </div>
+</article>
+
+
+    <footer class="c-footer">
+  <div class="u-container c-footer__container">
+    <p>&copy; Gao Xu 2016</p>
+    <p>
+      <a href="https://twitter.com/gavin_china">Twitter</a>
+      <a href="https://github.com/gaoxuxu">Github</a>
+      
+      
+    </p>
+  </div>
+</footer>
+
+  </body>
+</html>

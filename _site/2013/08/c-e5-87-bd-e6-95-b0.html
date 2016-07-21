@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html class="t-blue">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>C++函数</title>
+  <meta name="description" content="函数">
+
+  <link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic,700|Roboto+Mono:400,500' rel='stylesheet' type='text/css'>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="/material-jekyll-theme/css/main.css">
+  <link rel="canonical" href="http://gaoxuxu.github.io/material-jekyll-theme/2013/08/c-e5-87-bd-e6-95-b0">
+  <link rel="alternate" type="application/rss+xml" title="Gao Xu" href="http://gaoxuxu.github.io/material-jekyll-theme/feed.xml">
+</head>
+
+  <body>
+    <nav class="c-navigation is-fixed">
+  <div class="c-navigation__container u-container">
+    <a class="c-navigation__item " href="/material-jekyll-theme/">Home</a>
+    <a class="c-navigation__item " href="/material-jekyll-theme/articles/">Articles</a>
+    <a class="c-navigation__item " href="/material-jekyll-theme/about/">About</a>
+  </div>
+</nav>
+
+
+    <article class="c-article">
+  <header class="c-header c-article__header">
+    <div class="u-container">
+      <h1 class="c-header__title">C++函数</h1>
+    </div>
+  </header>
+
+  <div class="c-article__main">
+    <h2 id="section">函数</h2>
+
+<p>通常，函数通过将返回值复制到制定的CPU寄存器或内存单元中来将其返回。随后，调用程序查看该程序单元。返回函数和调用函数必须就该内存单元中存储的数据的类型达成一致。函数原型将返回值类型告诉调用程序，而函数定义命令被调用函数应该返回什么类型的数据。在原型中提供与定义中相同的信息似乎有些多余，但这样也是有道理的。</p>
+
+<h3 id="section-1">函数原型</h3>
+
+<p>原型描述了函数到编译器的接口，也就是说，它将函数返回值的类型（如果有的话）以及参数的类型和数量告诉编译器。考虑下面的函数调用：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>double volume = cube (side);
+</code></pre>
+</div>
+
+<p>首先，原型告诉编译器，<code class="highlighter-rouge">cube()</code>有一个<code class="highlighter-rouge">double</code>参数。如果程序没有提供这样的参数，原型将让编译器能够捕获这种错误。其次<code class="highlighter-rouge">cube()</code>函数完成计算后，将把返回值放置在指定位置——可能是CPU寄存器，也可能是在内存中。然后调用函数将从这个位置取得返回值。由于原型指出了<code class="highlighter-rouge">cube()</code>的类型为<code class="highlighter-rouge">double</code>，因此编译器知道应检索多少个字节以及如何解释它们。如果没有这些信息，编译器将只能进行猜测，而编译器是不会这样做的。</p>
+
+<p><strong>编译器需要原型的原因：</strong>原因之一是在文件中查找效率不高，另一个原因是函数可能根本就不在文件中。因为C++允许将一个程序放在不同的文件中，单独编译这些文件，然后再将它们组合起来。可以避免使用函数原型，就是在首次使用函数之前定义它，但这并不总是可行的。</p>
+
+<h4 id="section-2">函数原型句法</h4>
+
+<p>函数原型是一条语句，因此必须以分号结束。获得原型最简单的办法是，复制函数定义中的函数头，并添加分号。不过，函数原型不要求提供变量名，有类型列表就足够了。原型中的变量名相当于占位符，因此不必与函数定义中的变量名相同：</p>
+
+<p><code class="highlighter-rouge">return_type function_name(paramter_type_list);</code></p>
+
+<p><strong>注意</strong>：ANSI C借鉴了C++中的原型，但两者还是有区别的：最重要的区别是，为与基本C兼容，ANSI C中的原型时可选的，但在C++中，原型是必不可少的。另外，在C++中，括号为空与在括号中使用关键字<code class="highlighter-rouge">void</code>是等效的，都意味着函数没有参数。在ANSI C中，括号为空意味着不指出参数——这意味着将在后面定义参数列表。在C++中，不指定参数列表时应使用省略号。</p>
+
+<h4 id="section-3">函数原型的功能</h4>
+
+<p>具体来说，原型确保以下几点：</p>
+
+<ul>
+  <li>编译器正确处理函数返回值。</li>
+  <li>编译器检查使用的参数数目是否正确。</li>
+  <li>编译器检查使用的参数类型是否正确。如果不正确，则转换为正确的类型（如果可能的话）。</li>
+</ul>
+
+<h3 id="section-4">函数参数和按值传递</h3>
+
+<p>C++通常按值传递参数，这意味着将数值参数传递给函数，而后者将其赋给一个新的变量。用于接收值的变量被称为形参，传递给函数的值被称为实参。出于简化的目的，C++标准使用参数（argument）来表示实参，使用参量（parameter）来表示形参，因此参数传递将参量赋给参数。</p>
+
+<p>在函数中声明的变量（包括参数）是该函数私有的。在函数被调用时，计算机将为这些变量分配内存；在函数结束时，计算机将释放这些变量使用的内存。这样的变量被称为局部变量，因为它们被限制在函数中。这样做有助于确保数据的完整性。这样的变量也被称为自动变量，因为它们是在程序执行过程中自动被分配和释放的。</p>
+
+<p>函数传递常规变量时，函数将使用该变量的拷贝；但传递数组时，函数将使用原来的数组。这并不违反C++按值传递的方法，此时函数仍传递了一个值，这个值被赋给一个新的变量，但这个值是一个地址，而不是数组的内容。将数组地址作为参数可以节省复制整个数组所需的时间和内存。如果数组很大，则使用拷贝的系统开销将非常大；程序不仅需要更多的计算机内存，还需要花费时间来复制大块的数据。另一方面，使用原始数据增加了破坏数据的风险。不过，ANSI C和C++中的<code class="highlighter-rouge">const</code>限定符提供了解决这种问题的办法。</p>
+
+<h4 id="section-5">函数和数组</h4>
+
+<p>对于处理数组的C++函数，必须将数组中的数据种类、数组的起始位置和数组中元素数量提交给它：传统的C/C++方法是，将指向数组起始处的指针作为一个参数，将数组长度作为第二个参数，这样便给函数提供了找到所有数据所需的信息。还有另一种给函数提供所需信息的方法，即指定元素区间（range），这可以通过传递两个指针来完成：一个指针标识数组的开头，另一个指针标识数组的尾部。</p>
+
+<h3 id="section-6">函数重载</h3>
+
+<p>在C++中，语义、功能相似的几个函数可以使用同一个名字，即函数重载。</p>
+
+<p>函数重载的原理是，编译器通过检查传入的参数的类型和个数来确定哪一个函数被调用。需要注意的是，函数的返回值类型不能作为函数重载的标识。</p>
+
+<h3 id="section-7">参数默认值</h3>
+
+<p>C++中，可以为参数指定默认值。在函数调用时如果没有指定与形参相对应的实参，就会自动使用默认参数。</p>
+
+<ul>
+  <li>默认参数在函数声明和函数定义中只能出现一次。而且只有在没有函数声明时，才可以在函数定义中设定。</li>
+  <li>如果一个参数设置了默认值，其右边的参数都要有默认值。</li>
+  <li>默认值可以是全局变量、全局常量，甚至是一个函数。但不可以是局部变量，因为默认参数的调用是在编译时确定的，而局部变量位置与默认值在编译时无法确定。</li>
+</ul>
+
+<p><strong>注意：函数重载与函数默认值同时使用时，会产生二义性问题。</strong></p>
+
+<h3 id="section-8">内联函数</h3>
+
+<p><code class="highlighter-rouge">inline</code>指令可以被放在函数声明之前，要求该函数必须在被调用的地方以代码形式被编译。这相当与一个宏（macro）定义。它的好处只对短小的函数有效，这种情况下因为避免了调用函数的一些常规操作的时间，如参数堆栈操作的时间，所以编译后的运行代码会更快一点。</p>
+
+
+  </div>
+</article>
+
+
+    <footer class="c-footer">
+  <div class="u-container c-footer__container">
+    <p>&copy; Gao Xu 2016</p>
+    <p>
+      <a href="https://twitter.com/gavin_china">Twitter</a>
+      <a href="https://github.com/gaoxuxu">Github</a>
+      
+      
+    </p>
+  </div>
+</footer>
+
+  </body>
+</html>

@@ -1,0 +1,1913 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Gao Xu</title>
+    <description>Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search results) and in your feed.xml site description.
+</description>
+    <link>http://gaoxuxu.github.io/material-jekyll-theme/</link>
+    <atom:link href="http://gaoxuxu.github.io/material-jekyll-theme/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Thu, 21 Jul 2016 22:58:45 +0800</pubDate>
+    <lastBuildDate>Thu, 21 Jul 2016 22:58:45 +0800</lastBuildDate>
+    <generator>Jekyll v3.1.6</generator>
+    
+      <item>
+        <title>Javapoet</title>
+        <description>&lt;p&gt;JavaPoet学习&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;JavaPoet&lt;/code&gt; is a Java API for generating &lt;code class=&quot;highlighter-rouge&quot;&gt;.java&lt;/code&gt; source files.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;###Hello world&lt;/p&gt;
+
+&lt;p&gt;如果我们要生成下面这个类文件：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;package com.example.helloworld;
+
+public final class HelloWorld {
+	public static void main(String[] args) {
+		System.out.println(&quot;Hello, JavaPoet!&quot;);
+	}
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;所需要的代码如下：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;MethodSpec main = MethodSpec.methodBuilder(&quot;main&quot;)
+	.addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+	.returns(void.class)
+	.addParameter(String[].class, &quot;args&quot;)
+	.addStatement(&quot;$T.out.println($S)&quot;, System.class, &quot;Hello, JavaPoet!&quot;)
+	.build();
+
+TypeSpec helloWorld = TypeSpec.classBuilder(&quot;HelloWorld&quot;)
+	.addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+	.addMethod(main)
+	.build;
+
+JavaFile javaFile = JavaFile.builder(&quot;com.example.helloworld&quot;, helloworld)
+	.build();
+
+javaFile.writeTo(System.out);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;###代码以及控制流&lt;/p&gt;
+
+&lt;p&gt;太赞了，上面代码很容易理解，&lt;code class=&quot;highlighter-rouge&quot;&gt;$T&lt;/code&gt;和&lt;code class=&quot;highlighter-rouge&quot;&gt;$S&lt;/code&gt;后面再说。下面是JavaPoet提供的一些模型：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;类（class）和接口（interface）：&lt;code class=&quot;highlighter-rouge&quot;&gt;TypeSpec&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;字段（field）：&lt;code class=&quot;highlighter-rouge&quot;&gt;FieldSpec&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;方法（method）和构造方法（constructor）：&lt;code class=&quot;highlighter-rouge&quot;&gt;MethodSpec&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;参数（parameter）：&lt;code class=&quot;highlighter-rouge&quot;&gt;ParameterSpec&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;注解（annotation）：&lt;code class=&quot;highlighter-rouge&quot;&gt;AnnotationSpec&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;有个问题，方法体的model没有办法提供，这是因为我们没有表达式类、没有语句类或者语法树节点。所以，在JavaPoet中，我们使用字符串来实现代码块：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;MethodSpec main = MethodSpec.methodBuilder(&quot;main&quot;)
+	.addCode(&quot;&quot;
+		+ &quot;int total = 0;\n&quot;
+		+ &quot;for (int i = 0; i &amp;lt; 10; i++) {\n&quot;
+		+ &quot;  total += i;\n&quot;
+		+ &quot;}\n&quot;)
+	.build();
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;生成的代码如下：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;void main() {
+	int total = 0;
+	for (int i = 0; i &amp;lt; 10; i++) {
+		total += i;
+	}
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;问题来了，手写分号、折行以及缩进等都非常无聊，所以JavaPoet还提供了一些简单的API来让这些工作轻松一些：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;addStatement()&lt;/code&gt;会自动处理分号和换行&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;beginControlFlow()&lt;/code&gt;和&lt;code class=&quot;highlighter-rouge&quot;&gt;endControlFlow()&lt;/code&gt;会自动处理大括号、换行和缩进&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;代码如下&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;MethodSpec main = MethodSpec.methodBuilder(&quot;main&quot;)
+	.addStatement(&quot;int total = 0&quot;)
+	.beginControlFlow(&quot;for (int i = 0; i &amp;lt; 10; i++)&quot;)
+	.addStatement(&quot;total += i&quot;)
+	.endControlFlow()
+	.build();
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;###占位符&lt;/p&gt;
+
+&lt;p&gt;包括第一段代码中出现的&lt;code class=&quot;highlighter-rouge&quot;&gt;$T&lt;/code&gt;和&lt;code class=&quot;highlighter-rouge&quot;&gt;$S&lt;/code&gt;两个占位符，JavaPoet中的占位符具体的用处如下：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;$L&lt;/code&gt;表示输出的字面量的值，类似于&lt;code class=&quot;highlighter-rouge&quot;&gt;Formatter&lt;/code&gt;的&lt;code class=&quot;highlighter-rouge&quot;&gt;%s&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;$S&lt;/code&gt;与&lt;code class=&quot;highlighter-rouge&quot;&gt;$L&lt;/code&gt;类似，但是用于字符串&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;$T&lt;/code&gt;用于类型&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;$N&lt;/code&gt;用来表示名字&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;###Import static&lt;/p&gt;
+
+</description>
+        <pubDate>Sun, 10 Apr 2016 00:00:00 +0800</pubDate>
+        <link>http://gaoxuxu.github.io/material-jekyll-theme/2016/04/javapoet</link>
+        <guid isPermaLink="true">http://gaoxuxu.github.io/material-jekyll-theme/2016/04/javapoet</guid>
+        
+        
+      </item>
+    
+      <item>
+        <title>View</title>
+        <description>&lt;p&gt;##一般操作&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;设置属性：可以在xml中配置，或者在代码中设置。&lt;/li&gt;
+  &lt;li&gt;设置焦点：framework会根据用户输入来焦点的移动，使用&lt;code class=&quot;highlighter-rouge&quot;&gt;requestFocus&lt;/code&gt;方法强制将焦点移到特定的View。&lt;/li&gt;
+  &lt;li&gt;设置监听者：比如焦点变化监听、点击事件监听等。&lt;/li&gt;
+  &lt;li&gt;设置可见性：使用&lt;code class=&quot;highlighter-rouge&quot;&gt;setVisibility&lt;/code&gt;方法来显示或者隐藏某个&lt;code class=&quot;highlighter-rouge&quot;&gt;View&lt;/code&gt;。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;##自定义View&lt;/p&gt;
+
+&lt;p&gt;实现一个自定义View，一般只需要重载几个特殊的方法即可：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;创建：
+    &lt;ul&gt;
+      &lt;li&gt;构造器：使用代码或者布局文件，后者可以解析并应用定义在布局文件中的属性。&lt;/li&gt;
+      &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;onFinishInflate()&lt;/code&gt;：&lt;code class=&quot;highlighter-rouge&quot;&gt;View&lt;/code&gt;和它的所有子视图都填充完后调用。&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;布局：
+    &lt;ul&gt;
+      &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;onMeasure(int, int)&lt;/code&gt;：确定该视图和它所有子视图需要的尺寸。&lt;/li&gt;
+      &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;onLayout(boolean, int, int, int, int)&lt;/code&gt;：当该视图需要给它所有的子视图分配尺寸和位置时调用。&lt;/li&gt;
+      &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;onSizeChanged(int, int, int, int)&lt;/code&gt;：当该视图的尺寸变化时调用。&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;绘制：
+    &lt;ul&gt;
+      &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;onDraw(android.graphics.Canvas)&lt;/code&gt;：当该视图需要渲染它的内容时调用。&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;事件处理：
+    &lt;ul&gt;
+      &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;onKeyDown(int, KeyEvent)&lt;/code&gt;：设备按键按下事件。&lt;/li&gt;
+      &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;onKeyUp(int, KeyEvent)&lt;/code&gt;：设备按键抬起事件。&lt;/li&gt;
+      &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;onTrackballEvent(MotionEvent)&lt;/code&gt;：轨迹球事件。&lt;/li&gt;
+      &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;onTouchEvent(MotionEvent)&lt;/code&gt;：屏幕触摸事件。&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;焦点：
+    &lt;ul&gt;
+      &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;onFocusChanged(boolean, int, android.graphics.Rect)&lt;/code&gt;：当该view捕获或者失去焦点时调用。&lt;/li&gt;
+      &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;onWindowFocusChanged(boolean)&lt;/code&gt;：当该窗口包含一个捕获或者失去焦点的视图时调用。&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Attaching：
+    &lt;ul&gt;
+      &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;onAttachedToWindow()&lt;/code&gt;：当该视图固定到一个窗口上时调用。&lt;/li&gt;
+      &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;onDetachedFromWindow&lt;/code&gt;：当该视图从它的窗口上脱离时调用。&lt;/li&gt;
+      &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;onWindowVisibilityChanged(int)&lt;/code&gt;：当包含给视图的窗口可见性变化时调用。&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;##位置&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;View&lt;/code&gt;的几何形状是矩形。一个&lt;code class=&quot;highlighter-rouge&quot;&gt;View&lt;/code&gt;的位置使用两组值表示：一组是左上顶点的坐标，一组是两个尺寸，及宽和高。位置的最小单位是像素。&lt;/p&gt;
+
+&lt;p&gt;使用&lt;code class=&quot;highlighter-rouge&quot;&gt;getLeft()&lt;/code&gt;和&lt;code class=&quot;highlighter-rouge&quot;&gt;getTop()&lt;/code&gt;方法可以获得当前view在它直接上级中的位置，比如如果&lt;code class=&quot;highlighter-rouge&quot;&gt;getLeft()&lt;/code&gt;方法返回20，则意味着该view距离它直接上级的左边缘距离为20。&lt;code class=&quot;highlighter-rouge&quot;&gt;getRight()&lt;/code&gt;和&lt;code class=&quot;highlighter-rouge&quot;&gt;getBottom()&lt;/code&gt;方法可以获得该view右下顶点的位置，使用&lt;code class=&quot;highlighter-rouge&quot;&gt;getRight()&lt;/code&gt;方法等同于&lt;code class=&quot;highlighter-rouge&quot;&gt;getLeft() + getWidth()&lt;/code&gt;。&lt;/p&gt;
+
+&lt;p&gt;##尺寸、外边距、内边距&lt;/p&gt;
+
+&lt;p&gt;view的尺寸即宽和高，一个view实际上有两组宽和高的值：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;measured width和measured height：这组尺寸定义了一个view想要在它的父view中占据多大的位置。使用&lt;code class=&quot;highlighter-rouge&quot;&gt;getMeasuredWidth()&lt;/code&gt;和&lt;code class=&quot;highlighter-rouge&quot;&gt;getMeasuredHeight()&lt;/code&gt;方法获得这一组参数。&lt;/li&gt;
+  &lt;li&gt;第二组就是简单的宽和高，或者说所谓的drawing width和drawing height。这组值是该view在绘制时和布局后实际在屏幕上的尺寸。这组值和测量的值不一定相同。使用&lt;code class=&quot;highlighter-rouge&quot;&gt;getWidth()&lt;/code&gt;和&lt;code class=&quot;highlighter-rouge&quot;&gt;getHeight()&lt;/code&gt;方法来获取这组参数。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;padding（内边距）就是视图内容的偏移距离，可以明确指定左、上、右、下的偏移值，比如左padding设置为2的话，内容就会偏移左边缘2像素。可以使用&lt;code class=&quot;highlighter-rouge&quot;&gt;setPadding(int, int, int, int)&lt;/code&gt;和&lt;code class=&quot;highlighter-rouge&quot;&gt;setPaddingRelative(int, int, int, int)&lt;/code&gt;方法来设置，以及使用&lt;code class=&quot;highlighter-rouge&quot;&gt;getPaddingLeft()&lt;/code&gt;、&lt;code class=&quot;highlighter-rouge&quot;&gt;getPaddingTop()&lt;/code&gt;、&lt;code class=&quot;highlighter-rouge&quot;&gt;getPaddingRight()&lt;/code&gt;、&lt;code class=&quot;highlighter-rouge&quot;&gt;getPaddingBottom()&lt;/code&gt;、&lt;code class=&quot;highlighter-rouge&quot;&gt;getPaddingStart()&lt;/code&gt;和&lt;code class=&quot;highlighter-rouge&quot;&gt;getPaddingEnd()&lt;/code&gt;方法来查询。&lt;/p&gt;
+
+&lt;p&gt;margin（外边距）就是当前视图在上层布局（&lt;code class=&quot;highlighter-rouge&quot;&gt;ViewGroup&lt;/code&gt;）中的偏移（页边），使用&lt;code class=&quot;highlighter-rouge&quot;&gt;android.view.ViewGroup.MarginLayoutParams&lt;/code&gt;来设置。&lt;/p&gt;
+
+&lt;p&gt;##布局（Layout）&lt;/p&gt;
+
+&lt;p&gt;布局分为两个步骤：测量和布局。测量过程是通过在view tree上从上到下递归调用&lt;code class=&quot;highlighter-rouge&quot;&gt;measure(int, int)&lt;/code&gt;方法来实现的，递归中&lt;code class=&quot;highlighter-rouge&quot;&gt;view&lt;/code&gt;将尺寸规格推到树中的下级节点。测量过程结束后，每个&lt;code class=&quot;highlighter-rouge&quot;&gt;view&lt;/code&gt;都将它的尺寸存储起来。布局过程也是从上到下执行的，不过是通过递归调用&lt;code class=&quot;highlighter-rouge&quot;&gt;layout(int, int, int, int)&lt;/code&gt;方法来实现。在这个过程中每个&lt;code class=&quot;highlighter-rouge&quot;&gt;ViewParent&lt;/code&gt;都负责通过在测量过程计算得到的尺寸来确定它所有子视图的位置。&lt;/p&gt;
+
+&lt;p&gt;当一个&lt;code class=&quot;highlighter-rouge&quot;&gt;view&lt;/code&gt;的&lt;code class=&quot;highlighter-rouge&quot;&gt;measure()&lt;/code&gt;方法返回时，它以及它所有的后代视图的&lt;code class=&quot;highlighter-rouge&quot;&gt;getMeasuredWidth()&lt;/code&gt;和&lt;code class=&quot;highlighter-rouge&quot;&gt;getMeasuredHeight()&lt;/code&gt;方法的返回值都被设置。一个&lt;code class=&quot;highlighter-rouge&quot;&gt;view&lt;/code&gt;的&lt;code class=&quot;highlighter-rouge&quot;&gt;measured width&lt;/code&gt;和&lt;code class=&quot;highlighter-rouge&quot;&gt;measured height&lt;/code&gt;必须考虑到它父视图对它强加的限制，这样可以保证在测量过程结束后，所有的父视图可以接受它们所有的子视图的尺寸。一个父视图可能会不止一次调用它子视图的&lt;code class=&quot;highlighter-rouge&quot;&gt;measure()&lt;/code&gt;方法，例如，父视图以未指定尺寸测量每个子视图来确定它想要多大的空间，然后，如果所有的子视图加起来尺寸太大或太小的话，再以确定的值来测量每个子视图。&lt;/p&gt;
+
+&lt;p&gt;测量过程使用两个类来传递尺寸，视图通过&lt;code class=&quot;highlighter-rouge&quot;&gt;MeasureSpec&lt;/code&gt;类来告诉它们的父视图它们想要哪种方式来测量和确定位置。&lt;code class=&quot;highlighter-rouge&quot;&gt;LayoutParams&lt;/code&gt;类（基类）定义了视图想要多大的宽和高，每种尺寸都可以设置为：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;一个确定的值。&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;MATCH_PARENT&lt;/code&gt;，意思是该视图想要和它的父视图一样大（减去padding）。&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;WRAP_CONTENT&lt;/code&gt;，意思是该视图仅仅想要足以包裹其内容的大小（加上padding）。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;ViewGroup&lt;/code&gt;的子类都有自己的继承自&lt;code class=&quot;highlighter-rouge&quot;&gt;LayoutParams&lt;/code&gt;类的子类。例如，&lt;code class=&quot;highlighter-rouge&quot;&gt;AbsoluteLayout&lt;/code&gt;就有它自己的&lt;code class=&quot;highlighter-rouge&quot;&gt;LayoutParams&lt;/code&gt;子类，可以添加x和y坐标的值。&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;MeasureSpecs&lt;/code&gt;类被用来将需求从视图树上从上而下推进，&lt;code class=&quot;highlighter-rouge&quot;&gt;MeasureSpec&lt;/code&gt;you三种模式：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;UNSPECIFIED&lt;/code&gt;：父视图用来确定子视图期望的尺寸。例如，一个&lt;code class=&quot;highlighter-rouge&quot;&gt;LinearLayout&lt;/code&gt;调用它子视图的&lt;code class=&quot;highlighter-rouge&quot;&gt;measure()&lt;/code&gt;方法时，高设置为&lt;code class=&quot;highlighter-rouge&quot;&gt;UNSPECIFIED&lt;/code&gt;以及宽设置为&lt;code class=&quot;highlighter-rouge&quot;&gt;EXACTLY&lt;/code&gt;240，这时它就要确定要给一个宽为240像素的子视图分配多少的高。&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;EXACTLY&lt;/code&gt;：父视图用来强制给子视图一个确定的尺寸，子视图必须使用该尺寸，并且保证它的后代视图都在这个尺寸填充的范围内。&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;AT_MOST&lt;/code&gt;：父视图用来强制给子视图一个最大的尺寸，子视图必须保证它以及它所有的后代视图都在这个尺寸填充的范围内。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;直接布局的话，调用&lt;code class=&quot;highlighter-rouge&quot;&gt;requestLayout()&lt;/code&gt;方法即可。这个方法通常是由view自己调用的，调用时它相信它已经不再适合它当前的边界了。&lt;/p&gt;
+
+&lt;p&gt;##绘制（Drawing）&lt;/p&gt;
+
+</description>
+        <pubDate>Mon, 07 Dec 2015 00:00:00 +0800</pubDate>
+        <link>http://gaoxuxu.github.io/material-jekyll-theme/2015/12/view</link>
+        <guid isPermaLink="true">http://gaoxuxu.github.io/material-jekyll-theme/2015/12/view</guid>
+        
+        
+      </item>
+    
+      <item>
+        <title>加速你的应用</title>
+        <description>&lt;p&gt;&lt;a href=&quot;http://blog.udinic.com/2015/09/15/speed-up-your-app&quot;&gt;原文&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;##My Rules&lt;/p&gt;
+
+&lt;p&gt;Everytime I approach a performance problem, or looking for performance problems, I follow these rules:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;Always Measure&lt;/strong&gt; - Optimizing with your eyes is never a good idea. After looking at the same animation for a few times, you’ll start imagining it’s running faster. Numbers don’t lie. Use the tools we’ll go over soon, and measure how your app performs a few times before and after you make your change.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;Use slow devices&lt;/strong&gt; - If you really want to expose all the weak spots, slower devices will help you more. Newer and stronger devices might not get too excited about performance issues you may have, but not all your users use the latest and greatest.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;Trade-offs&lt;/strong&gt; - Performance optimization is all about trade-offs. You optimize one thing - it comes on the expense of another. In many cases, that other thing can be your time spent finding and fixing it, but it can also be the quality of your bitmaps or the amount of data you should store in a specific data structure. Prepare yourself to make sacrifices.&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;##Systrace&lt;/p&gt;
+
+&lt;p&gt;Systrace is one of the greatest tools that you probably don’t use. That’s because developers weren’t sure what to do with the information it provides.&lt;/p&gt;
+
+&lt;p&gt;Systrace shows us an overview of what’s currently running on the phone. This tool reminds us that the phone we hold in our hands, is actually is a powerful computer that can do many things at the same time. In one of the latest SDK tools updates, this tool was improved with generated insights from the data, helping us to find problems. Let’s see how a trace file looks like:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://7b1h5r.com1.z0.glb.clouddn.com/image/speed-up-your-app/systrace-overview.png&quot; alt=&quot;img&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;You can generate a trace file using the Android Device Monitor tool, or using command line. You can find more info &lt;a href=&quot;http://developer.android.com/tools/help/systrace.html&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;On the video, I explained the different sections. The interesting parts are the Alerts and the Frames, showing you insights the tool has generated based on the data it collected. Let’s look at a trace I took, and select one of the alerts on the top:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://7b1h5r.com1.z0.glb.clouddn.com/image/speed-up-your-app/systrace-alert.png&quot; alt=&quot;img&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The alert states that there was a long View#draw() call. We get a description, links to the documentation and even video links for relevant talks on that subject. Looking at the Frames row below, we see an indication for every frame that was rendered, and it’s colored green, yellow and red to indicate a performance issue while rendering that frame. Let’s select one of these red frames:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://7b1h5r.com1.z0.glb.clouddn.com/image/speed-up-your-app/systrace-frame.png&quot; alt=&quot;img&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;On the bottom, we’ll see all the relevant alerts for that frame. We see there were 3 of those, one of them is the one we saw earlier. Let’s zoom-in that frame and expand the “Inflation during ListView recycling” alert on the bottom:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://7b1h5r.com1.z0.glb.clouddn.com/image/speed-up-your-app/systrace-frame-zoomin.png&quot; alt=&quot;img&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;We see the amount of time it took for this part, 32ms, which puts the frame’s rendering time way over the 16ms boundary, a requirement to achieve 60fps. There’s more timing information for each of the items in the ListView for that frame - about 6ms was spent per item, and we have 5 of these. The description helps us understand the problem, and even provides a solution. On the graph at the top, we see a visualization of everything, we can even zoom-in on the “inflate” slice to see what views took longer to inflate in the layout.&lt;/p&gt;
+
+&lt;p&gt;Another example of a slow rendered frame:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://7b1h5r.com1.z0.glb.clouddn.com/image/speed-up-your-app/systrace-2-frame.png&quot; alt=&quot;img&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;After selecting a frame, we can press the ‘m’ key to highlight it and see how long that part took. Looking at the top, we see it took over 19ms to render that frame. Expanding the only alert for that frame, shows us there was a “Scheduling delay”.&lt;/p&gt;
+
+&lt;p&gt;A Scheduling delay means that the thread, processing that specific slice, was not scheduled on the CPU for a long time. Therefore, it took longer for this thread to complete. Selecting the longest slice in the frame shows more specific information:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://7b1h5r.com1.z0.glb.clouddn.com/image/speed-up-your-app/systrace-2-slice.png&quot; alt=&quot;img&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The Wall duration is the time passed from the moment that slice started until finished. It’s called “Wall duration”, because it’s like looking at a wall clock since the thread has started.&lt;/p&gt;
+
+&lt;p&gt;The CPU duration is the actual time the CPU spent processing that slice.&lt;/p&gt;
+
+&lt;p&gt;It’s noticeable that there’s a wide difference between these durations. While it took 18ms to complete this slice, the CPU spent only 4ms working on it. That’s a little strange, so now will be a good time to look up and see what the CPU was doing this entire time:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://7b1h5r.com1.z0.glb.clouddn.com/image/speed-up-your-app/systrace-2-cpu.png&quot; alt=&quot;img&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;All 4 cores were pretty busy.&lt;/p&gt;
+
+&lt;p&gt;Selecting one the threads shows us where it was originated from, an app called com.udinic.keepbusyapp. In this case, a different app was causing the CPU to work harder, denying it from dedicating some energy to our app.&lt;/p&gt;
+
+&lt;p&gt;While this specific scenario is usually temporary, since other apps don’t often hog the CPU in the background (..right?), these threads could come from a different process on your app, or even from the main process. Since Systrace is an overview tool, there’s a limit to how deep we can get. To find what’s keeping our CPU busy in our app, we’ll use another tool called Traceview.&lt;/p&gt;
+
+&lt;p&gt;##Traceview
+Traceview is a profiling tool, showing how long it took for each method to run. Let’s see how a trace file looks like:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://7b1h5r.com1.z0.glb.clouddn.com/image/speed-up-your-app/traceview-overview.png&quot; alt=&quot;img&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The tool can be started from the Android Device Monitor and from code. More information is available &lt;a href=&quot;http://developer.android.com/tools/debugging/debugging-tracing.html&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Let’s go over the different columns:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;Name&lt;/strong&gt; - The name of the method, along with a color to identify it on the graph above.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;Inclusive CPU Time&lt;/strong&gt; - The time it took the CPU to process that method and its children (i.e. all the methods it called).&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;Exclusive CPU Time&lt;/strong&gt; - The time it took the CPU to process that method alone.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;Inclusive / Exclusive Real Time&lt;/strong&gt; - The time that has passed from the moment the method started until completed. Same as “Wall duration” on Systrace.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;Calls+Recursion&lt;/strong&gt; - How many times this method was called, and the amount of recursive calls too.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;CPU/Real time per Call&lt;/strong&gt; - The CPU/Real time it took per call to this method, on average. The other time fields are showing the aggregated time of all calls to a method.&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;I opened an app that had hard time scrolling smoothly. I started the trace, scrolled a little and stopped the trace. I found the getView() method and expanded it, here’s what I saw:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://7b1h5r.com1.z0.glb.clouddn.com/image/speed-up-your-app/traceview-getview.png&quot; alt=&quot;img&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;This method was called 12 times, the CPU spent ~3ms for each call, but the real time it took for each call to finish is 162ms! Definitely a problem..&lt;/p&gt;
+
+&lt;p&gt;Looking at the children of this method, we can see how the overall time splits between the different methods. The Thread.join() took ~98% of the inclusive real time. This method is used when we want to wait for another thread to finish. One of the other children is Thread.start(), which gets me to assume that the getView() method is starting a thread and waiting for it to finish.&lt;/p&gt;
+
+&lt;p&gt;But where is that thread?&lt;/p&gt;
+
+&lt;p&gt;We can’t see what that thread was doing as a child of getView(), since getView() is not doing that work directly . To look for it, I searched for a Thread.run() method, which is the method being invoked when spawning a new thread. I followed it until I reached the culprit:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://7b1h5r.com1.z0.glb.clouddn.com/image/speed-up-your-app/traceview-thread.png&quot; alt=&quot;img&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;I found that the BgService.doWork() method took ~14ms per call, and we have about 40 of these! There’s a chance each getView() calls it more than once, and explains why each getView() call takes such a long time. This method was keeping the CPU busy for a long time. Looking at the Exclusive CPU time, we see that it used 80% of the CPU time in the entire trace! Sorting by the Exclusive CPU time is also a great way to find the busiest methods in the trace, it’s possible they contribute to the performance issue you’re experiencing.&lt;/p&gt;
+
+&lt;p&gt;Following time critical methods, such as getView(), View#onDraw() and others, will help us find the reasons why our app is acting slow. But sometimes, there’s something else keeping the CPU busy, taking away precious CPU cycles, that could be spent on rendering our UI more smoothly. The Garbage Collector is running occasionally, clearing out unused objects, and usually don’t have a strong impact on the app running in the foreground. If the GC is running too often, it could slow down our app, and it’s possible that we are to blame..&lt;/p&gt;
+
+&lt;p&gt;##Memory Profiling&lt;/p&gt;
+
+&lt;p&gt;Android Studio was improved a lot lately, with more and more tools to help us find and analyze performace issues. The Memory tab on the Android window, will show us the amount of data being allocated on the heap over time. That’s how it looks like:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://7b1h5r.com1.z0.glb.clouddn.com/image/speed-up-your-app/mem-graph.png&quot; alt=&quot;img&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Wherever we see little drops in the graph, a GC event has occurred, removing unused objects and freeing space on the heap.&lt;/p&gt;
+
+&lt;p&gt;There are 2 tools available on the left side of the graph: Heap dump and Allocation Tracker.&lt;/p&gt;
+
+&lt;p&gt;##Heap dump&lt;/p&gt;
+
+&lt;p&gt;In order to investigate what’s currently allocated in our heap, we can use the heap dump button on the left. This will take a snapshot of what’s currently allocated in the heap, and will show it in a special report screen inside Android Studio:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://7b1h5r.com1.z0.glb.clouddn.com/image/speed-up-your-app/heap-overview.png&quot; alt=&quot;img&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;On the left, we see a histogram of the instances in the heap, grouped by their class name. For each one, there’s the amount of objects allocated, the size of these instances (Shallow size) and the size these objects are retaining in memory. The latter tells us how much memory could be free if these instances will get freed. This view gives us an important glimpse to our app’s memory footprint, helping us identify large data structures and objects relations. This information could help us build more efficient data structures, untying object connections to reduce the retained memory and ultimately - reducing the memory footprint as much as possible.&lt;/p&gt;
+
+&lt;p&gt;Looking at the histogram, we see that the MemoryActivity has 39 instances, which seems odd for an activity. Picking one of its instances on the right, will reveal all the references for this instance in the Reference Tree at the bottom.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://7b1h5r.com1.z0.glb.clouddn.com/image/speed-up-your-app/heap-reftree.png&quot; alt=&quot;img&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;One of them is part of an array inside an on object of ListenersManager. Looking at the other instances of the activity will reveal that all of them are retained by this object. This explains why the only object of this class is retaining so much memory:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://7b1h5r.com1.z0.glb.clouddn.com/image/speed-up-your-app/heap-retained.png&quot; alt=&quot;img&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;This situations is notoriously called “Memory Leak”, since the activities were clearly destroyed and that unused memory cannot be garbage collected due to that reference. We can avoid situations like this, by making sure our objects are not being referenced by other objects that outlive it. In this situation, the ListenersManager does not need to keep that reference after the activity was destroyed. A solution will be to remove that reference when the activity is about to be destroyed, in the onDestory() callback method.&lt;/p&gt;
+
+&lt;p&gt;Memory leaks and other large objects are occupying large space in the heap, reducing the available memory and causing many GC events to try and free more space. These GC events will keep the CPU busy, causing performance degradation of our app. If the amount of available memory isn’t sufficient for the app, and the heap cannot grow any bigger, a more dramatic result will happen - OutOfMemoryException, leading to an app crash.&lt;/p&gt;
+
+&lt;p&gt;A more advanced tool is the Eclipse Memory Analyzer Tool (Eclipse MAT):&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://7b1h5r.com1.z0.glb.clouddn.com/image/speed-up-your-app/eclipse-mat.png&quot; alt=&quot;img&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;This tool can do everything Android Studio can, and also identify potential memory leaks and provide more advanced instances searching, such as searching for all the Bitmap instances that are larger than 2 MB, or all the &lt;a href=&quot;http://kohlerm.blogspot.com/2009/04/analyzing-memory-usage-off-your-android.html&quot;&gt;empty Rect objects&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Another great tool is a library called &lt;a href=&quot;https://corner.squareup.com/2015/05/leak-canary.html&quot;&gt;LeakCanary&lt;/a&gt;, which tracks your objects and make sure they aren’t leaked. If so - you’ll get a notification to let you know what happened and where.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://7b1h5r.com1.z0.glb.clouddn.com/image/speed-up-your-app/leakcanary.png&quot; alt=&quot;img&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;##Allocation Tracker&lt;/p&gt;
+
+&lt;p&gt;The Allocation Tracker is started/stopped using one of the other buttons to the left of the memory graph. It will generate a report of all the instances being allocated at that period of time, grouped by class:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://7b1h5r.com1.z0.glb.clouddn.com/image/speed-up-your-app/alloc-class.png&quot; alt=&quot;img&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;or by method:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://7b1h5r.com1.z0.glb.clouddn.com/image/speed-up-your-app/alloc-method.png&quot; alt=&quot;img&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;There’s also a nice visualization, showing us the biggest allocated instances.&lt;/p&gt;
+
+&lt;p&gt;Using this information, we can find time-critical methods that allocate too much memory and could trigger many GC events. We can also find many short-living instances for the same class, where we can consider using an &lt;a href=&quot;https://en.wikipedia.org/wiki/Object_pool_pattern&quot;&gt;Object pool&lt;/a&gt; to reduce the amount of allocations.&lt;/p&gt;
+
+&lt;p&gt;##General memory tips&lt;/p&gt;
+
+&lt;p&gt;Here are some quick tips/guidelines I use when I’m writing code:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;Enums&lt;/strong&gt; are already a hot subject when discussing performance. There’s a &lt;a href=&quot;https://youtu.be/Hzs6OBcvNQE&quot;&gt;Video&lt;/a&gt; about it, showing the size enums spend, and a &lt;a href=&quot;https://plus.google.com/+JakeWharton/posts/bTtjuFia5wm&quot;&gt;discussion&lt;/a&gt; about that video and some potential misleading information it has. Do enums take more space than regular constants? Definitely. Is that bad? not necessarily. If you’re writing a library and need a strong type safety, that could justify using it over other solutions, such as &lt;a href=&quot;https://developer.android.com/reference/android/support/annotation/IntDef.html&quot;&gt;@IntDef&lt;/a&gt;. If you just have a bunch of constants that can be grouped together - it may not be wise to use an Enum for that purpose. As always, there’s a trade-off that you need to consider when making this decision.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;Auto-boxing&lt;/strong&gt; - auto-boxing is the automatic conversion from primitive types to their object representation (e.g. int -&amp;gt; Integer). Every time a primitive type is being “boxed” to an object representation, a new object is created (shocking, I know). If we have many of these - the GC will run more frequently. It’s easy not to notice the amount of auto-boxing that happens, because it’s automatically done for us when assigning a primitive to an object. As a solution, try to be consistent with these types. If you use primitives throughout your app, try to avoid getting them auto-boxed for no real reason. You can use the memory profiling tools to find many objects representing a primitive type. You can also use Traceview and look for Integer.valueOf(), Long.valueOf() etc.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;HashMap vs ArrayMap / Sparse*Array&lt;/strong&gt; - In a related manner to the auto-boxing issue, using HashMaps requires us to use objects as keys. If we use the primitive “int” type in the app, and it’s getting auto-boxed to Integer when interacting with a HashMap, we could probably just use SparseIntArray. In case we still need keys that are objects, we can use the ArrayMap class. It’s very similar to HashMap, but it &lt;a href=&quot;https://www.youtube.com/watch?v=ORgucLTtTDI&quot;&gt;works differently under the hood&lt;/a&gt;, making it more memory efficient, with a cost of being slower. Both alternatives have a smaller memory footprint than HashMap, but the time it takes to retrieve the items or allocate more space is a little higher than HashMap. Unless you have 1000+ or entries, there’s almost no difference in the runtime, making them a viable option for your mapping purposes.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;Context Awareness&lt;/strong&gt; - As seen earlier, it’s relatively easy to leak your activities’ memory. You may wouldn’t be surprised to learn that activities are the most common memory leak in Android(!). They are also very expensive to leak, since they hold all the view hierarchy of their UI, which could take a lot of space on its own. Many operations in the platform require a Context object, and an Activity is usually what you send. Make sure to understand what happens to that Activity. If a reference to it is cached, and that object lives longer than your Activity, without clearing that reference, you got yourself a memory leak.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;Avoid non-static inner classes&lt;/strong&gt; - When creating a non-static inner class, and instantiating it, you create an implicit reference to the outer class. If the inner class’s instance is needed for longer period of time than the outer class, the outer class will still be retained in memory, even though it’s not needed anymore. For example, creating a non-static class that extends AsyncTask inside an Activity class, then proceeding to start that async task and while it’s running - killing the activity. That async task will keep that activity alive for as long as it runs. The solution - just don’t do it, declare a &lt;strong&gt;static&lt;/strong&gt; inner class if needed.&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;##GPU Profiling&lt;/p&gt;
+
+&lt;p&gt;A new addition to Android Studio 1.4, is a tool to profile GPU rendering.&lt;/p&gt;
+
+&lt;p&gt;Under the Android window, go to the GPU tab, and you’ll see a graph showing the time it took to render each frame on your screen:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://7b1h5r.com1.z0.glb.clouddn.com/image/speed-up-your-app/gpu-overview.png&quot; alt=&quot;img&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Each bar on the graph represents one frame being rendered, and the colors represents the different phases in the process:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;Draw (blue)&lt;/strong&gt; - Represents the View#onDraw() method. That part builds/updates the DisplayList objects, being converted later to OpenGL commands the GPU can understand. High values can be due to complex views, requiring more time to build their display lists, or many views being invalidated at a short period of time.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;Prepare (purple)&lt;/strong&gt; - In Lollipop, another thread was added to help the UI Thread render the UI faster. That thread is called RenderThread. It’s responsible for converting the display lists to OpenGL commands and sending them to the GPU. While that is happening, the UI thread can move on to start processing the next frame. The time it takes for the UI thread to pass all the resources to the RenderThread, is being in this step. If we have a lot of resources to pass on, such as many/heavy display lists, this step could take longer.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;Process (red)&lt;/strong&gt; - Executing the display lists to create OpenGL commands. This step could take longer if there are many/complex display lists to execute, because many views needs to be redrawn. A view can be redrawn due to an invalidation or if it’s revealed by moving an overlapping view.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;Execute (yellow)&lt;/strong&gt; - Sending the OpenGL commands to the GPU. That part is a blocking call, since the CPU is sending a buffer with these commands to the GPU, expecting to get back a clean buffer for the next frame. The amount of buffers is limited, and if the GPU is too busy - the CPU will find itself waiting for one to get freed first. Therefore, if we see high values for this step, it probably means the GPU was busy drawing our UI, which could be too complex to be drawn at a shorter time.&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;In Marshmallow, more colors were added to indicate more steps, such as Measure/Layout, input handling and others:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://7b1h5r.com1.z0.glb.clouddn.com/image/speed-up-your-app/gpu-colors-marsh.png&quot; alt=&quot;img&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;EDIT 09/29/2015: John Reck, a framework engineer in Google, &lt;a href=&quot;https://plus.google.com/+AlexLockwood/posts/Yj23fFY7Eon&quot;&gt;has added&lt;/a&gt; this information about some of the new colors:&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;The exact definition of “animation” is everything that’s registered with Choreographer as CALLBACK_ANIMATION. This includes Choreographer#postFrameCallback and View#postOnAnimation which are what’s used by view.animate(), ObjectAnimator, Transitions, etc… And yup, it’s the same thing systrace labels as “animation”.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;“misc” is the delay between the vsync’s timestamp and the current timestamp when it was received. If you’ve ever seen logs from Choreographer about “Missed vsync by blabla ms skipping blabla frames”, that now shows up as “misc”. This is the difference between INTENDED_VSYNC and VSYNC in the framestats dump (https://developer.android.com/preview/testing/performance.html#timing-info)&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;But before using this feature, you need to enable GPU rendering first, from the developer options:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://7b1h5r.com1.z0.glb.clouddn.com/image/speed-up-your-app/gpu-settings2.png&quot; alt=&quot;img&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;This will allow the tool to use ADB commands to get all the information it needs, and so are we (!), using:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;adb shell dumpsys gfxinfo &amp;lt;PACKAGE_NAME&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;we can receive all that data and create the graph ourselves. The command will print other useful information, such as the number of views in the hierarchy, size of all the display lists and more. In Marshmallow, we’ll get even more stats.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://7b1h5r.com1.z0.glb.clouddn.com/image/speed-up-your-app/gpu-adb.png&quot; alt=&quot;img&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;If we have automated UI testing for our app, we can make our build server run this command after certain interactions (list scroll, heavy animation etc.) and see if there’s a change in the values, such as “Janky Frames”, over time. This could help identify a performance degrade after some commits were pushed, allowing us time to address the problem before the app hits production. We can get even more precise rendering information, when using the “framestats” keyword, as explained &lt;a href=&quot;https://developer.android.com/preview/testing/performance.html&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;But that’s not the only way to see this graph!&lt;/p&gt;
+
+&lt;p&gt;As seen in the “Profile GPU Rendering” developer option, there’s also an option to see the graph “On screen as bars”. Enabling that, will show the graph for each window on our screen, along with a green line to indicate the 16ms threshold.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://7b1h5r.com1.z0.glb.clouddn.com/image/speed-up-your-app/gpu-onscreen.png&quot; alt=&quot;img&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;On the right example, we can see that some frames crossed the green line, which means it took longer than 16ms to render them. Since the blue color seems to be dominating these bars, we understand there were many and/or complex views to draw. In that scenario, I scrolled over the newsfeed list, which supports different types of views. Some of the views are being invalidated and some are also more complex to render than others. It’s possible that the reason some frames cross that threshold, is because there was a complex view to render at the time.&lt;/p&gt;
+
+&lt;p&gt;##Hierarchy Viewer&lt;/p&gt;
+
+&lt;p&gt;I love this tool, and it saddens me that many aren’t using it at all!&lt;/p&gt;
+
+&lt;p&gt;Using the Hierarchy Viewer, we can get performance stats, see the complete view hierarchy on the screen and have access to all the views’ properties. You can also dump the theme’s data, see all the values used for each style attribute, but that’s available only when running Hierarchy Viewer as a standalone, not from Android Monitor. I use this tool when I design my layouts and when I want to optimize them.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://7b1h5r.com1.z0.glb.clouddn.com/image/speed-up-your-app/hierview-overview.png&quot; alt=&quot;img&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;At the center, we see a tree representing the view hierarchy. The view hierarchy can be wide, but if it’s too deep (~10 levels), this may cost us with expensive layout/measurement phases. Every time a view is being measured, in View#onMeasure(), or when it’s positioning all its child views, in View#onLayout(), these commands propagate to the child views, which do the same. Some layouts will do each step twice, such as RelativeLayout and some LinearLayout configurations, and if they are nested - the number of passes increases exponentially.&lt;/p&gt;
+
+&lt;p&gt;At the bottom-right, we see a “blueprint” of our layout, marking where each view is positioned. We can select a view here, or in the tree, and see all its properties on the left. When designing a layout, I sometimes not sure why a certain view ended up where it is. Using this tool, I can track it on the tree, select it and see where it is in the preview window. I can design interesting animations by looking the final measurements of the views on the screen, and use that information to move things around accurately. I can find lost views that were overlapped by other views unintentionally, and much more.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://7b1h5r.com1.z0.glb.clouddn.com/image/speed-up-your-app/hierview-colors.png&quot; alt=&quot;img&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;For each view we have the time it took to measure/layout/draw it and all its child views. Colors indicate how this view performed in compare to the other views in the tree, a great way to find the weakest link. Since we also see a preview of that view, we can go over the tree and follow the steps created it, finding redundant steps that we could remove. One of those things, that has a great impact on performance, is called Overdraw.&lt;/p&gt;
+
+&lt;p&gt;##Overdraw&lt;/p&gt;
+
+&lt;p&gt;As seen in the GPU Profiling section - the Execute phase, represented by the yellow color on the graph, could take longer to complete if the GPU has many things to draw on the screen, increasing the time it takes to draw each frame. Overdraw occurs when we draw something on top of something else, say a yellow button on a red background. The GPU needs to draw the red background first and later the yellow button on top of that, making overdraws inevitable. If we have too many layers of overdraw, it will cause the GPU to work harder and be farther from the 16ms goal.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://7b1h5r.com1.z0.glb.clouddn.com/image/speed-up-your-app/overdraw-gif.gif&quot; alt=&quot;img&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Using the “Debug GPU Overdraw” setting in the Developer Options, all overdraws will be colored to indicate the severity of the overdraw at that area. Having 1x/2x overdraw is fine, even some small light-red areas are not bad, but if we see too much red on the screen - we might have a problem. Let’s see couple of examples:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://7b1h5r.com1.z0.glb.clouddn.com/image/speed-up-your-app/overdraw-examples.png&quot; alt=&quot;img&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;On the left example, there’s a list drawn in green, which usually is fine, but there’s an overlay on the top that makes it red, and that’s starting to become a problem. On the right example, the entire list is light red. In both cases, there’s an opaque list that has 2x/3x overdraw. These overdraws could happen if there’s a full screen background color to the window holding your Activity/Fragment, the list view and each list view item. We can solve such problem by setting a background color for only one of them.&lt;/p&gt;
+
+&lt;p&gt;Note: the default theme declares a full screen background color to your window. If you have an activity with an opaque layout that covers the entire screen, you could remove the window background to remove one layer of overdraw. This can be done in the theme or in code, by calling getWindow().setBackgroundDrawable(null) inside onCreate().&lt;/p&gt;
+
+&lt;p&gt;Using Hierarchy Viewer, you can export all the layers of your hierarchy to a PSD file, to open in Photoshop. Investigating the different layers in Photoshop, will reveal all the overdraws in the layout. Use this information to remove redundant overdraws, and don’t settle on the green, go for the blue!&lt;/p&gt;
+
+&lt;p&gt;##Alpha&lt;/p&gt;
+
+&lt;p&gt;Using transparency could have performance implications, and to understand why - let’s see what happens when setting an alpha value to a view. Consider the following layout:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://7b1h5r.com1.z0.glb.clouddn.com/image/speed-up-your-app/alpha-before.png&quot; alt=&quot;img&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;We see a layout that holds 3 ImageViews that overlap each other. In the direct/naive implementation, setting an alpha, using setAlpha(), will cause the command to propagate to all the child views, the ImageViews in this case. Later, these ImageViews will be drawn with that alpha value to the frame buffer. The result:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://7b1h5r.com1.z0.glb.clouddn.com/image/speed-up-your-app/alpha-direct.png&quot; alt=&quot;img&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;That’s not what we want to see.&lt;/p&gt;
+
+&lt;p&gt;Since each ImageView was drawn with an alpha value, all the overlapping images blend together. Luckily, the OS has a solution to this problem. The layout will be copied to an off-screen buffer, the alpha will be applied to that buffer as a whole and the result will be copied to the frame buffer. The result:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://7b1h5r.com1.z0.glb.clouddn.com/image/speed-up-your-app/alpha-complex.png&quot; alt=&quot;img&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;But..we payed a price for that.&lt;/p&gt;
+
+&lt;p&gt;Drawing the view on an off-screen buffer, before drawing it on the frame buffer, is virtually adding another &lt;strong&gt;undetected&lt;/strong&gt; overdraw layer. The OS doesn’t know when exactly to use this approach or the direct approach shown earlier, so the default is to always do the complex one. But there are still ways to set alpha and avoid the complexity the off-screen buffer adds:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;TextViews&lt;/strong&gt; - Use &lt;strong&gt;setTextColor()&lt;/strong&gt; instead of setAlpha(). Using the alpha channel for the text color, will cause the text to be drawn directly using it.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;ImageView&lt;/strong&gt; - Use &lt;strong&gt;setImageAlpha()&lt;/strong&gt; instead of setAlpha(). Same reason as for the TextView.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;Custom Views&lt;/strong&gt; - If your custom view doesn’t support overlapping views, this complex behavior is irrelevant to us. There’s no way our child views will blend together, as seen in the example above. By overriding the &lt;strong&gt;hasOverlappingRendering()&lt;/strong&gt; method to return false, we’re signaling the OS to take the direct/naive path with our view. There’s also an option to manually handle what happens when setting an alpha, by overriding the &lt;strong&gt;onSetAlpha()&lt;/strong&gt; method to return true.&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;##Hardware Acceleration&lt;/p&gt;
+
+&lt;p&gt;When Hardware Acceleration was introduced in Honeycomb, we got a &lt;a href=&quot;http://developer.android.com/guide/topics/graphics/hardware-accel.html&quot;&gt;new drawing model&lt;/a&gt; to render our app to the screen. It introduced the DisplayList structures, which records the view’s drawing commands for faster rendering. But there’s another great feature that developers sometimes miss or don’t use properly - The View layers.&lt;/p&gt;
+
+&lt;p&gt;Using a View layer, we can render the View into an off-screen buffer (as seen earlier, when applying an Alpha channel) and manipulate it as we like. This feature is mainly great for animations, because we can animate complex Views quicker. Without layers, animating a View will invalidate it after changing the animated property (e.g. x coordinate, scale, alpha value etc.). For complex views, this invalidation propagates to all the child views, and they in turn will redraw themselves, a costly operation. Using a View layer, backed by Hardware, a texture is created in the GPU for our view. There are several operations we can apply on that texture without invalidating it, such as x/y position, rotation, alpha and more. All that means, that we can animate a complex view on our screen without invalidating it at all during the animation! This will make the animation much smoother. Here’s a code example how to do this:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;// Using the Object animator
+view.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(view, View.TRANSLATION_X, 20f);
+objectAnimator.addListener(new AnimatorListenerAdapter() {
+    @Override
+    public void onAnimationEnd(Animator animation) {
+	    view.setLayerType(View.LAYER_TYPE_NONE, null);
+    }
+});
+objectAnimator.start();
+
+// Using the Property animator
+view.animate().translationX(20f).withLayer().start();
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Simple, right?&lt;/p&gt;
+
+&lt;p&gt;Yes, but there are a few things to remember when using hardware layers:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;Clean up&lt;/strong&gt; after your view - hardware layers consume space on a limited memory component, your GPU. Try and use them only for the time they needed, like an animation, and clean them up afterwards. In the ObjectAnimator example above, I applied a listener to remove the layer when the animation ends. On the Property animator example, I used the withLayers() method, which automatically creates the layer at the beginning and removes it when the animation ends.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;If you **change your View&lt;/strong&gt; after applying a hardware layer, it will invalidate the hardware layer and will render the view to that off-screen buffer all over again. That will happen when changing a property that’s not optimized for hardware layers (for now, these are optimized: rotation, scale, x/y, translation, pivot and alpha). For example, if you’re animating a View, backed by hardware layer, by moving it across the screen while updating the View’s background color as it moves, it will result with constant updating of the hardware layer. Updating the hardware layer has an overhead that could make using it not worthwhile&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;For the second problem, there’s a way to visualize these hardware layer updates. Using the Developer Options, we can enable the “Show hardware layers updates”.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://7b1h5r.com1.z0.glb.clouddn.com/image/speed-up-your-app/hwl-devoptions2.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;When enabled, the View is being flashed with a green color as it updates its hardware layer. I used it a while ago, when I had a ViewPager that didn’t scroll as smooth as I expected. After enabling this developer option, I went ahead and scroll the ViewPager, and this is what I saw:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://7b1h5r.com1.z0.glb.clouddn.com/image/speed-up-your-app/hwl-calproblem.gif&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Both pages were green for the entire scroll!&lt;/p&gt;
+
+&lt;p&gt;That means that there’s a hardware layer created for them, and the pages are also invalidated as we scroll the ViewPager. I did update the pages as I scroll them, using a parallax effect on the background and gradually animating the items in the page. What I didn’t do, is create a hardware layer for the ViewPager’s pages. After reading the ViewPager’s source code, I found that when the user starts scrolling, a hardware layer is created for both pages and removed after the scrolling stops.&lt;/p&gt;
+
+&lt;p&gt;While it makes complete sense to create hardware layers to the pages as we scroll, it was bad for me. Usually, these pages aren’t changing as we scroll the ViewPager, and since they can be pretty complex - hardware layers help rendering them much quicker. In the app I was working on, that wasn’t the case and I had to remove these hardware layer, using a &lt;a href=&quot;http://blog.udinic.com/2013/09/16/viewpager-and-hardware-acceleration&quot;&gt;small hack that I wrote&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Hardware layers are not a silver bullet. It’s important to understand how they work and use them properly, or you can find yourself with a bigger problem.&lt;/p&gt;
+
+&lt;p&gt;##DIY&lt;/p&gt;
+
+&lt;p&gt;In preparation for all the examples I showed here, I wrote a lot of code to simulate these situations. You can find everything in this &lt;a href=&quot;https://github.com/Udinic/PerformanceDemo&quot;&gt;Github repository&lt;/a&gt;, and also on &lt;a href=&quot;https://play.google.com/store/apps/details?id=com.udinic.perfdemo&quot;&gt;Google Play&lt;/a&gt;. I splitted different scenarios to different activities, and tried to document them as much as possible to help understand what kind of problems you can find using that Activity. Read the Activities’ javadoc, open the tools and play with app.&lt;/p&gt;
+
+&lt;p&gt;##More info&lt;/p&gt;
+
+&lt;p&gt;As the Android OS evolves, so are the ways you can optimize your apps. New tools are being introduced with the Android SDK, and new features are added to the OS (such as the hardware layers). It’s important to stay up-to-date and examine the trade-offs before choosing to change something.&lt;/p&gt;
+
+&lt;p&gt;There’s a great YouTube playlist, called &lt;a href=&quot;https://www.youtube.com/playlist?list=PLOU2XLYxmsIKEOXh5TwZEv89aofHzNCiu&quot;&gt;Android Performance Patterns&lt;/a&gt;, with many short videos from Google, explaining different subjects related to performance. You can find comparisons between different data structures (HashMap vs ArrayMap), Bitmaps optimizations and even how to optimize your network requests. I highly recommend watching all of them.&lt;/p&gt;
+
+&lt;p&gt;Join the &lt;a href=&quot;https://plus.google.com/communities/116342551728637785407&quot;&gt;Android Performance Patterns Google+ community&lt;/a&gt; and talk about performance with others, including Googlers, to share ideas, articles and questions.&lt;/p&gt;
+
+&lt;p&gt;More interesting links:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;Learn how the &lt;a href=&quot;http://source.android.com/devices/graphics/architecture.html&quot;&gt;Graphics Architecture in Android&lt;/a&gt; works. It has everything you need to know about how Android renders your UI, explaining the different system components, such as SurfaceFlinger, and how they all talk to each other. It’s long, but worth it.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;A &lt;a href=&quot;https://www.youtube.com/watch?v=Q8m9sHdyXnE&quot;&gt;talk from Google IO 2012&lt;/a&gt;, showing how the drawing model works and how/why we get a jank when our UI renders.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;An &lt;a href=&quot;https://www.parleys.com/tutorial/part-2-android-performance-workshop&quot;&gt;Android Performance Workshop talk&lt;/a&gt;, from Devoxx 2013, showing some of the optimizations that were made in Android 4.4 to the drawing model, and demoing the different tools to optimize performance (Systrace, Overdraw etc.).&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Great post about &lt;a href=&quot;https://medium.com/google-developers/the-truth-about-preventative-optimizations-ccebadfd3eb5&quot;&gt;Preventative Optimizations&lt;/a&gt;, and why they are different than Premature Optimizations. Many developers don’t optimize parts of their code, because they think the impact is not noticeable. One thing to keep in mind, is that everything add up to become a &lt;a href=&quot;https://plus.google.com/105051985738280261832/posts/YDykw2hstUu&quot;&gt;bigger problem&lt;/a&gt;. If you have an opportunity to optimize a small part, that may seem negligible, don’t rule it out.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=_CruQY55HOk&quot;&gt;Memory managment in Android&lt;/a&gt; - an old video from Google IO 2011, that’s still relevant. It showcases how Android manages the memory of our apps, and how to use tools such as Eclipse MAT to find problems.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;a href=&quot;http://www.curious-creature.com/docs/android-performance-case-study-1.html&quot;&gt;Case study&lt;/a&gt; done by Google Engineer, Romain Guy, to optimize a popular twitter client. In this case study, Romain shows how he found performance issues in the app and what he recommends on doing to fix them. There’s a &lt;a href=&quot;http://www.curious-creature.com/2015/03/25/android-performance-case-study-follow-up/&quot;&gt;follow-up post&lt;/a&gt;, showing other issues for the same app, after it was redesigned.&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;I hope you now have enough information, and more confidence, to start optimizing your apps today!&lt;/p&gt;
+
+&lt;p&gt;Start a trace, or enable some of the relevant Developer Options, and just go from there. You’re welcome to share some of the things you’ve found in the comments or in the Android Performance Patterns Google+ community.&lt;/p&gt;
+</description>
+        <pubDate>Fri, 09 Oct 2015 01:21:09 +0800</pubDate>
+        <link>http://gaoxuxu.github.io/material-jekyll-theme/2015/10/speed-up-your-app</link>
+        <guid isPermaLink="true">http://gaoxuxu.github.io/material-jekyll-theme/2015/10/speed-up-your-app</guid>
+        
+        
+        <category>Java</category>
+        
+        <category>Android</category>
+        
+      </item>
+    
+      <item>
+        <title>Android文件层次结构</title>
+        <description>&lt;p&gt;前几天阅读Android 5.0的源码，发现自己以前没有了解过Android文件层次，这篇文章简单记录了我了解的一些信息。&lt;/p&gt;
+
+&lt;p&gt;Android文件层次不过是Linux文件层次的变体。在Linux／Android／Unix（为简单起见，下午一律称为Linux）中，文件层次是一棵单独的树，树的顶部也就是根部是“&lt;code class=&quot;highlighter-rouge&quot;&gt;/&lt;/code&gt;”，在“&lt;code class=&quot;highlighter-rouge&quot;&gt;/&lt;/code&gt;”之下是文件和目录。Linux文件层次缺乏Windows中驱动的概念，它将文件系统挂载在一个目录来创建一棵单独的树。对基于媒介的文件系统来说，文件系统相当于一些媒介的分区，这使得文件系统无论存在于本地还是远程设备都一样。所有事物都是从根部开始的一棵单独整体树的一部分。&lt;/p&gt;
+
+&lt;p&gt;所有文件或目录的路径都以根部“&lt;code class=&quot;highlighter-rouge&quot;&gt;/&lt;/code&gt;”开始。例如，我的文件管理器显示的内部闪存的路径是&lt;code class=&quot;highlighter-rouge&quot;&gt;/mnt/sdcard&lt;/code&gt;，它也被简称为“&lt;code class=&quot;highlighter-rouge&quot;&gt;sdcard&lt;/code&gt;”。如果你的Android设备有外部SD卡，你还会看到&lt;code class=&quot;highlighter-rouge&quot;&gt;/mnt/extSdCard&lt;/code&gt;。当然可能实际的名字会不一样，但概念都是一样的。例如，CyanogenMod将外部闪存挂载到了&lt;code class=&quot;highlighter-rouge&quot;&gt;/mnt/sdcard&lt;/code&gt;，而内部闪存则挂载到了&lt;code class=&quot;highlighter-rouge&quot;&gt;/mnt/emmc&lt;/code&gt;。这里需要记住的一个重点是，每个目录都代表了一个文件系统的&lt;strong&gt;挂载点&lt;/strong&gt;。对普通用户来说，Android文件仅仅用来展示了你访问的文件系统，这些文件系统只是整体文件层次的一部分。&lt;/p&gt;
+
+&lt;p&gt;要看到完整的Android文件层次的话，需要“root”权限。这种情况下，“root”指的是有系统管理员特权的特殊用户账户。如果你“root”了一个Android设备，你就会提升为root账户。没有自动授予root权限的其中一个理由是，极小的错误会导致大麻烦。然而，它为有Linux命令和Linux系统管理经验的人揭开了Android底层结构的面纱。&lt;/p&gt;
+
+&lt;p&gt;##Android文件系统&lt;/p&gt;
+
+&lt;p&gt;Android使用的是Linux内核，所有文件和目录都被称之为虚拟文件系统（VFS）。每个文件系统都是VFS的实现。每个文件系统有一个单独的内核模块，这个内核模块注册了它由VFS支持的操作。通过抽象和实现分离，增加一个新文件系统就变为写一个内核模块的问题。这些模块要么是内核的一部分，要么动态按需加载。Android内核自带从AIX（IBM的Unix变体）的Journal文件系统（JFS）到Amiga文件系统的文件系统的大集合的一个子集。这里边所有的花样对用户都是隐藏的，当内核挂载一个文件系统时它会处理所有操作。&lt;/p&gt;
+
+&lt;p&gt;内核配置文件确定什么文件系统模块要被编译，以及它们是要在内核中构建，还是动态加载。因此，Android内核只包含了与它运行有关的文件系统模块。实际上，我没听说过有编译了所有文件系统模块的独立Linux分支，因为有些文件系统是依赖于硬件结构的。不同的Android设备支持的文件系统有所不同，下面是比较常见的闪存文件系统：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;em&gt;exFAT&lt;/em&gt;&lt;/strong&gt;：The extended File Allocation Table，微软专有的闪存文件系统。由于许可证的限制，它不是标准Linux内核的一部分。不过，一些制造商提供了Android对该文件系统的支持。&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;em&gt;F2FS&lt;/em&gt;&lt;/strong&gt;：The Flash-Friendly File System，三星于2012年推出的开源Linux文件系统。&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;em&gt;JFFS2&lt;/em&gt;&lt;/strong&gt;：The Journal Flash System version 2，Ice Cream Sandwich以来AOSP（Android Open Source Project）默认的闪存文件系统。JFFS2是原始JFFS的替代品。&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;em&gt;YAFFS2&lt;/em&gt;&lt;/strong&gt;：Yet Another Flash File System 2，2.6.32版本内核的默认AOSP闪存文件系统。新的内核版本不支持YAFFS2，在kernel.org的最新内核版本的源码树中已经找不到它了。不过，有些手机生产厂商可能会继续支持YAFFS2。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;除了闪存文件系统，Android设备通常支持以下的media-based文件系统：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;em&gt;EXT2/EXT3/EXT4&lt;/em&gt;&lt;/strong&gt;：EXTended文件系统是标准的Linux文件系统，EXT4是当前版本。从2010年以后，EXT4经常被用来代替YAFFS2或者JFFS2作为Android设备的内部闪存文件系统。&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;em&gt;MSDOS&lt;/em&gt;&lt;/strong&gt;：MMSDOS驱动器支持FAT12、FAT16和FAT32文件系统。&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;em&gt;VFAT&lt;/em&gt;&lt;/strong&gt;：VFAT实际上不是文件系统，它是FAT12、FAT16和FAT32文件系统的一个扩展。因此，你总是看到VFAT内核模块和MSDOS模块结合在一起。外部SD卡通常使用VFAT格式。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;上面是media-based文件系统。VFS也支持伪文件系统，也就是非media based文件系统。Linux内核支持一些伪文件系统，下面是对Android设备比较重要的一部分：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;em&gt;cgroup&lt;/em&gt;&lt;/strong&gt;：cgroup（control group）伪文件系统提供了访问和定义各种内核参数的方法。cgroup是伪文件系统，有许多不同的进程控制组。如果你的Android设备支持进程控制组，你可以在&lt;code class=&quot;highlighter-rouge&quot;&gt;/proc/cgroups&lt;/code&gt;文件中找到这些组的列表。Android使用cgroup来acct（用户账户控制）和cpuctl（CPU控制）。&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;em&gt;rootfs&lt;/em&gt;&lt;/strong&gt;：这个文件系统服务于根文件系统（“&lt;code class=&quot;highlighter-rouge&quot;&gt;/&lt;/code&gt;”）挂载点。&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;em&gt;procfs&lt;/em&gt;&lt;/strong&gt;：procfs文件系统通常挂载在&lt;code class=&quot;highlighter-rouge&quot;&gt;/proc&lt;/code&gt;目录，它们反映了一些内核数据结构。在这些文件上的操作实际上读的是内核中的数据。这些文件夹反映了每个正在运行的任务的进程ID（实际上是线程组leader的进程ID）。&lt;code class=&quot;highlighter-rouge&quot;&gt;/proc/filesystems&lt;/code&gt;文件中创建了当前已经注册的文件系统的列表。NODEV下面的就是伪文件系统，它们没有相关的设备。&lt;code class=&quot;highlighter-rouge&quot;&gt;/proc/sys&lt;/code&gt;目录包含了一些可调的内核参数。&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;em&gt;sysfs&lt;/em&gt;&lt;/strong&gt;：内核的设备模型是一个面向对象数据结构，反映了内核通过sysfs文件系统所知的设备，它一般挂载在&lt;code class=&quot;highlighter-rouge&quot;&gt;/sys&lt;/code&gt;目录。当内核发现一个新的设备，它就在&lt;code class=&quot;highlighter-rouge&quot;&gt;/sys/devices&lt;/code&gt;目录构建一个对象。内核使用socket通信将新设备的信息告诉udevd守护进程，udevd守护进程在&lt;code class=&quot;highlighter-rouge&quot;&gt;/dev&lt;/code&gt;目录下构建一条记录。&lt;code class=&quot;highlighter-rouge&quot;&gt;/sys/fs&lt;/code&gt;目录包含media-based文件系统的内核对象结构。&lt;code class=&quot;highlighter-rouge&quot;&gt;/sys/module&lt;/code&gt;目录包含每个已加载内核模块的对象。&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;em&gt;tmpfs&lt;/em&gt;&lt;/strong&gt;：tmpfs文件系统经常挂载在&lt;code class=&quot;highlighter-rouge&quot;&gt;/dev&lt;/code&gt;目录。由于它是伪文件系统，因此&lt;code class=&quot;highlighter-rouge&quot;&gt;/dev&lt;/code&gt;目录下的所有数据在重启设备后都会丢失。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;上面看到的一些文件系统，只是冰山一角。对没有root的设备，这些文件系统和目录都是隐藏起来的，你没有权限去访问它们。我的三星Galaxy S3在设置按钮的开发者选项中提供了USB调试功能，打开这个选项后就可以用adb（Android Debug Bridge）连接到三星Galaxy S3.然而它只提供用户级别的权限，它提供了对绝大多数目录的访问和绝大多数Linux命令。这个选项应该在其他三星Android设备也有。你也可以用&lt;a href=&quot;https://play.google.com/store/apps/details?id=jackpal.androidterm&quot;&gt;Terminal Emulator&lt;/a&gt;试试。它在我的三星Galaxy S3和运行CyanogenMod 10（Jelly Bean）的B&amp;amp;N Nook Color上都是可以工作的。&lt;/p&gt;
+
+&lt;p&gt;##Android文件层次&lt;/p&gt;
+
+&lt;p&gt;由上所述，Android文件层次是Linux文件层次的一个修改过的版本。不同Linux版本和不同生产厂商的结构有细微的差别。然而，差别非常细小。下面对Jelly Bean的AOSP目录结构的最顶层做一个简单的总结：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;em&gt;acct&lt;/em&gt;&lt;/strong&gt;：这个目录是acct cgroup（control group）的挂载点。&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;em&gt;cache&lt;/em&gt;&lt;/strong&gt;：&lt;code class=&quot;highlighter-rouge&quot;&gt;/dev/block/mtdblock2&lt;/code&gt;分区的挂载点（分区名称可能有所不同）。缓存的大小被限制为这个分区的大小。&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;em&gt;d&lt;/em&gt;&lt;/strong&gt;：&lt;code class=&quot;highlighter-rouge&quot;&gt;/sys/kernel/debug&lt;/code&gt;的一个符号链接。&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;em&gt;data&lt;/em&gt;&lt;/strong&gt;：&lt;code class=&quot;highlighter-rouge&quot;&gt;/dev/block/mtdblock1&lt;/code&gt;分区的挂载点。&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;em&gt;default.prop&lt;/em&gt;&lt;/strong&gt;：这个文件定义了各种默认属性。&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;em&gt;dev&lt;/em&gt;&lt;/strong&gt;：tmpfs文件系统的挂载点，定义了应用程序可用的设备。&lt;code class=&quot;highlighter-rouge&quot;&gt;/dev/cpuctl&lt;/code&gt;目录是cpuctl控制组的挂载点，使用cgroup伪文件系统。&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;em&gt;etc&lt;/em&gt;&lt;/strong&gt;：&lt;code class=&quot;highlighter-rouge&quot;&gt;/system/etc&lt;/code&gt;的一个符号链接。&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;em&gt;init&lt;/em&gt;&lt;/strong&gt;：处理&lt;code class=&quot;highlighter-rouge&quot;&gt;init.rc&lt;/code&gt;文件的一个二进制程序。&lt;code class=&quot;highlighter-rouge&quot;&gt;init.rc&lt;/code&gt;文件引入其他&lt;code class=&quot;highlighter-rouge&quot;&gt;init.*.rc&lt;/code&gt;文件。Android启动时，内核会在启动进程的最后运行init程序。&lt;code class=&quot;highlighter-rouge&quot;&gt;init.rc&lt;/code&gt;文件值得一读，它告诉我们一些Android设备配置的事情。由于Android不支持&lt;code class=&quot;highlighter-rouge&quot;&gt;/etc/sysctl.conf&lt;/code&gt;，所以&lt;code class=&quot;highlighter-rouge&quot;&gt;/proc/sys/kernel&lt;/code&gt;参数的更新就成为了&lt;code class=&quot;highlighter-rouge&quot;&gt;init.rc&lt;/code&gt;文件的一部分。除非你对Linux内核的内部工作机制有一个好的理解，最好不要修改这些参数。对&lt;code class=&quot;highlighter-rouge&quot;&gt;/dev/cpuctl&lt;/code&gt;的参数也是一样的道理。&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;em&gt;mnt&lt;/em&gt;&lt;/strong&gt;：除了挂载内部和外部SD卡，这个目录还是其他文件系统的挂载点。&lt;code class=&quot;highlighter-rouge&quot;&gt;/mnt/asec&lt;/code&gt;目录是一个tmpfs文件系统的挂载点，它是Android安全机制的一部分。&lt;code class=&quot;highlighter-rouge&quot;&gt;/mnt/obb&lt;/code&gt;目录是一个tmpfs文件系统的挂载点，它用来存储应用程序文件超出50MB后的扩展文件。&lt;code class=&quot;highlighter-rouge&quot;&gt;/mnt/secure&lt;/code&gt;目录是Android安全机制的另外一个组件。你也可以看到一个或多个USB设备的挂载点。&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;em&gt;proc&lt;/em&gt;&lt;/strong&gt;：procfs文件系统的挂载点，用来提供对内核数据结构的访问。&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;em&gt;root&lt;/em&gt;&lt;/strong&gt;：root账户的home目录。&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;em&gt;sbin&lt;/em&gt;&lt;/strong&gt;：比标准Linux发行版中的&lt;code class=&quot;highlighter-rouge&quot;&gt;/sbin&lt;/code&gt;目录小很多，但它确实包含了几个重要守护进程的二进制文件。&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;em&gt;sdcard&lt;/em&gt;&lt;/strong&gt;：&lt;code class=&quot;highlighter-rouge&quot;&gt;/mnt/sdcard&lt;/code&gt;的一个符号链接。&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;em&gt;sys&lt;/em&gt;&lt;/strong&gt;：sysfs伪文件系统的挂载点，sysfs伪文件系统是内核的设备对象结构的反映。这个目录下有很多信息，但它需要理解内核设备模型。简而言之，这些目录表示内核对象，而文件是这些对象的属性。&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;em&gt;system&lt;/em&gt;&lt;/strong&gt;：这个目录是&lt;code class=&quot;highlighter-rouge&quot;&gt;/dev/block/mtdblock0&lt;/code&gt;的挂载点，这个目录下就是你通常在标准Linux发行版中root目录下看到的目录。这些目录包括&lt;code class=&quot;highlighter-rouge&quot;&gt;bin&lt;/code&gt;、&lt;code class=&quot;highlighter-rouge&quot;&gt;etc&lt;/code&gt;、&lt;code class=&quot;highlighter-rouge&quot;&gt;lib&lt;/code&gt;、&lt;code class=&quot;highlighter-rouge&quot;&gt;usr&lt;/code&gt;和&lt;code class=&quot;highlighter-rouge&quot;&gt;xbin&lt;/code&gt;。&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;em&gt;ueventd.goldfish.rc ueventd.rc&lt;/em&gt;&lt;/strong&gt;：这些文件定义了&lt;code class=&quot;highlighter-rouge&quot;&gt;/dev&lt;/code&gt;目录的配置规则。&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;&lt;em&gt;vendor&lt;/em&gt;&lt;/strong&gt;：&lt;code class=&quot;highlighter-rouge&quot;&gt;/system/vendor&lt;/code&gt;的一个符号链接。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;上面只是Android文件结构的一个简单描述。要理解桌面之下Android的工作，你需要了解Linux的基本知识和Linux命令行。对于内核参数，你需要知道Linux内核的工作知识。在以后的文章中我将详细探讨Android文件层次。&lt;/p&gt;
+</description>
+        <pubDate>Sun, 16 Nov 2014 22:28:09 +0800</pubDate>
+        <link>http://gaoxuxu.github.io/material-jekyll-theme/2014/11/understanding-android-file-hierarchy</link>
+        <guid isPermaLink="true">http://gaoxuxu.github.io/material-jekyll-theme/2014/11/understanding-android-file-hierarchy</guid>
+        
+        
+        <category>Java</category>
+        
+        <category>Android</category>
+        
+      </item>
+    
+      <item>
+        <title>Android代码红线:不要将敏感信息明文保存在外部存储设备（SD卡）上</title>
+        <description>&lt;p&gt;##不要将敏感信息明文保存在外部存储设备（SD卡）上&lt;/p&gt;
+
+&lt;p&gt;Android提供了几种数据存储方式，其中有一种就是&lt;strong&gt;外部存储设备（&lt;code class=&quot;highlighter-rouge&quot;&gt;/sdcard&lt;/code&gt;,&lt;code class=&quot;highlighter-rouge&quot;&gt;/mnt/sdcard&lt;/code&gt;）&lt;/strong&gt;。“外部存储设备”的例子包括设备中的微型或者标准尺寸的SD卡，装载到PC的Android设备存储，以及&lt;code class=&quot;highlighter-rouge&quot;&gt;Android/obb&lt;/code&gt;文件夹。&lt;/p&gt;
+
+&lt;p&gt;在Android 4.1之前，外部存储设备中的文件是全球可读的（world-readable）。在Android 1之前，外部存储设备中的文件是全球可写的（world-writable）。从Android 1到Android 4.3，一个app要向其他app保存在外部存储设备上的文件写入，只需要一个权限&lt;code class=&quot;highlighter-rouge&quot;&gt;WRITE_EXTERNAL_STORAGE&lt;/code&gt;。从Android 4.4开始，采用了基于文件夹结构创建的文件组和文件行为，它允许一个app利用权限来管理／读／写基于它包名的文件夹结构中的文件。从Android 4.4开始，用户（包括apps）从Android设备管理的其它app主要的外部存储空间脱离了开来。&lt;/p&gt;
+
+&lt;p&gt;上面所说的缺乏限制的后果就是，保存在外部存储的文件可以被设备上安装其它的app读或者修改（对于允许读／写的Android版本）；如果存储到可以拆卸的外部存储设备的话，那么谁都可以访问这些文件，比如PC（还有一种情况就是，设备内部的外部存储设备被卸载并且装载到其它地方）。&lt;/p&gt;
+
+&lt;p&gt;Android API指南&lt;a href=&quot;http://developer.android.com/guide/topics/data/data-storage.html&quot;&gt;Storage Options&lt;/a&gt;的陈述如下：&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Caution: External storage can become unavailable if the user mounts the external storage on a computer or removes the media, and there’s no security enforced upon files you save to the external storage. All applications can read and write files placed on the external storage and the user can remove them.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;开发者如果没有对敏感信息进行编码，就不能将其保存在外部存储设备上，因为保存在外部存储上的文件不能保证其可用性、完整性和机密性。&lt;/p&gt;
+
+&lt;p&gt;###不符合该规则的代码示例&lt;/p&gt;
+
+&lt;p&gt;下面的代码在外部存储中创建了一个文件，并将敏感信息写入了该文件：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;private String filename = &quot;myfile&quot;;
+
+private String string = &quot;sensitive data such as credit card number&quot;;
+FileOutputStream fos = null;
+
+try {
+  File file = new File(getExternalFilesDir(TARGET_TYPE), filename);
+  fos = new FileOutputStream(file, false);
+  fos.write(string.getBytes());
+} catch (FileNotFoundException e) {
+  // handle FileNotFoundException
+} catch (IOException e) {
+  // handle IOException
+} finally {
+  if (fos != null) {
+    try {
+      fos.close();
+    } catch (IOException e) {
+    
+    }
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;####验证&lt;/p&gt;
+
+&lt;p&gt;一般来说，一个应用保存的文件位置如下：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;/sdcard/Android/data/com.company.app/files/save/appdata/save_appdata
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;###解决方案1（将文件保存在内部存储）&lt;/p&gt;
+
+&lt;p&gt;下面的代码使用了&lt;code class=&quot;highlighter-rouge&quot;&gt;openFileOutput()&lt;/code&gt;方法在应用的&lt;code class=&quot;highlighter-rouge&quot;&gt;data&lt;/code&gt;文件夹创建了文件&lt;code class=&quot;highlighter-rouge&quot;&gt;myfile&lt;/code&gt;，并将其权限设置为&lt;code class=&quot;highlighter-rouge&quot;&gt;MODE_PRIVATE&lt;/code&gt;，因此其他app无法访问这个文件：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;private String filename = &quot;myfile&quot;;
+
+private String string = &quot;sensitive data such as credit card number&quot;;
+FileOutputStream fos = null;
+
+try {
+  fos = openFileOutput(filename, Context.MODE_PRIVATE);
+  fos.write(string.getBytes());
+  fos.close();
+} catch (FileNotFoundException e) {
+  // handle FileNotFoundException
+} catch (IOException e) {
+  // handle IOException
+} finally {
+  if (fos != null) {
+    try {
+      fos.close();
+    } catch (IOException e) {
+    
+    }
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;###解决方案2&lt;/p&gt;
+
+&lt;p&gt;在将数据保存在外部存储（比如SD卡）中之前，请先将数据安全地编码。&lt;/p&gt;
+
+&lt;p&gt;翻译自&lt;a href=&quot;https://www.securecoding.cert.org/confluence/display/java/DRD00-J.+Do+not+store+sensitive+information+on+external+storage+%28SD+card%29+unless+encrypted+first&quot;&gt;CERT&lt;/a&gt;&lt;/p&gt;
+</description>
+        <pubDate>Sat, 20 Sep 2014 22:11:30 +0800</pubDate>
+        <link>http://gaoxuxu.github.io/material-jekyll-theme/2014/09/do-not-store-sensitive-information-on-external-storage-unless-encrypted-first</link>
+        <guid isPermaLink="true">http://gaoxuxu.github.io/material-jekyll-theme/2014/09/do-not-store-sensitive-information-on-external-storage-unless-encrypted-first</guid>
+        
+        
+        <category>Java</category>
+        
+        <category>Android</category>
+        
+      </item>
+    
+      <item>
+        <title>IDEA 快捷键</title>
+        <description>&lt;p&gt;##Editing&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Ctrl + Space&lt;/strong&gt;：Basic code completion (the name of any class,method or variable)&lt;br /&gt;
+&lt;strong&gt;Ctrl + Shift + Space&lt;/strong&gt;：Smart code completion (filters the list of methods and variables by expected type)&lt;br /&gt;
+&lt;strong&gt;Ctrl + Shift + Enter&lt;/strong&gt;：Complete statement&lt;br /&gt;
+&lt;strong&gt;Ctrl + P&lt;/strong&gt;：Parameter info (within method call arguments)&lt;br /&gt;
+&lt;strong&gt;Ctrl + Q&lt;/strong&gt;：Quick documentation lookup&lt;br /&gt;
+&lt;strong&gt;Shift + F1&lt;/strong&gt;：External Doc&lt;br /&gt;
+&lt;strong&gt;Ctrl + mouse over code&lt;/strong&gt;：Brief Info&lt;br /&gt;
+&lt;strong&gt;Ctrl + F1&lt;/strong&gt;：Show descriptions of error or warning at caret&lt;br /&gt;
+&lt;strong&gt;Alt + Insert&lt;/strong&gt;：Generate code… (Getters, Setters, Constructors, hashCode/equals, toString)&lt;br /&gt;
+&lt;strong&gt;Ctrl + O&lt;/strong&gt;：Override methods&lt;br /&gt;
+&lt;strong&gt;Ctrl + I&lt;/strong&gt;：Implement methods&lt;br /&gt;
+&lt;strong&gt;Ctrl + Alt + T&lt;/strong&gt;：Surround with… (if..else, try..catch, for,synchronized, etc.)&lt;br /&gt;
+&lt;strong&gt;Ctrl + /&lt;/strong&gt;：Comment/uncomment with line comment&lt;br /&gt;
+&lt;strong&gt;Ctrl + Shift + /&lt;/strong&gt;：Comment/uncomment with block comment&lt;br /&gt;
+&lt;strong&gt;Ctrl + W&lt;/strong&gt;：Select successively increasing code blocks&lt;br /&gt;
+&lt;strong&gt;Ctrl + Shift + W&lt;/strong&gt;：Decrease current selection to previous state&lt;br /&gt;
+&lt;strong&gt;Alt + Q&lt;/strong&gt;：Context info&lt;br /&gt;
+&lt;strong&gt;Alt + Enter&lt;/strong&gt;：Show intention actions and quick-fixes&lt;br /&gt;
+&lt;strong&gt;Ctrl + Alt + L&lt;/strong&gt;：Reformat code&lt;br /&gt;
+&lt;strong&gt;Ctrl + Alt + O&lt;/strong&gt;：Optimize imports&lt;br /&gt;
+&lt;strong&gt;Ctrl + Alt + I&lt;/strong&gt;：Auto-indent line(s)&lt;br /&gt;
+&lt;strong&gt;Tab / Shift + Tab&lt;/strong&gt;：Indent/unindent selected lines&lt;br /&gt;
+&lt;strong&gt;Ctrl + X&lt;/strong&gt; or &lt;strong&gt;Shift + Delete&lt;/strong&gt;：Cut current line or selected block to clipboard&lt;br /&gt;
+&lt;strong&gt;Ctrl + C&lt;/strong&gt; or &lt;strong&gt;Ctrl + Insert&lt;/strong&gt;：Copy current line or selected block to clipboard&lt;br /&gt;
+&lt;strong&gt;Ctrl + V&lt;/strong&gt; or &lt;strong&gt;Shift + Insert&lt;/strong&gt;：Paste from clipboard&lt;br /&gt;
+&lt;strong&gt;Ctrl + Shift + V&lt;/strong&gt;：Paste from recent buffers…&lt;br /&gt;
+&lt;strong&gt;Ctrl + D&lt;/strong&gt;：Duplicate current line or selected block&lt;br /&gt;
+&lt;strong&gt;Ctrl + Y&lt;/strong&gt;：Delete line at caret&lt;br /&gt;
+&lt;strong&gt;Ctrl + Shift + J&lt;/strong&gt;：Smart line join&lt;br /&gt;
+&lt;strong&gt;Ctrl + Enter&lt;/strong&gt;：Smart line split&lt;br /&gt;
+&lt;strong&gt;Shift + Enter&lt;/strong&gt;：Start new line&lt;br /&gt;
+&lt;strong&gt;Ctrl + Shift + U&lt;/strong&gt;：Toggle case for word at caret or selected block&lt;br /&gt;
+&lt;strong&gt;Ctrl + Shift + ] / [&lt;/strong&gt;：Select till code block end/start&lt;br /&gt;
+&lt;strong&gt;Ctrl + Delete&lt;/strong&gt;：Delete to word end&lt;br /&gt;
+&lt;strong&gt;Ctrl + Backspace&lt;/strong&gt;：Delete to word start&lt;br /&gt;
+&lt;strong&gt;Ctrl + NumPad+/-&lt;/strong&gt;：Expand/collapse code block&lt;br /&gt;
+&lt;strong&gt;Ctrl + Shift + NumPad+&lt;/strong&gt;：Expand all&lt;br /&gt;
+&lt;strong&gt;Ctrl + Shift + NumPad-&lt;/strong&gt;：Collapse all&lt;br /&gt;
+&lt;strong&gt;Ctrl + F4&lt;/strong&gt;：Close active editor tab&lt;/p&gt;
+
+&lt;p&gt;##Search/Replace&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Double Shift&lt;/strong&gt;：Search everywhere&lt;br /&gt;
+&lt;strong&gt;Ctrl + F&lt;/strong&gt;：Find&lt;br /&gt;
+&lt;strong&gt;F3&lt;/strong&gt;：Find next&lt;br /&gt;
+&lt;strong&gt;Shift + F3&lt;/strong&gt;：Find previous&lt;br /&gt;
+&lt;strong&gt;Ctrl + R&lt;/strong&gt;：Replace&lt;br /&gt;
+&lt;strong&gt;Ctrl + Shift + F&lt;/strong&gt;：Find in path&lt;br /&gt;
+&lt;strong&gt;Ctrl + Shift + R&lt;/strong&gt;：Replace in path&lt;br /&gt;
+&lt;strong&gt;Ctrl + Shift + S&lt;/strong&gt;：Search structurally (Ultimate Edition only)&lt;br /&gt;
+&lt;strong&gt;Ctrl + Shift + M&lt;/strong&gt;：Replace structurally (Ultimate Edition only)&lt;/p&gt;
+
+&lt;p&gt;##Usage Search&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Alt + F7 / Ctrl + F7&lt;/strong&gt;：Find usages / Find usages in file&lt;br /&gt;
+&lt;strong&gt;Ctrl + Shift + F7&lt;/strong&gt;：Highlight usages in file&lt;br /&gt;
+&lt;strong&gt;Ctrl + Alt + F7&lt;/strong&gt;：Show usages&lt;/p&gt;
+
+&lt;p&gt;##Compile and Run&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Ctrl + F9&lt;/strong&gt;：Make project (compile modifed and dependent)&lt;br /&gt;
+&lt;strong&gt;Ctrl + Shift + F9&lt;/strong&gt;：Compile selected file, package or module&lt;br /&gt;
+&lt;strong&gt;Alt + Shift + F10&lt;/strong&gt;：Select configuration and run&lt;br /&gt;
+&lt;strong&gt;Alt + Shift + F9&lt;/strong&gt;：Select configuration and debug&lt;br /&gt;
+&lt;strong&gt;Shift + F10&lt;/strong&gt;：Run&lt;br /&gt;
+&lt;strong&gt;Shift + F9&lt;/strong&gt;：Debug&lt;br /&gt;
+&lt;strong&gt;Ctrl + Shift + F10&lt;/strong&gt;：Run context configuration from editor&lt;/p&gt;
+
+&lt;p&gt;##Debugging&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;F8&lt;/strong&gt;：Step over&lt;br /&gt;
+&lt;strong&gt;F7&lt;/strong&gt;：Step into&lt;br /&gt;
+&lt;strong&gt;Shift + F7&lt;/strong&gt;：Smart step into&lt;br /&gt;
+&lt;strong&gt;Shift + F8&lt;/strong&gt;：Step out&lt;br /&gt;
+&lt;strong&gt;Alt + F9&lt;/strong&gt;：Run to cursor&lt;br /&gt;
+&lt;strong&gt;Alt + F8&lt;/strong&gt;：Evaluate expression&lt;br /&gt;
+&lt;strong&gt;F9&lt;/strong&gt;：Resume program&lt;br /&gt;
+&lt;strong&gt;Ctrl + F8&lt;/strong&gt;：Toggle breakpoint&lt;br /&gt;
+&lt;strong&gt;Ctrl + Shift + F8&lt;/strong&gt;：View breakpoints&lt;/p&gt;
+
+&lt;p&gt;##Navigation&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Ctrl + N&lt;/strong&gt;：Go to class&lt;br /&gt;
+&lt;strong&gt;Ctrl + Shift + N&lt;/strong&gt;：Go to file&lt;br /&gt;
+&lt;strong&gt;Ctrl + Alt + Shift + N&lt;/strong&gt;：Go to symbol&lt;br /&gt;
+&lt;strong&gt;Alt + Right/Left&lt;/strong&gt;：Go to next/previous editor tab&lt;br /&gt;
+&lt;strong&gt;F12&lt;/strong&gt;：Go back to previous tool window&lt;br /&gt;
+&lt;strong&gt;Esc&lt;/strong&gt;：Go to editor (from tool window)&lt;br /&gt;
+&lt;strong&gt;Shift + Esc&lt;/strong&gt;：Hide active or last active window&lt;br /&gt;
+&lt;strong&gt;Ctrl + Shift + F4&lt;/strong&gt;：Close active run/messages/find/… tab&lt;br /&gt;
+&lt;strong&gt;Ctrl + G&lt;/strong&gt;：Go to line&lt;br /&gt;
+&lt;strong&gt;Ctrl + E&lt;/strong&gt;：Recent files popup&lt;br /&gt;
+&lt;strong&gt;Ctrl + Alt + Left/Right&lt;/strong&gt;：Navigate back/forward&lt;br /&gt;
+&lt;strong&gt;Ctrl + Shift + Backspace&lt;/strong&gt;：Navigate to last edit location&lt;br /&gt;
+&lt;strong&gt;Alt + F1&lt;/strong&gt;：Select current file or symbol in any view&lt;br /&gt;
+&lt;strong&gt;Ctrl + B&lt;/strong&gt; or &lt;strong&gt;Ctrl + Click&lt;/strong&gt;：Go to declaration&lt;br /&gt;
+&lt;strong&gt;Ctrl + Alt + B&lt;/strong&gt;：Go to implementation(s)&lt;br /&gt;
+&lt;strong&gt;Ctrl + Shift + I&lt;/strong&gt;：Open quick definition lookup&lt;br /&gt;
+&lt;strong&gt;Ctrl + Shift + B&lt;/strong&gt;：Go to type declaration&lt;br /&gt;
+&lt;strong&gt;Ctrl + U&lt;/strong&gt;：Go to super-method/super-class&lt;br /&gt;
+&lt;strong&gt;Alt + Up/Down&lt;/strong&gt;：Go to previous/next method&lt;br /&gt;
+&lt;strong&gt;Ctrl + ] / [&lt;/strong&gt;：Move to code block end/start&lt;br /&gt;
+&lt;strong&gt;Ctrl + F12&lt;/strong&gt;：File structure popup&lt;br /&gt;
+&lt;strong&gt;Ctrl + H&lt;/strong&gt;：Type hierarchy&lt;br /&gt;
+&lt;strong&gt;Ctrl + Shift + H&lt;/strong&gt;：Method hierarchy&lt;br /&gt;
+&lt;strong&gt;Ctrl + Alt + H&lt;/strong&gt;：Call hierarchy&lt;br /&gt;
+&lt;strong&gt;F2 / Shift + F2&lt;/strong&gt;：Next/previous highlighted error&lt;br /&gt;
+&lt;strong&gt;F4 / Ctrl + Enter&lt;/strong&gt;：Edit source / View source&lt;br /&gt;
+&lt;strong&gt;Alt + Home&lt;/strong&gt;：Show navigation bar&lt;br /&gt;
+&lt;strong&gt;F11&lt;/strong&gt;：Toggle bookmark&lt;br /&gt;
+&lt;strong&gt;Ctrl + F11&lt;/strong&gt;：Toggle bookmark with mnemonic&lt;br /&gt;
+&lt;strong&gt;Ctrl + #[0-9]&lt;/strong&gt;：Go to numbered bookmark&lt;br /&gt;
+&lt;strong&gt;Shift + F11&lt;/strong&gt;：Show bookmarks&lt;/p&gt;
+
+&lt;p&gt;##Refactoring&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;F5&lt;/strong&gt;：Copy&lt;br /&gt;
+&lt;strong&gt;F6&lt;/strong&gt;：Move&lt;br /&gt;
+&lt;strong&gt;Alt + Delete&lt;/strong&gt;：Safe Delete&lt;br /&gt;
+&lt;strong&gt;Shift + F6&lt;/strong&gt;：Rename&lt;br /&gt;
+&lt;strong&gt;Ctrl + F6&lt;/strong&gt;：Change Signature&lt;br /&gt;
+&lt;strong&gt;Ctrl + Alt + N&lt;/strong&gt;：Inline&lt;br /&gt;
+&lt;strong&gt;Ctrl + Alt + M&lt;/strong&gt;：Extract Method&lt;br /&gt;
+&lt;strong&gt;Ctrl + Alt + V&lt;/strong&gt;：Extract Variable&lt;br /&gt;
+&lt;strong&gt;Ctrl + Alt + F&lt;/strong&gt;：Extract Field&lt;br /&gt;
+&lt;strong&gt;Ctrl + Alt + C&lt;/strong&gt;：Extract Constant&lt;br /&gt;
+&lt;strong&gt;Ctrl + Alt + P&lt;/strong&gt;：Extract Parameter&lt;/p&gt;
+
+&lt;p&gt;##VCS/Local History&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Ctrl + K&lt;/strong&gt;：Commit project to VCS&lt;br /&gt;
+&lt;strong&gt;Ctrl + T&lt;/strong&gt;：Update project from VCS&lt;br /&gt;
+&lt;strong&gt;Alt + Shift + C&lt;/strong&gt;：View recent changes&lt;br /&gt;
+&lt;strong&gt;Alt + BackQuote (`)&lt;/strong&gt;：‘VCS’ quick popup&lt;/p&gt;
+
+&lt;p&gt;##Live Templates&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Ctrl + Alt + J&lt;/strong&gt;：Surround with Live Template&lt;br /&gt;
+&lt;strong&gt;Ctrl + J&lt;/strong&gt;：Insert Live Template&lt;br /&gt;
+&lt;strong&gt;&lt;em&gt;iter&lt;/em&gt;&lt;/strong&gt;：Iteration according to Java SDK 1.5 style&lt;br /&gt;
+&lt;strong&gt;&lt;em&gt;inst&lt;/em&gt;&lt;/strong&gt;：Check object type with instanceof and downcast it&lt;br /&gt;
+&lt;strong&gt;&lt;em&gt;itco&lt;/em&gt;&lt;/strong&gt;：Iterate elements of java.util.Collection&lt;br /&gt;
+&lt;strong&gt;&lt;em&gt;itit&lt;/em&gt;&lt;/strong&gt;：Iterate elements of java.util.Iterator&lt;br /&gt;
+&lt;strong&gt;&lt;em&gt;itli&lt;/em&gt;&lt;/strong&gt;：Iterate elements of java.util.List&lt;br /&gt;
+&lt;strong&gt;&lt;em&gt;psf&lt;/em&gt;&lt;/strong&gt;：public static final&lt;br /&gt;
+&lt;strong&gt;&lt;em&gt;thr&lt;/em&gt;&lt;/strong&gt;：throw new&lt;/p&gt;
+
+&lt;p&gt;##General&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Alt + #[0-9]&lt;/strong&gt;：Open corresponding tool window&lt;br /&gt;
+&lt;strong&gt;Ctrl + S&lt;/strong&gt;：Save all&lt;br /&gt;
+&lt;strong&gt;Ctrl + Alt + Y&lt;/strong&gt;：Synchronize&lt;br /&gt;
+&lt;strong&gt;Ctrl + Shift + F12&lt;/strong&gt;：Toggle maximizing editor&lt;br /&gt;
+&lt;strong&gt;Alt + Shift + F&lt;/strong&gt;：Add to Favorites&lt;br /&gt;
+&lt;strong&gt;Alt + Shift + I&lt;/strong&gt;：Inspect current file with current profile&lt;br /&gt;
+&lt;strong&gt;Ctrl + BackQuote (`)&lt;/strong&gt;：Quick switch current scheme&lt;br /&gt;
+&lt;strong&gt;Ctrl + Alt + S&lt;/strong&gt;：Open Settings dialog&lt;br /&gt;
+&lt;strong&gt;Ctrl + Alt + Shift + S&lt;/strong&gt;：Open Project Structure dialog&lt;br /&gt;
+&lt;strong&gt;Ctrl + Shift + A&lt;/strong&gt;：Find Action&lt;br /&gt;
+&lt;strong&gt;Ctrl + Tab&lt;/strong&gt;：Switch between tabs and tool window&lt;/p&gt;
+
+&lt;p&gt;####To find any action inside the IDE use Find Action (Ctrl+Shift+A)&lt;/p&gt;
+
+</description>
+        <pubDate>Wed, 23 Apr 2014 06:17:25 +0800</pubDate>
+        <link>http://gaoxuxu.github.io/material-jekyll-theme/2014/04/idea-keymap</link>
+        <guid isPermaLink="true">http://gaoxuxu.github.io/material-jekyll-theme/2014/04/idea-keymap</guid>
+        
+        
+        <category>Java</category>
+        
+        <category>Android</category>
+        
+      </item>
+    
+      <item>
+        <title>Google Android PRNG Entropy Weakness</title>
+        <description>&lt;p&gt;Google Android存在弱密码安全问题。攻击者通过暴力破解技术利用此漏洞可获取敏感信息。参见&lt;a href=&quot;http://www.securityfocus.com/bid/61813/info&quot;&gt;链接&lt;/a&gt;。&lt;br /&gt;
+Android开发者博客中给出了解决办法，只需要将下面的代码添加到&lt;code class=&quot;highlighter-rouge&quot;&gt;Application&lt;/code&gt;类的&lt;code class=&quot;highlighter-rouge&quot;&gt;onCreate&lt;/code&gt;方法中即可：&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;
+PRNGFixes.apply();
+&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;PRNGFixes&lt;/code&gt;类的代码如下：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;/*
+ * This software is provided &#39;as-is&#39;, without any express or implied
+ * warranty.  In no event will Google be held liable for any damages
+ * arising from the use of this software.
+ 	 *
+ * Permission is granted to anyone to use this software for any purpose,
+ * including commercial applications, and to alter it and redistribute it
+ * freely, as long as the origin is not misrepresented.
+ */
+
+package org.thoughtcrime.securesms.crypto;
+
+import android.os.Build;
+import android.os.Process;
+import android.util.Log;
+
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
+import java.security.Provider;
+import java.security.SecureRandom;
+import java.security.SecureRandomSpi;
+import java.security.Security;
+
+/**
+ * This class is taken directly from the Android blog post announcing this bug:
+ * http://android-developers.blogspot.com/2013/08/some-securerandom-thoughts.html
+ *
+ * Since I still don&#39;t know exactly what the source of this bug was, I&#39;m using
+ * this class verbatim under the assumption that the Android team knows what
+ * they&#39;re doing.  Although, at this point, that is perhaps a foolish assumption.
+ */
+
+/**
+ * Fixes for the output of the default PRNG having low entropy.
+ *
+ * The fixes need to be applied via {@link #apply()} before any use of Java
+ * Cryptography Architecture primitives. A good place to invoke them is in the
+ * application&#39;s {@code onCreate}.
+ */
+public final class PRNGFixes {
+
+  private static final int VERSION_CODE_JELLY_BEAN = 16;
+  private static final int VERSION_CODE_JELLY_BEAN_MR2 = 18;
+  private static final byte[] BUILD_FINGERPRINT_AND_DEVICE_SERIAL =
+  getBuildFingerprintAndDeviceSerial();
+
+  /** Hidden constructor to prevent instantiation. */
+  private PRNGFixes() {}
+
+  /**
+   * Applies all fixes.
+   *
+   * @throws SecurityException if a fix is needed but could not be applied.
+   */
+  public static void apply() {
+    applyOpenSSLFix();
+    installLinuxPRNGSecureRandom();
+  }
+
+  /**
+   * Applies the fix for OpenSSL PRNG having low entropy. Does nothing if the
+   * fix is not needed.
+   *
+   * @throws SecurityException if the fix is needed but could not be applied.
+   */
+  private static void applyOpenSSLFix() throws SecurityException {
+    if ((Build.VERSION.SDK_INT &amp;lt; VERSION_CODE_JELLY_BEAN)
+        || (Build.VERSION.SDK_INT &amp;gt; VERSION_CODE_JELLY_BEAN_MR2)) {
+      // No need to apply the fix
+      return;
+    }
+
+    try {
+      // Mix in the device- and invocation-specific seed.
+      Class.forName(&quot;org.apache.harmony.xnet.provider.jsse.NativeCrypto&quot;)
+       .getMethod(&quot;RAND_seed&quot;, byte[].class)
+       .invoke(null, generateSeed());
+
+  // Mix output of Linux PRNG into OpenSSL&#39;s PRNG
+  int bytesRead = (Integer) Class.forName(
+      &quot;org.apache.harmony.xnet.provider.jsse.NativeCrypto&quot;)
+      .getMethod(&quot;RAND_load_file&quot;, String.class, long.class)
+      .invoke(null, &quot;/dev/urandom&quot;, 1024);
+  if (bytesRead != 1024) {
+    throw new IOException(
+        &quot;Unexpected number of bytes read from Linux PRNG: &quot;
+            + bytesRead);
+  }
+} catch (Exception e) {
+      throw new SecurityException(&quot;Failed to seed OpenSSL PRNG&quot;, e);
+    }
+  }
+
+  /**
+   * Installs a Linux PRNG-backed {@code SecureRandom} implementation as the
+   * default. Does nothing if the implementation is already the default or if
+   * there is not need to install the implementation.
+   *
+   * @throws SecurityException if the fix is needed but could not be applied.
+   */
+  private static void installLinuxPRNGSecureRandom()
+      throws SecurityException {
+    if (Build.VERSION.SDK_INT &amp;gt; VERSION_CODE_JELLY_BEAN_MR2) {
+      // No need to apply the fix
+      return;
+    }
+
+    // Install a Linux PRNG-based SecureRandom implementation as the
+    // default, if not yet installed.
+    Provider[] secureRandomProviders =
+        Security.getProviders(&quot;SecureRandom.SHA1PRNG&quot;);
+    if ((secureRandomProviders == null)
+        || (secureRandomProviders.length &amp;lt; 1)
+        || (!LinuxPRNGSecureRandomProvider.class.equals(
+        secureRandomProviders[0].getClass()))) {
+      Security.insertProviderAt(new LinuxPRNGSecureRandomProvider(), 1);
+    }
+
+    // Assert that new SecureRandom() and
+    // SecureRandom.getInstance(&quot;SHA1PRNG&quot;) return a SecureRandom backed
+    // by the Linux PRNG-based SecureRandom implementation.
+    SecureRandom rng1 = new SecureRandom();
+    if (!LinuxPRNGSecureRandomProvider.class.equals(
+        rng1.getProvider().getClass())) {
+      throw new SecurityException(
+          &quot;new SecureRandom() backed by wrong Provider: &quot;
+              + rng1.getProvider().getClass());
+    }
+
+    SecureRandom rng2;
+    try {
+      rng2 = SecureRandom.getInstance(&quot;SHA1PRNG&quot;);
+    } catch (NoSuchAlgorithmException e) {
+      throw new SecurityException(&quot;SHA1PRNG not available&quot;, e);
+    }
+    if (!LinuxPRNGSecureRandomProvider.class.equals(
+        rng2.getProvider().getClass())) {
+      throw new SecurityException(
+          &quot;SecureRandom.getInstance(\&quot;SHA1PRNG\&quot;) backed by wrong&quot;
+              + &quot; Provider: &quot; + rng2.getProvider().getClass());
+    }
+  }
+
+  /**
+   * {@code Provider} of {@code SecureRandom} engines which pass through
+   * all requests to the Linux PRNG.
+   */
+  private static class LinuxPRNGSecureRandomProvider extends Provider {
+
+    public LinuxPRNGSecureRandomProvider() {
+      super(&quot;LinuxPRNG&quot;,
+            1.0,
+            &quot;A Linux-specific random number provider that uses&quot;
+                + &quot; /dev/urandom&quot;);
+      // Although /dev/urandom is not a SHA-1 PRNG, some apps
+      // explicitly request a SHA1PRNG SecureRandom and we thus need to
+      // prevent them from getting the default implementation whose output
+      // may have low entropy.
+      put(&quot;SecureRandom.SHA1PRNG&quot;, 		LinuxPRNGSecureRandom.class.getName());
+      put(&quot;SecureRandom.SHA1PRNG ImplementedIn&quot;, &quot;Software&quot;);
+    }
+  }
+
+  /**
+   * {@link SecureRandomSpi} which passes all requests to the Linux PRNG
+   * ({@code /dev/urandom}).
+   */
+  public static class LinuxPRNGSecureRandom extends SecureRandomSpi {
+
+        /*
+         * IMPLEMENTATION NOTE: Requests to generate bytes and to mix in a seed
+         * are passed through to the Linux PRNG (/dev/urandom). Instances of
+         * this class seed themselves by mixing in the current time, PID, UID,
+         * build fingerprint, and hardware serial number (where available) into
+         * Linux PRNG.
+         *
+         * Concurrency: Read requests to the underlying Linux PRNG are
+         * serialized (on sLock) to ensure that multiple threads do not get
+         * duplicated PRNG output.
+         */
+
+    private static final File URANDOM_FILE = new File(&quot;/dev/urandom&quot;);
+
+    private static final Object sLock = new Object();
+
+    /**
+     * Input stream for reading from Linux PRNG or {@code null} if not yet
+     * opened.
+     *
+     * @GuardedBy(&quot;sLock&quot;)
+     */
+    private static DataInputStream sUrandomIn;
+
+    /**
+     * Output stream for writing to Linux PRNG or {@code null} if not yet
+     * opened.
+     *
+     * @GuardedBy(&quot;sLock&quot;)
+     */
+    private static OutputStream sUrandomOut;
+
+    /**
+     * Whether this engine instance has been seeded. This is needed because
+     * each instance needs to seed itself if the client does not explicitly
+     * seed it.
+     */
+    private boolean mSeeded;
+
+    @Override
+    protected void engineSetSeed(byte[] bytes) {
+      try {
+        OutputStream out;
+        synchronized (sLock) {
+          out = getUrandomOutputStream();
+        }
+        out.write(bytes);
+        out.flush();
+      } catch (IOException e) {
+        // On a small fraction of devices /dev/urandom is not writable.
+        // Log and ignore.
+        Log.w(PRNGFixes.class.getSimpleName(),
+              &quot;Failed to mix seed into &quot; + URANDOM_FILE);
+      } finally {
+        mSeeded = true;
+      }
+    }
+
+    @Override
+    protected void engineNextBytes(byte[] bytes) {
+      if (!mSeeded) {
+        // Mix in the device- and invocation-specific seed.
+        engineSetSeed(generateSeed());
+      }
+
+      try {
+        DataInputStream in;
+        synchronized (sLock) {
+          in = getUrandomInputStream();
+        }
+        synchronized (in) {
+          in.readFully(bytes);
+        }
+      } catch (IOException e) {
+        throw new SecurityException(
+            &quot;Failed to read from &quot; + URANDOM_FILE, e);
+      }
+    }
+
+    @Override
+    protected byte[] engineGenerateSeed(int size) {
+      byte[] seed = new byte[size];
+      engineNextBytes(seed);
+      return seed;
+    }
+
+    private DataInputStream getUrandomInputStream() {
+      synchronized (sLock) {
+        if (sUrandomIn == null) {
+          // NOTE: Consider inserting a BufferedInputStream between
+          // DataInputStream and FileInputStream if you need higher
+          // PRNG output performance and can live with future PRNG
+          // output being pulled into this process prematurely.
+          try {
+            sUrandomIn = new DataInputStream(
+                new FileInputStream(URANDOM_FILE));
+          } catch (IOException e) {
+            throw new SecurityException(&quot;Failed to open &quot;
+                                            + URANDOM_FILE + &quot; 	for reading&quot;, e);
+          }
+        }
+        return sUrandomIn;
+      }
+    }
+
+    private OutputStream getUrandomOutputStream() throws IOException {
+      synchronized (sLock) {
+        if (sUrandomOut == null) {
+          sUrandomOut = new FileOutputStream(URANDOM_FILE);
+        }
+        return sUrandomOut;
+      }
+    }
+  }
+
+  /**
+   * Generates a device- and invocation-specific seed to be mixed into the
+   * Linux PRNG.
+   */
+  private static byte[] generateSeed() {
+    try {
+      ByteArrayOutputStream seedBuffer = new 	ByteArrayOutputStream();
+      DataOutputStream seedBufferOut =
+          new DataOutputStream(seedBuffer);
+      seedBufferOut.writeLong(System.currentTimeMillis());
+      seedBufferOut.writeLong(System.nanoTime());
+      seedBufferOut.writeInt(Process.myPid());
+      seedBufferOut.writeInt(Process.myUid());
+      seedBufferOut.write(BUILD_FINGERPRINT_AND_DEVICE_SERIAL);
+      seedBufferOut.close();
+      return seedBuffer.toByteArray();
+    } catch (IOException e) {
+      throw new SecurityException(&quot;Failed to generate seed&quot;, e);
+    }
+  }
+
+  /**
+   * Gets the hardware serial number of this device.
+   *
+   * @return serial number or {@code null} if not available.
+   */
+  private static String getDeviceSerialNumber() {
+    // We&#39;re using the Reflection API because Build.SERIAL is only available
+    // since API Level 9 (Gingerbread, Android 2.3).
+    try {
+      return (String) Build.class.getField(&quot;SERIAL&quot;).get(null);
+    } catch (Exception ignored) {
+      return null;
+    }
+  }
+
+  private static byte[] getBuildFingerprintAndDeviceSerial() {
+    StringBuilder result = new StringBuilder();
+    String fingerprint = Build.FINGERPRINT;
+    if (fingerprint != null) {
+      result.append(fingerprint);
+    }
+    String serial = getDeviceSerialNumber();
+    if (serial != null) {
+      result.append(serial);
+    }
+    try {
+      return result.toString().getBytes(&quot;UTF-8&quot;);
+    } catch (UnsupportedEncodingException e) {
+      throw new RuntimeException(&quot;UTF-8 encoding not 	supported&quot;);
+    }
+  }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+</description>
+        <pubDate>Mon, 21 Apr 2014 06:43:25 +0800</pubDate>
+        <link>http://gaoxuxu.github.io/material-jekyll-theme/2014/04/android-prng-fixed</link>
+        <guid isPermaLink="true">http://gaoxuxu.github.io/material-jekyll-theme/2014/04/android-prng-fixed</guid>
+        
+        
+        <category>Java</category>
+        
+        <category>Android</category>
+        
+      </item>
+    
+      <item>
+        <title>Android代码优化之斐波那契数列</title>
+        <description>&lt;p&gt;刚到手《Android Performance》,其第一章斐波那契的例子很不错。&lt;br /&gt;
+以下代码的结果都在我的&lt;code class=&quot;highlighter-rouge&quot;&gt;LG LU6200&lt;/code&gt;上运行得出，CPU型号为&lt;code class=&quot;highlighter-rouge&quot;&gt;高通MSM8660&lt;/code&gt;，&lt;code class=&quot;highlighter-rouge&quot;&gt;CPU&lt;/code&gt;频率为&lt;code class=&quot;highlighter-rouge&quot;&gt;1.5GHz双核&lt;/code&gt;。&lt;/p&gt;
+
+&lt;p&gt;###1.以递归的方式求第n项斐波那契数&lt;/p&gt;
+
+&lt;p&gt;代码如下：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;public static long computeRecursively(int n){
+    if(n &amp;gt; 1)
+        return computeRecursively(n-1) + computeRecursively(n-2);
+    return n;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;用这段代码求斐波那契数列的第&lt;code class=&quot;highlighter-rouge&quot;&gt;30&lt;/code&gt;项，结果如下：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;result:832040
+token:450milliseconds
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;###2.利用恒等式优化代码
+斐波那契数列有如下性质，我们可以利用一下：&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;F_0+F_1+F_2+F3+\cdots+F_n=F_{n+2}-1&lt;/script&gt;
+
+&lt;p&gt;代码如下：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;public static long computeRecursivelyWithLoop (int n){
+    if (n &amp;gt; 1) {
+        long result = 1;
+        do {
+            result += computeRecursivelyWithLoop(n-2);
+            n--;
+        } while (n &amp;gt; 1);
+        return result;
+    }
+    return n;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;用这段代码求斐波那契数列的第&lt;code class=&quot;highlighter-rouge&quot;&gt;30&lt;/code&gt;项，结果如下：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;result:832040
+token:297milliseconds
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;###3.从递归到迭代&lt;/p&gt;
+
+&lt;p&gt;递归算法的弊端是众所周知的，它会浪费大量的栈空间，并造成大量的方法调用，还有可能会导致栈溢出并导致应用崩溃。迭代版本的实现可以避免：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;public static long computeIteratively (int n){
+    if (n &amp;gt; 1) {
+        long a = 0, b = 1;
+        do {
+            long tmp = b;
+            b += a;
+            a = tmp;
+        } while (--n &amp;gt; 1);
+        return b;
+    }
+    return n;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;用这段代码求斐波那契数列的第&lt;code class=&quot;highlighter-rouge&quot;&gt;30&lt;/code&gt;项，结果如下：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;result:832040
+token:0milliseconds
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;好吧，这段代码简直太快了，不到&lt;code class=&quot;highlighter-rouge&quot;&gt;1&lt;/code&gt;毫秒。我们用这段代码求斐波那契数列的第&lt;code class=&quot;highlighter-rouge&quot;&gt;50000&lt;/code&gt;项，结果如下：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;result:-806788626697678875
+token:4milliseconds
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;只花&lt;code class=&quot;highlighter-rouge&quot;&gt;4&lt;/code&gt;毫秒，不过结果溢出了。&lt;/p&gt;
+
+&lt;p&gt;这段代码还可以将循环次数降为原来的一半：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;public static long computeIterativelyFaster (int n){
+    if (n &amp;gt; 1) {
+        long a, b = 1;
+        n--;
+        a = n &amp;amp; 1;
+        n /= 2;
+        while (n-- &amp;gt; 0) {
+            a += b;
+            b += a;
+        }
+        return b;
+    }
+    return n;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;用这段代码求斐波那契数列的第&lt;code class=&quot;highlighter-rouge&quot;&gt;50000&lt;/code&gt;项，结果如下：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;result:-806788626697678875
+token:3milliseconds
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;###4.用BigInteger&lt;/p&gt;
+
+&lt;p&gt;上面的代码，求第&lt;code class=&quot;highlighter-rouge&quot;&gt;50000&lt;/code&gt;项斐波那契数时溢出了，在Java中可以用&lt;code class=&quot;highlighter-rouge&quot;&gt;java.math.BigInteger&lt;/code&gt;类修复这个问题。下面的代码是&lt;code class=&quot;highlighter-rouge&quot;&gt;computeIterativelyFaster&lt;/code&gt;的&lt;code class=&quot;highlighter-rouge&quot;&gt;BigInteger&lt;/code&gt;版本：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;public static BigInteger computeIterativelyFasterUsingBigInteger (int n){
+	if (n &amp;gt; 1) {
+		BigInteger a, b = BigInteger.ONE;
+		n--;
+		a = BigInteger.valueOf(n &amp;amp; 1);
+		n /= 2;
+		while (n-- &amp;gt; 0) {
+			a = a.add(b);
+			b = b.add(a);
+		}
+		return b;
+	}
+	return (n == 0) ? BigInteger.ZERO : BigInteger.ONE;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;运行时间为&lt;code class=&quot;highlighter-rouge&quot;&gt;914milliseconds&lt;/code&gt;。&lt;/p&gt;
+
+&lt;p&gt;另外，斐波那契数列的项有如下性质：&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;F_{2n-1}=F^2_n+F^2_{n-1}&lt;/script&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;F_{2n}=(2F_{n-1}+F_n)\cdot F_n&lt;/script&gt;
+
+&lt;p&gt;根据以上恒等式修改&lt;code class=&quot;highlighter-rouge&quot;&gt;computeIterativelyFasterUsingBigInteger&lt;/code&gt;：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;public static BigInteger computeRecursivelyFasterUsingBigInteger (int n){
+    if (n &amp;gt; 1) {
+        // not obvious at first – wouldn’t it be great 
+        // to have a better comment here?
+        int m = (n / 2) + (n &amp;amp; 1); 
+        BigInteger fM = computeRecursivelyFasterUsingBigInteger(m);
+        BigInteger fM_1 = computeRecursivelyFasterUsingBigInteger(m - 1);
+        if ((n &amp;amp; 1) == 1) {
+            // F(m)^2 + F(m-1)^2
+            // three BigInteger objects created
+            return fM.pow(2).add(fM_1.pow(2));
+        } else {
+            // (2*F(m-1) + F(m)) * F(m)
+            // three BigInteger objects created
+            return fM_1.shiftLeft(1).add(fM).multiply(fM); 
+        }
+    }
+    // no BigInteger object created
+    return (n == 0) ? BigInteger.ZERO : BigInteger.ONE; 
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;用这个方法求第&lt;code class=&quot;highlighter-rouge&quot;&gt;50000&lt;/code&gt;项斐波那契数耗时为&lt;code class=&quot;highlighter-rouge&quot;&gt;1550milliseconds&lt;/code&gt;。&lt;/p&gt;
+
+&lt;p&gt;上面这个方法运行太慢了，我们还可以继续优化。其实在上面的方法中，对&lt;code class=&quot;highlighter-rouge&quot;&gt;BigInteger&lt;/code&gt;的使用有一个不正确的地方。我们知道，斐波那契数列的第&lt;code class=&quot;highlighter-rouge&quot;&gt;92&lt;/code&gt;项在基本数据类型&lt;code class=&quot;highlighter-rouge&quot;&gt;long&lt;/code&gt;的取值范围内，我们可以利用这项性质优化代码：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;public static BigInteger computeRecursivelyFasterUsingBigIntegerAndPrimitive(int n){
+	if (n &amp;gt; 92) {
+		int m = (n / 2) + (n &amp;amp; 1);
+		BigInteger fM = computeRecursivelyFasterUsingBigIntegerAndPrimitive(m);
+		BigInteger fM_1 = computeRecursivelyFasterUsingBigIntegerAndPrimitive(m - 1);
+		if ((n &amp;amp; 1) == 1) {
+			return fM.pow(2).add(fM_1.pow(2));
+		} else {
+		    // shiftLeft(1) to multiply by 2
+			return fM_1.shiftLeft(1).add(fM).multiply(fM); 
+		}
+	}
+	return BigInteger.valueOf(computeIterativelyFaster(n));
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;这次快多了，求斐波那契第&lt;code class=&quot;highlighter-rouge&quot;&gt;50000&lt;/code&gt;项的运行时间为&lt;code class=&quot;highlighter-rouge&quot;&gt;59milliseconds&lt;/code&gt;，是纯递归版本的近&lt;code class=&quot;highlighter-rouge&quot;&gt;30&lt;/code&gt;倍。&lt;/p&gt;
+
+&lt;p&gt;与上面的方法思想差不多，还可以使用预计算结果优化代码，即：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;	static final int PRECOMPUTED_SIZE= 512;
+static BigInteger PRECOMPUTED[] = new BigInteger[PRECOMPUTED_SIZE];
+
+static {
+	PRECOMPUTED[0] = BigInteger.ZERO;
+	PRECOMPUTED[1] = BigInteger.ONE;
+	for (int i = 2; i &amp;lt; PRECOMPUTED_SIZE; i++) {
+		PRECOMPUTED[i] = PRECOMPUTED[i-1].add(PRECOMPUTED[i-2]);
+	}
+}
+
+public static BigInteger computeRecursivelyFasterUsingBigIntegerAndTable(int n)	{
+	if (n &amp;gt; PRECOMPUTED_SIZE - 1) {
+		int m = (n / 2) + (n &amp;amp; 1);
+		BigInteger fM = computeRecursivelyFasterUsingBigIntegerAndTable (m);
+		BigInteger fM_1 = computeRecursivelyFasterUsingBigIntegerAndTable (m - 1);
+		if ((n &amp;amp; 1) == 1) {
+			return fM.pow(2).add(fM_1.pow(2));
+		} else {
+			return fM_1.shiftLeft(1).add(fM).multiply(fM);
+		}
+	}
+	return PRECOMPUTED[n];
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;这次求第&lt;code class=&quot;highlighter-rouge&quot;&gt;50000&lt;/code&gt;项斐波那契数的运行时间为&lt;code class=&quot;highlighter-rouge&quot;&gt;12milliseconds&lt;/code&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Written with &lt;a href=&quot;https://stackedit.io/&quot;&gt;StackEdit&lt;/a&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+</description>
+        <pubDate>Tue, 18 Mar 2014 06:43:25 +0800</pubDate>
+        <link>http://gaoxuxu.github.io/material-jekyll-theme/2014/03/optimizing-android-code-fibonacci</link>
+        <guid isPermaLink="true">http://gaoxuxu.github.io/material-jekyll-theme/2014/03/optimizing-android-code-fibonacci</guid>
+        
+        
+        <category>算法</category>
+        
+        <category>Java</category>
+        
+        <category>Android</category>
+        
+      </item>
+    
+      <item>
+        <title>Java集合框架——Set、List和Queue</title>
+        <description>&lt;p&gt;##List&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;List&lt;/code&gt;就是有序的&lt;code class=&quot;highlighter-rouge&quot;&gt;Collection&lt;/code&gt;，它也是所有&lt;code class=&quot;highlighter-rouge&quot;&gt;Collection&lt;/code&gt;中唯一对外界暴露索引的，即可以对&lt;code class=&quot;highlighter-rouge&quot;&gt;List&lt;/code&gt;中每个元素的插入元素进行控制，或者根据元素的索引访问元素。&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;List&lt;/code&gt;与&lt;code class=&quot;highlighter-rouge&quot;&gt;Set&lt;/code&gt;不同，&lt;code class=&quot;highlighter-rouge&quot;&gt;List&lt;/code&gt;通常允许重复元素，即满足&lt;code class=&quot;highlighter-rouge&quot;&gt;(e1.equals(e2))&lt;/code&gt;条件的两个元素。&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;List&lt;/code&gt;提供了一个方法可以获得一个受其支撑的&lt;code class=&quot;highlighter-rouge&quot;&gt;ListIterator&lt;/code&gt;：&lt;code class=&quot;highlighter-rouge&quot;&gt;listIterator()&lt;/code&gt;，它还有一个变种&lt;code class=&quot;highlighter-rouge&quot;&gt;listIterator(int index)&lt;/code&gt;。后者以适当顺序返回列表迭代器。&lt;code class=&quot;highlighter-rouge&quot;&gt;ListIterator&lt;/code&gt;有一个好处是可以进行双向搜索，这在有时候会非常有用，可以参考&lt;code class=&quot;highlighter-rouge&quot;&gt;Collections&lt;/code&gt;的&lt;code class=&quot;highlighter-rouge&quot;&gt;iteratorBinarySearch()&lt;/code&gt;。&lt;/p&gt;
+
+&lt;p&gt;###ArrayList、Vector和LinkedList&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;ArrayList&lt;/code&gt;和&lt;code class=&quot;highlighter-rouge&quot;&gt;Vector&lt;/code&gt;都是基于数组的可随机访问列表，&lt;code class=&quot;highlighter-rouge&quot;&gt;LinkedList&lt;/code&gt;基于链表，且实现了&lt;code class=&quot;highlighter-rouge&quot;&gt;List&lt;/code&gt;和&lt;code class=&quot;highlighter-rouge&quot;&gt;Deque&lt;/code&gt;两个接口。&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Vector&lt;/code&gt;是线程安全的，而&lt;code class=&quot;highlighter-rouge&quot;&gt;ArrayList&lt;/code&gt;和&lt;code class=&quot;highlighter-rouge&quot;&gt;LinkedList&lt;/code&gt;不是。&lt;/li&gt;
+  &lt;li&gt;添加新元素时，如果&lt;code class=&quot;highlighter-rouge&quot;&gt;ArrayList&lt;/code&gt;的容量已满，则会将其容量在当前规模的基础上增加一半；相同情况下&lt;code class=&quot;highlighter-rouge&quot;&gt;Vector&lt;/code&gt;的容量会增加为现有规模的二倍。二者都提供了&lt;code class=&quot;highlighter-rouge&quot;&gt;trimToSize()&lt;/code&gt;方法可以释放掉没有用到的数组空间。&lt;/li&gt;
+  &lt;li&gt;基本操作运行时间：
+    &lt;ul&gt;
+      &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;get()&lt;/code&gt;：&lt;code class=&quot;highlighter-rouge&quot;&gt;ArrayList&lt;/code&gt;：$O(1)$，&lt;code class=&quot;highlighter-rouge&quot;&gt;LinkedList&lt;/code&gt;：$O(n)$&lt;/li&gt;
+      &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;add()&lt;/code&gt;：&lt;code class=&quot;highlighter-rouge&quot;&gt;ArrayList&lt;/code&gt;：$O(1)$，&lt;code class=&quot;highlighter-rouge&quot;&gt;LinkedList&lt;/code&gt;：$O(1)$&lt;/li&gt;
+      &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;remove()&lt;/code&gt;：&lt;code class=&quot;highlighter-rouge&quot;&gt;ArrayList&lt;/code&gt;：$O(n)$，&lt;code class=&quot;highlighter-rouge&quot;&gt;LinkedList&lt;/code&gt;：$O(1)$&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Java&lt;/code&gt;还实现了&lt;code class=&quot;highlighter-rouge&quot;&gt;Stack&lt;/code&gt;类，它继承自&lt;code class=&quot;highlighter-rouge&quot;&gt;Vector&lt;/code&gt;，所以也是线程安全的。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;##Set&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Set&lt;/code&gt;是一种不包含重复元素的&lt;code class=&quot;highlighter-rouge&quot;&gt;Collection&lt;/code&gt;，确切地讲，就是不会存在两个满足条件的&lt;code class=&quot;highlighter-rouge&quot;&gt;(e1.equals(e2))&lt;/code&gt;的元素&lt;code class=&quot;highlighter-rouge&quot;&gt;e1&lt;/code&gt;和&lt;code class=&quot;highlighter-rouge&quot;&gt;e2&lt;/code&gt;。&lt;code class=&quot;highlighter-rouge&quot;&gt;Set&lt;/code&gt;中最多只能有一个&lt;code class=&quot;highlighter-rouge&quot;&gt;null&lt;/code&gt;，&lt;code class=&quot;highlighter-rouge&quot;&gt;Set&lt;/code&gt;是对数学概念上“集合”的抽象。&lt;/p&gt;
+
+&lt;p&gt;注意：尽量不要将可变元素加入&lt;code class=&quot;highlighter-rouge&quot;&gt;Set&lt;/code&gt;，如果在外界改变&lt;code class=&quot;highlighter-rouge&quot;&gt;Set&lt;/code&gt;中某个元素的值（影响到了&lt;code class=&quot;highlighter-rouge&quot;&gt;equals()&lt;/code&gt;的行为），那么&lt;code class=&quot;highlighter-rouge&quot;&gt;Set&lt;/code&gt;的行为将是不确定的。&lt;/p&gt;
+
+&lt;p&gt;最后注意：&lt;code class=&quot;highlighter-rouge&quot;&gt;Set&lt;/code&gt;是通过桥接模式由&lt;code class=&quot;highlighter-rouge&quot;&gt;Map&lt;/code&gt;支撑的，它们之间的关系见下图：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://p.blog.csdn.net/images/p_blog_csdn_net/turkeyzhou/EntryImages/20081105/set.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;###HashSet、LinkedHashSet和TreeSet&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;如上图，&lt;code class=&quot;highlighter-rouge&quot;&gt;HashSet&lt;/code&gt;包装的是&lt;code class=&quot;highlighter-rouge&quot;&gt;HashMap&lt;/code&gt;，&lt;code class=&quot;highlighter-rouge&quot;&gt;LinkedHashSet&lt;/code&gt;包装的是&lt;code class=&quot;highlighter-rouge&quot;&gt;LinkedHashMap&lt;/code&gt;，&lt;code class=&quot;highlighter-rouge&quot;&gt;TreeSet&lt;/code&gt;包装的是&lt;code class=&quot;highlighter-rouge&quot;&gt;TreeMap&lt;/code&gt;。&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;HashSet&lt;/code&gt;无序，&lt;code class=&quot;highlighter-rouge&quot;&gt;LinkedHashSet&lt;/code&gt;保持输入时的数据，&lt;code class=&quot;highlighter-rouge&quot;&gt;TreeSet&lt;/code&gt;是有序的。&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;HashSet&lt;/code&gt;和&lt;code class=&quot;highlighter-rouge&quot;&gt;LinkedHashSet&lt;/code&gt;基于散列法存储列表信息，&lt;code class=&quot;highlighter-rouge&quot;&gt;TreeSet&lt;/code&gt;基于树。&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;HashSet&lt;/code&gt;和&lt;code class=&quot;highlighter-rouge&quot;&gt;LinkedHashSet&lt;/code&gt;添加删除较快，&lt;code class=&quot;highlighter-rouge&quot;&gt;TreeSet&lt;/code&gt;遍历快。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;##Queue&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Queue&lt;/code&gt;是处理元素前用来存储信息的&lt;code class=&quot;highlighter-rouge&quot;&gt;Collection&lt;/code&gt;。通常以&lt;code class=&quot;highlighter-rouge&quot;&gt;FIFO&lt;/code&gt;的方式排序各个元素，不过也有其它情况，比如优先队列和&lt;code class=&quot;highlighter-rouge&quot;&gt;LIFO&lt;/code&gt;队列（或堆栈）。&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Queue&lt;/code&gt;的三类操作：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;插入操作：&lt;code class=&quot;highlighter-rouge&quot;&gt;add(e)&lt;/code&gt;和&lt;code class=&quot;highlighter-rouge&quot;&gt;offer(e)&lt;/code&gt;，如果插入成功，则都返回&lt;code class=&quot;highlighter-rouge&quot;&gt;true&lt;/code&gt;。在使用有容量限制的队列的情况下，如果当前没有可用空间，则前者会抛出&lt;code class=&quot;highlighter-rouge&quot;&gt;IllegalStateException&lt;/code&gt;，后者会返回&lt;code class=&quot;highlighter-rouge&quot;&gt;false&lt;/code&gt;。因此在一般情况下，后者会优于前者。&lt;/li&gt;
+  &lt;li&gt;移除操作：&lt;code class=&quot;highlighter-rouge&quot;&gt;remove()&lt;/code&gt;和&lt;code class=&quot;highlighter-rouge&quot;&gt;poll()&lt;/code&gt;，这两个方法可以返回并移除队列的头，到底返回哪个元素取决于实现的排序策略。在队列为空时，前者会抛出一个异常，而后者返回&lt;code class=&quot;highlighter-rouge&quot;&gt;null&lt;/code&gt;。&lt;/li&gt;
+  &lt;li&gt;查询操作：&lt;code class=&quot;highlighter-rouge&quot;&gt;element()&lt;/code&gt;和&lt;code class=&quot;highlighter-rouge&quot;&gt;peek()&lt;/code&gt;，两者都会返回但不移除队列的头。当队列为空时，前者会抛出一个异常，而后者返回&lt;code class=&quot;highlighter-rouge&quot;&gt;null&lt;/code&gt;。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Queue&lt;/code&gt;接口没有定义阻塞队列的方法，详情参考另一篇文章&lt;a href=&quot;http://gaoxuxu.github.io/2013/02/28/blocking-queue/&quot;&gt;阻塞队列&lt;/a&gt;。&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Written with &lt;a href=&quot;https://stackedit.io/&quot;&gt;StackEdit&lt;/a&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+</description>
+        <pubDate>Thu, 21 Nov 2013 01:28:25 +0800</pubDate>
+        <link>http://gaoxuxu.github.io/material-jekyll-theme/2013/11/Java-Collection-framework-Set-List-Queue</link>
+        <guid isPermaLink="true">http://gaoxuxu.github.io/material-jekyll-theme/2013/11/Java-Collection-framework-Set-List-Queue</guid>
+        
+        
+        <category>算法</category>
+        
+        <category>Java</category>
+        
+      </item>
+    
+      <item>
+        <title>Java集合框架——Collections</title>
+        <description>&lt;p&gt;本类完全由在&lt;code class=&quot;highlighter-rouge&quot;&gt;collection&lt;/code&gt;上进行操作或返回&lt;code class=&quot;highlighter-rouge&quot;&gt;collection&lt;/code&gt;的静态方法组成。包含多种在&lt;code class=&quot;highlighter-rouge&quot;&gt;collection&lt;/code&gt;上操作的算法，即“包装器（Wrapper）”。注意这些方法如果接收的参数为&lt;code class=&quot;highlighter-rouge&quot;&gt;null&lt;/code&gt;，都会抛出&lt;code class=&quot;highlighter-rouge&quot;&gt;NullPointerException&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Collections&lt;/code&gt;类的方法主要有以下几个分类：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;算法类操作。&lt;/li&gt;
+  &lt;li&gt;不可修改包装器（这部分的API有问题，可以参考&lt;a href=&quot;https://code.google.com/p/guava-libraries/&quot;&gt;Google Guava Collections&lt;/a&gt;）。&lt;/li&gt;
+  &lt;li&gt;同步包装器。&lt;/li&gt;
+  &lt;li&gt;动态类型安全包装器。&lt;/li&gt;
+  &lt;li&gt;空集合。&lt;/li&gt;
+  &lt;li&gt;单例集合。&lt;/li&gt;
+  &lt;li&gt;其它操作。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;##算法类操作&lt;/p&gt;
+
+&lt;p&gt;许多&lt;code class=&quot;highlighter-rouge&quot;&gt;List&lt;/code&gt;的算法类操作都有两种实现：一些适用于可随机访问的&lt;code class=&quot;highlighter-rouge&quot;&gt;List&lt;/code&gt;，另一些适用于顺序访问的&lt;code class=&quot;highlighter-rouge&quot;&gt;List&lt;/code&gt;。&lt;/p&gt;
+
+&lt;p&gt;###排序&lt;/p&gt;
+
+&lt;p&gt;有两个为&lt;code class=&quot;highlighter-rouge&quot;&gt;List&lt;/code&gt;排序的方法：&lt;code class=&quot;highlighter-rouge&quot;&gt;sort(List&amp;lt;T&amp;gt; list)&lt;/code&gt;和&lt;code class=&quot;highlighter-rouge&quot;&gt;sort(List&amp;lt;T&amp;gt; list, Comparator&amp;lt;? super T&amp;gt; c)&lt;/code&gt;，前者需要&lt;code class=&quot;highlighter-rouge&quot;&gt;List&lt;/code&gt;存储的元素类型&lt;code class=&quot;highlighter-rouge&quot;&gt;T&lt;/code&gt;实现&lt;code class=&quot;highlighter-rouge&quot;&gt;Comparator&lt;/code&gt;接口。&lt;/p&gt;
+
+&lt;p&gt;这两个方法实际排序时使用的都是&lt;code class=&quot;highlighter-rouge&quot;&gt;Arrays.sort&lt;/code&gt;方法，此方法使用合并排序算法，最坏情况运行时间为$O(n\lg n)$。&lt;/p&gt;
+
+&lt;p&gt;###二分查找&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;binarySearch(List&amp;lt;? extends Comparable&amp;lt;? super T&amp;gt;&amp;gt; list, T key)&lt;/code&gt;和&lt;code class=&quot;highlighter-rouge&quot;&gt;binarySearch(List&amp;lt;? extends T&amp;gt; list, T key, Comparator&amp;lt;? super T&amp;gt; c)&lt;/code&gt;。与&lt;code class=&quot;highlighter-rouge&quot;&gt;sort&lt;/code&gt;方法一样，前者要求&lt;code class=&quot;highlighter-rouge&quot;&gt;list&lt;/code&gt;中存储的元素类型实现&lt;code class=&quot;highlighter-rouge&quot;&gt;Comparator&lt;/code&gt;接口。进行二分查找的前提是&lt;code class=&quot;highlighter-rouge&quot;&gt;list&lt;/code&gt;必须是有序的。&lt;/p&gt;
+
+&lt;p&gt;对于可随机访问的&lt;code class=&quot;highlighter-rouge&quot;&gt;List&lt;/code&gt;和&lt;code class=&quot;highlighter-rouge&quot;&gt;size &amp;lt;= 5000&lt;/code&gt;的顺序访问&lt;code class=&quot;highlighter-rouge&quot;&gt;List&lt;/code&gt;，这两个方法都使用&lt;code class=&quot;highlighter-rouge&quot;&gt;indexedBinarySearch&lt;/code&gt;进行查找，对于大于此阈值的顺序访问&lt;code class=&quot;highlighter-rouge&quot;&gt;List&lt;/code&gt;，使用&lt;code class=&quot;highlighter-rouge&quot;&gt;iteratorBinarySearch&lt;/code&gt;查找:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;public static &amp;lt;T&amp;gt;
+int binarySearch(List&amp;lt;? extends Comparable&amp;lt;? super T&amp;gt;&amp;gt; list, T key) {
+    if (list instanceof RandomAccess || list.size()&amp;lt;BINARYSEARCH_THRESHOLD)
+        return Collections.indexedBinarySearch(list, key);
+    else
+        return Collections.iteratorBinarySearch(list, key);
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;前者与后者的区别在于定位中间元素时的策略，前者使用&lt;code class=&quot;highlighter-rouge&quot;&gt;list.get(mid)&lt;/code&gt;，而后者利用了&lt;code class=&quot;highlighter-rouge&quot;&gt;ListIterator&lt;/code&gt;来进行移动。在规模较大时，后者的效率是很显著的。&lt;/p&gt;
+
+&lt;p&gt;###反转&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;reverse(List&amp;lt;?&amp;gt; list)&lt;/code&gt;会将&lt;code class=&quot;highlighter-rouge&quot;&gt;list&lt;/code&gt;中元素的顺序倒转，以线性时间运行。&lt;/p&gt;
+
+&lt;p&gt;###洗牌算法（shuffle）&lt;/p&gt;
+
+&lt;p&gt;此方法会将&lt;code class=&quot;highlighter-rouge&quot;&gt;list&lt;/code&gt;中的元素打乱顺序。同样有两种实现，对可随机访问的以及规模小于阈值&lt;code class=&quot;highlighter-rouge&quot;&gt;5&lt;/code&gt;的&lt;code class=&quot;highlighter-rouge&quot;&gt;List&lt;/code&gt;直接调用&lt;code class=&quot;highlighter-rouge&quot;&gt;swap(List list, int i, int j)&lt;/code&gt;，否则先以数组形式打乱顺序，再使用迭代器&lt;code class=&quot;highlighter-rouge&quot;&gt;set&lt;/code&gt;。&lt;/p&gt;
+
+&lt;p&gt;###交换元素（swap）&lt;/p&gt;
+
+&lt;p&gt;同样有两种实现：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;public static void swap(List&amp;lt;?&amp;gt; list, int i, int j) {
+    final List l = list;
+    l.set(i, l.set(j, l.get(i)));
+}
+
+private static void swap(Object[] arr, int i, int j) {
+    Object tmp = arr[i];
+    arr[i] = arr[j];
+    arr[j] = tmp;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;###使用指定元素填充（fill）&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;fill(List&amp;lt;? super T&amp;gt; list, T obj)&lt;/code&gt;可以将&lt;code class=&quot;highlighter-rouge&quot;&gt;list&lt;/code&gt;中的所有元素都替换为&lt;code class=&quot;highlighter-rouge&quot;&gt;obj&lt;/code&gt;。&lt;/p&gt;
+
+&lt;p&gt;###将一个List中的元素复制到另一个List中&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;copy(List&amp;lt;? super T&amp;gt; dest, List&amp;lt;? extends T&amp;gt; src)&lt;/code&gt;将&lt;code class=&quot;highlighter-rouge&quot;&gt;src&lt;/code&gt;中的元素复制到&lt;code class=&quot;highlighter-rouge&quot;&gt;dest&lt;/code&gt;中，&lt;code class=&quot;highlighter-rouge&quot;&gt;dest&lt;/code&gt;至少要与&lt;code class=&quot;highlighter-rouge&quot;&gt;src&lt;/code&gt;的长度相同。&lt;/p&gt;
+
+&lt;p&gt;###最大值与最小值&lt;/p&gt;
+
+&lt;p&gt;有四个相关方法，都以线性时间运行。&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;lt;T extends Object &amp;amp; Comparable&amp;lt;? super T&amp;gt;&amp;gt; T min(Collection&amp;lt;? extends T&amp;gt; coll);
+&amp;lt;T&amp;gt; T min(Collection&amp;lt;? extends T&amp;gt; coll, Comparator&amp;lt;? super T&amp;gt; comp);
+&amp;lt;T extends Object &amp;amp; Comparable&amp;lt;? super T&amp;gt;&amp;gt; T max(Collection&amp;lt;? extends T&amp;gt; coll);
+&amp;lt;T&amp;gt; T max(Collection&amp;lt;? extends T&amp;gt; coll, Comparator&amp;lt;? super T&amp;gt; comp)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;###回转（rotate）&lt;/p&gt;
+
+&lt;p&gt;当调用&lt;code class=&quot;highlighter-rouge&quot;&gt;Collections.rotate(list, distance)&lt;/code&gt;后，&lt;code class=&quot;highlighter-rouge&quot;&gt;list&lt;/code&gt;中位于索引&lt;code class=&quot;highlighter-rouge&quot;&gt;i&lt;/code&gt;的将是之前位于索引&lt;code class=&quot;highlighter-rouge&quot;&gt;(i - distance) mod list.size()&lt;/code&gt;的元素。此方法可以用于在列表中回转移动一个或多个元素，&lt;code class=&quot;highlighter-rouge&quot;&gt;distance&lt;/code&gt;就是移动的距离。&lt;/p&gt;
+
+&lt;p&gt;###全部替换（replaceAll）&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;boolean replaceAll(List&amp;lt;T&amp;gt; list, T oldVal, T newVal)&lt;/code&gt;，将&lt;code class=&quot;highlighter-rouge&quot;&gt;list&lt;/code&gt;中所有值为&lt;code class=&quot;highlighter-rouge&quot;&gt;oldVal&lt;/code&gt;的元素都替换为&lt;code class=&quot;highlighter-rouge&quot;&gt;newVal&lt;/code&gt;。&lt;/p&gt;
+
+&lt;p&gt;###子列表第一次出现的位置（indexOfSubList）&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;int indexOfSubList(List&amp;lt;?&amp;gt; source, List&amp;lt;?&amp;gt; target)&lt;/code&gt;：如果&lt;code class=&quot;highlighter-rouge&quot;&gt;target&lt;/code&gt;存在于&lt;code class=&quot;highlighter-rouge&quot;&gt;source&lt;/code&gt;中，则返回&lt;code class=&quot;highlighter-rouge&quot;&gt;target&lt;/code&gt;在&lt;code class=&quot;highlighter-rouge&quot;&gt;source&lt;/code&gt;中第一次出现的位置（即满足这样条件的i——&lt;code class=&quot;highlighter-rouge&quot;&gt;source.subList(i, i+target.size()).equals(target)&lt;/code&gt;）。如果不存在，则返回&lt;code class=&quot;highlighter-rouge&quot;&gt;-1&lt;/code&gt;。&lt;/p&gt;
+
+&lt;p&gt;###子列表最后一次出现的位置（lastIndexOfSubList）&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;lastIndexOfSubList&lt;/code&gt;方法与&lt;code class=&quot;highlighter-rouge&quot;&gt;indexOfSubList&lt;/code&gt;方法类似，只不过前者从高位索引开始向前查找，而后者从低位索引开始向后查找。&lt;/p&gt;
+
+&lt;p&gt;##不可修改包装器&lt;/p&gt;
+
+&lt;p&gt;此类方法提供将&lt;code class=&quot;highlighter-rouge&quot;&gt;Collection&lt;/code&gt;变为无法修改的&lt;code class=&quot;highlighter-rouge&quot;&gt;Collection&lt;/code&gt;的包装器，不过有个问题，如果修改（指&lt;code class=&quot;highlighter-rouge&quot;&gt;add&lt;/code&gt;或&lt;code class=&quot;highlighter-rouge&quot;&gt;remove&lt;/code&gt;操作）源&lt;code class=&quot;highlighter-rouge&quot;&gt;Collection&lt;/code&gt;，照样可以成功。&lt;/p&gt;
+
+&lt;p&gt;##同步包装器&lt;/p&gt;
+
+&lt;p&gt;这部分操作返回一个线程安全的集合。需要注意的是，在返回的集合上进行迭代时，必须手工同步：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Collection c = Collections.synchronizedCollection(myCollection);
+    ...
+synchronized (c) {
+    Iterator i = c.iterator(); // Must be in the synchronized block
+    while (i.hasNext())
+        foo(i.next());
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;或者&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Map m = Collections.synchronizedMap(new HashMap());
+    ...
+Set s = m.keySet();  // Needn&#39;t be in synchronized block
+    ...
+synchronized(m) {  // Synchronizing on m, not s!
+    Iterator i = s.iterator(); // Must be in synchronized block
+    while (i.hasNext())
+        foo(i.next());
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;##动态类型安全包装器&lt;/p&gt;
+
+&lt;p&gt;此类操作会返回指定集合的动态类型安全版本。试图在返回的集合中插入一个类型错误的元素会立即抛出&lt;code class=&quot;highlighter-rouge&quot;&gt;ClassCastException&lt;/code&gt;。&lt;/p&gt;
+
+&lt;p&gt;##空集合&lt;/p&gt;
+
+&lt;p&gt;此类操作会返回类型安全且可序列化的空集合，此类空集合的作用与赋值字段相同，但是类型安全的。&lt;/p&gt;
+
+&lt;p&gt;##单例集合&lt;/p&gt;
+
+&lt;p&gt;此类操作返回的集合仅仅包含指定的元素，并且是不可修改的。&lt;/p&gt;
+
+&lt;p&gt;##其它操作&lt;/p&gt;
+
+&lt;p&gt;###nCopies&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;List&amp;lt;T&amp;gt; nCopies(int n, T o)&lt;/code&gt;返回一个不可修改的&lt;code class=&quot;highlighter-rouge&quot;&gt;List&lt;/code&gt;，此&lt;code class=&quot;highlighter-rouge&quot;&gt;List&lt;/code&gt;中包含&lt;code class=&quot;highlighter-rouge&quot;&gt;n&lt;/code&gt;个&lt;code class=&quot;highlighter-rouge&quot;&gt;o&lt;/code&gt;的副本。返回的&lt;code class=&quot;highlighter-rouge&quot;&gt;List&lt;/code&gt;是可序列化的。&lt;/p&gt;
+
+&lt;p&gt;###reverseOrder&lt;/p&gt;
+
+&lt;p&gt;有两个版本：&lt;code class=&quot;highlighter-rouge&quot;&gt;reverseOrder()&lt;/code&gt;强行逆转了实现&lt;code class=&quot;highlighter-rouge&quot;&gt;Comparator&lt;/code&gt;接口的对象的自然顺序；&lt;code class=&quot;highlighter-rouge&quot;&gt;reverseOrder(Comparator&amp;lt;T&amp;gt; cmp)&lt;/code&gt;强行逆转了指定比较器&lt;code class=&quot;highlighter-rouge&quot;&gt;cmp&lt;/code&gt;的顺序。两者返回的比较器都是可序列化的。&lt;/p&gt;
+
+&lt;p&gt;###枚举类操作（enumeration和list）&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Enumeration&amp;lt;T&amp;gt; enumeration(final Collection&amp;lt;T&amp;gt; c)&lt;/code&gt;返回一个指定&lt;code class=&quot;highlighter-rouge&quot;&gt;Collection&lt;/code&gt;上的枚举。&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;ArrayList&amp;lt;T&amp;gt; list(Enumeration&amp;lt;T&amp;gt; e)&lt;/code&gt;返回一个与指定枚举返回顺序相同的数组列表。&lt;/p&gt;
+
+&lt;p&gt;###指定元素出现的频率&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;int frequency(Collection&amp;lt;?&amp;gt; c, Object o)&lt;/code&gt;方法返回指定&lt;code class=&quot;highlighter-rouge&quot;&gt;Collection&lt;/code&gt;中指定对象的元素数。确切地讲，返回&lt;code class=&quot;highlighter-rouge&quot;&gt;c&lt;/code&gt;中满足&lt;code class=&quot;highlighter-rouge&quot;&gt;(o == null ? e == null : o.equals(e))&lt;/code&gt;的元素&lt;code class=&quot;highlighter-rouge&quot;&gt;e&lt;/code&gt;的个数。&lt;/p&gt;
+
+&lt;p&gt;###两个Collection的交集是否为空&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;boolean disjoint(Collection&amp;lt;?&amp;gt; c1, Collection&amp;lt;?&amp;gt; c2)&lt;/code&gt;：如果&lt;code class=&quot;highlighter-rouge&quot;&gt;c1&lt;/code&gt;与&lt;code class=&quot;highlighter-rouge&quot;&gt;c2&lt;/code&gt;中没有相同的元素，则返回&lt;code class=&quot;highlighter-rouge&quot;&gt;true&lt;/code&gt;。在使用此方法时，要保证两个&lt;code class=&quot;highlighter-rouge&quot;&gt;Collection&lt;/code&gt;都使用相同的相等性测试方法。&lt;/p&gt;
+
+&lt;p&gt;需要注意的是，在两个&lt;code class=&quot;highlighter-rouge&quot;&gt;Collection&lt;/code&gt;都为&lt;code class=&quot;highlighter-rouge&quot;&gt;null&lt;/code&gt;时，返回值是&lt;code class=&quot;highlighter-rouge&quot;&gt;true&lt;/code&gt;。&lt;/p&gt;
+
+&lt;p&gt;###addAll&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;boolean addAll(Collection&amp;lt;? super T&amp;gt; c, T... elements)&lt;/code&gt;方法与&lt;code class=&quot;highlighter-rouge&quot;&gt;c.addAll(Arrays.asList(elements))&lt;/code&gt;的行为相同，但大多数实现下要比它快很多。&lt;/p&gt;
+
+&lt;p&gt;###newSetFromMap&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;newSetFromMap(Map&amp;lt;E, Boolean&amp;gt; map)&lt;/code&gt;方法返回指定&lt;code class=&quot;highlighter-rouge&quot;&gt;Map&lt;/code&gt;支撑的&lt;code class=&quot;highlighter-rouge&quot;&gt;Set&lt;/code&gt;，返回的&lt;code class=&quot;highlighter-rouge&quot;&gt;Set&lt;/code&gt;与底层的&lt;code class=&quot;highlighter-rouge&quot;&gt;Map&lt;/code&gt;有同样的顺序、并发性和性能特征。每次在返回的&lt;code class=&quot;highlighter-rouge&quot;&gt;Set&lt;/code&gt;上调用方法都将导致在底层的&lt;code class=&quot;highlighter-rouge&quot;&gt;Map&lt;/code&gt;或其&lt;code class=&quot;highlighter-rouge&quot;&gt;KeySet&lt;/code&gt;上调用该方法一次，并伴随一个异常。&lt;/p&gt;
+
+&lt;p&gt;调用此方法时，指定的&lt;code class=&quot;highlighter-rouge&quot;&gt;Map&lt;/code&gt;必须为空，并且不能在此方法返回后直接访问。一种可以保证这些条件的代码方法如下：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Set&amp;lt;Object&amp;gt; weakHashSet = Collections.newSetFromMap(
+    new WeakHashMap&amp;lt;Object, Boolean&amp;gt;());
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;###asLifoQueue&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Queue&amp;lt;T&amp;gt; asLifoQueue(Deque&amp;lt;T&amp;gt; deque)&lt;/code&gt;可以返回一个&lt;code class=&quot;highlighter-rouge&quot;&gt;Deque&lt;/code&gt;（双向队列）的后进先出形式的&lt;code class=&quot;highlighter-rouge&quot;&gt;Queue&lt;/code&gt;。方法&lt;code class=&quot;highlighter-rouge&quot;&gt;add&lt;/code&gt;被映射到&lt;code class=&quot;highlighter-rouge&quot;&gt;push&lt;/code&gt;，&lt;code class=&quot;highlighter-rouge&quot;&gt;remove&lt;/code&gt;被映射到&lt;code class=&quot;highlighter-rouge&quot;&gt;pop&lt;/code&gt;等等。&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Written with &lt;a href=&quot;https://stackedit.io/&quot;&gt;StackEdit&lt;/a&gt;.&lt;/p&gt;
+&lt;/blockquote&gt;
+</description>
+        <pubDate>Mon, 18 Nov 2013 02:20:25 +0800</pubDate>
+        <link>http://gaoxuxu.github.io/material-jekyll-theme/2013/11/Java-Collection-framework-Collections</link>
+        <guid isPermaLink="true">http://gaoxuxu.github.io/material-jekyll-theme/2013/11/Java-Collection-framework-Collections</guid>
+        
+        
+        <category>算法</category>
+        
+        <category>Java</category>
+        
+      </item>
+    
+  </channel>
+</rss>

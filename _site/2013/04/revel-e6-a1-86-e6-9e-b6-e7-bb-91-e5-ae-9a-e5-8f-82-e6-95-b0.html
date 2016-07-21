@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html class="t-blue">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Revel框架——绑定参数</title>
+  <meta name="description" content="##绑定参数* * *Revel尝试尽可能地简单地将参数转换为它们期望的Go类型。这种从字符串到其他类型的转换被称为“数据绑定”。">
+
+  <link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic,700|Roboto+Mono:400,500' rel='stylesheet' type='text/css'>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="/material-jekyll-theme/css/main.css">
+  <link rel="canonical" href="http://gaoxuxu.github.io/material-jekyll-theme/2013/04/revel-e6-a1-86-e6-9e-b6-e7-bb-91-e5-ae-9a-e5-8f-82-e6-95-b0">
+  <link rel="alternate" type="application/rss+xml" title="Gao Xu" href="http://gaoxuxu.github.io/material-jekyll-theme/feed.xml">
+</head>
+
+  <body>
+    <nav class="c-navigation is-fixed">
+  <div class="c-navigation__container u-container">
+    <a class="c-navigation__item " href="/material-jekyll-theme/">Home</a>
+    <a class="c-navigation__item " href="/material-jekyll-theme/articles/">Articles</a>
+    <a class="c-navigation__item " href="/material-jekyll-theme/about/">About</a>
+  </div>
+</nav>
+
+
+    <article class="c-article">
+  <header class="c-header c-article__header">
+    <div class="u-container">
+      <h1 class="c-header__title">Revel框架——绑定参数</h1>
+    </div>
+  </header>
+
+  <div class="c-article__main">
+    <p>##绑定参数
+* * *
+Revel尝试尽可能地简单地将参数转换为它们期望的Go类型。这种从字符串到其他类型的转换被称为“数据绑定”。</p>
+
+<p>##参数
+* * *
+所有的请求参数都被集中在了一个单独的Params对象中。其中包括：</p>
+
+<ul>
+  <li>URL路径参数</li>
+  <li>URL查询参数</li>
+  <li>表格数据（multipart或非multipart）</li>
+  <li>文件上传</li>
+</ul>
+
+<p>这里是定义（<a href="http://robfig.github.io/revel/docs/godoc/binder.html">godoc</a>）:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>    type Params struct {
+        url.Values
+        Files map[string][]*multipart.FileHeader
+    }
+</code></pre>
+</div>
+
+<p>内嵌的url.Values(<a href="http://www.golang.org/pkg/net/url/#Values">godoc</a>)提供了一个简单值的存取器，但是开发者会发现使用Revel对任意非字符串值的数据绑定机制更简单。</p>
+
+<p>##Action参数
+* * *
+参数可以直接被接收为action的方法参数，例如：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>    func (c AppController) Action(name string, ids []int, user User, img []byte) revel.Result {
+        ...
+    } 在调用action之前，Revel要求它的Binder将这些参数转换为请求的数据类型。如果转换不成功，参数将会被赋予它的类型的零值。
+</code></pre>
+</div>
+
+<p>##Binder
+* * *
+绑定一个参数到一个数据类型，就要使用Revel的Binder（<a href="http://robfig.github.io/revel/docs/godoc/binder.html">godoc</a>）。它像下面例子中展示的那样整合参数对象：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>    func (c SomeController) Action() revel.Result {
+        var ids []int = c.Params.Bind("ids[]", reflect.TypeOf([]int{}))
+        ...
+    }
+</code></pre>
+</div>
+
+<p>下列的数据类型支持拆箱：</p>
+
+<ul>
+  <li>所有宽度的int</li>
+  <li>布尔值</li>
+  <li>所有支持类型的指针</li>
+  <li>所有支持类型的切片</li>
+  <li>struct</li>
+  <li>用于日期和时间的time.Time</li>
+  <li>用于文件上传的*os.File,[]byte,io.Reader,io.ReadSeeker</li>
+</ul>
+
+<p>下面的部分描述了这些类型的语法。如果需要更多有用的信息，请参阅<a href="http://robfig.github.io/revel/docs/src/binder.html">源码</a></p>
+
+<p>###布尔值</p>
+
+<p>字符串“true”，“on”和“1”都被认为是true。其它绑定的值将是false。</p>
+
+<p>###Slices</p>
+
+<p>Revel支持两种绑定Slice的语法：有序的和无序的。</p>
+
+<p>有序的：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>    ?ids[0]=1
+    &amp;ids[1]=2
+    &amp;ids[3]=4
+</code></pre>
+</div>
+
+<p>slice中的结果为[]int{1,2,0,4}</p>
+
+<p>无序的：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>    ?ids[]=1
+    &amp;ids[]=2
+    &amp;ids[]=3
+</code></pre>
+</div>
+
+<p>slice中的结果为[]int{1,2,3}<br />
+<strong>注意：</strong>当绑定一个struct的slice时，应该仅仅使用有序slice：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>    ?user[0].Id=1
+    &amp;user[0].Name=rob
+    &amp;user[1].Id=2
+    &amp;user[1].Name=jenny
+</code></pre>
+</div>
+
+<p>###Struct</p>
+
+<p>使用一个简单的句点（.）来绑定struct：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>    ?user.Id=1
+    &amp;user.Name=rob
+    &amp;user.Friends[]=2
+    &amp;user.Friends[]=3
+    &amp;user.Father.Id=5
+    &amp;user.Father.Name=Hermes
+</code></pre>
+</div>
+
+<p>将要绑定的结构定义为：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>    type User struct {
+        Id int
+        Name string
+        Friends []int
+        Father User
+    }
+</code></pre>
+</div>
+
+<p><strong>注意：</strong>为了方便绑定，属性必须是可导出的。</p>
+
+<p>###日期和时间</p>
+
+<p>内建的日期时间格式为SQL标准时间格式[“2006-01-02”,”2006-01-02 15:04”]。</p>
+
+<p>使用<a href="http://golang.org/pkg/time/#constants">官方模式</a>可以为应用添加更多的格式。简单点的方法是：添加识别模式到TimeFormats变量即可，像这样：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>    func init() {
+        revel.TimeFormats = append(revel.TimeFormats, "01/02/2006")
+    }
+</code></pre>
+</div>
+
+<p>###文件上传</p>
+
+<p>文件上传可以绑定到下列任意的类型：</p>
+
+<ul>
+  <li>*os.File</li>
+  <li>[]byte</li>
+  <li>io.Reader</li>
+  <li>io.ReadSeeker</li>
+</ul>
+
+<p>这是一个通过<a href="http://golang.org/pkg/mime/multipart/">Go的multipart包</a>提供的围绕上传处理的包装者。字节保留在内存中，除非它们超过阈值（默认为10MB），在那种情况下，它们将被写入到一个临时文件。 <strong>注意：</strong>将一个文件上传绑定到os.File需要Revel将其写入到一个临时文件中,这样会使它比其它类型效率低。</p>
+
+<p>###自定义Binder</p>
+
+<p>应用可以自定义Binder以获得这个框架的优点。</p>
+
+<p>它只需要注册<a href="http://robfig.github.io/revel/docs/godoc/binder.html#Binder">binder接口</a>并且注册每一个它要访问的类型：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>    func myBinder(params Params, name string, typ reflect.Type) reflect.Value {
+        ...
+    }
+
+    func init() {
+        revel.TypeBinders[reflect.TypeOf(MyType{})] = myBinder
+    }
+</code></pre>
+</div>
+
+
+  </div>
+</article>
+
+
+    <footer class="c-footer">
+  <div class="u-container c-footer__container">
+    <p>&copy; Gao Xu 2016</p>
+    <p>
+      <a href="https://twitter.com/gavin_china">Twitter</a>
+      <a href="https://github.com/gaoxuxu">Github</a>
+      
+      
+    </p>
+  </div>
+</footer>
+
+  </body>
+</html>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html class="t-blue">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>算法导论第八章——线性排序</title>
+  <meta name="description" content="前面学到的排序都是基于输入元素间的比较，被称为比较排序。">
+
+  <link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic,700|Roboto+Mono:400,500' rel='stylesheet' type='text/css'>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="/material-jekyll-theme/css/main.css">
+  <link rel="canonical" href="http://gaoxuxu.github.io/material-jekyll-theme/2013/11/Introduction-to-Algorithms-Chapter-8">
+  <link rel="alternate" type="application/rss+xml" title="Gao Xu" href="http://gaoxuxu.github.io/material-jekyll-theme/feed.xml">
+</head>
+
+  <body>
+    <nav class="c-navigation is-fixed">
+  <div class="c-navigation__container u-container">
+    <a class="c-navigation__item " href="/material-jekyll-theme/">Home</a>
+    <a class="c-navigation__item " href="/material-jekyll-theme/articles/">Articles</a>
+    <a class="c-navigation__item " href="/material-jekyll-theme/about/">About</a>
+  </div>
+</nav>
+
+
+    <article class="c-article">
+  <header class="c-header c-article__header">
+    <div class="u-container">
+      <h1 class="c-header__title">算法导论第八章——线性排序</h1>
+    </div>
+  </header>
+
+  <div class="c-article__main">
+    <p>前面学到的排序都是基于输入元素间的比较，被称为<strong>比较排序</strong>。</p>
+
+<p>##决策树模型</p>
+
+<p>比较排序可以被抽象地视为<strong>决策树</strong>。一棵决策树是一棵满二叉树，表示某排序算法作用于给定输入所做的所有比较，而控制结构、数据移动等都被忽略了。</p>
+
+<p>在决策树中，对每个内节点都注明<code class="highlighter-rouge">i:j</code>，其中<code class="highlighter-rouge">1&lt;=i,j&lt;=n</code>，<code class="highlighter-rouge">n</code>是输入序列中的元素个数。对每个叶节点都注明排列$\langle\pi(1),\pi(2),\cdots,\pi(n)\rangle$。排序算法的执行对应于遍历一条从树的根到叶节点的路径。</p>
+
+<p><strong>定理</strong>  任意一个比较算法在最坏情况下，都需要做$\Omega(n\lg n)$次的比较。</p>
+
+<p><strong>证明</strong>  考虑一棵高度为$h$，具有$l$个可达叶节点的决策树。对于规模为$n$的输入，共有$n!$种排列。所以有$n!\le l$，又因该树中叶子的数目最多为$2^h$，所以$n!\le 2^h$，有$h\ge\lg(n!)\ge\Omega(n\lg n)$。</p>
+
+<p>##计数排序</p>
+
+<p>计数排序假设<code class="highlighter-rouge">n</code>个输入元素中的每一个都是介于<code class="highlighter-rouge">0</code>到<code class="highlighter-rouge">k</code>之间的整数，此处<code class="highlighter-rouge">k</code>为某个整数。当$k=O(n)$时，计数排序的运行时间为$\Theta(n)$。</p>
+
+<p>计数排序的基本思想就是对每一个输入元素<code class="highlighter-rouge">x</code>，确定出小于<code class="highlighter-rouge">x</code>的元素个数。有了这一信息，就可以把<code class="highlighter-rouge">x</code>直接放到它在最终输出数组中的位置上。当有几个元素相同时，这个方案要略做修改，因为不能把它们放在同一个输出位置上。</p>
+
+<p>在计数排序算法的代码中，假定输入是数组<code class="highlighter-rouge">A[1..n]</code>，<code class="highlighter-rouge">length[A]=n</code>。另外需要两个数组：存放排序结果的<code class="highlighter-rouge">B[1..n]</code>，以及提供临时存储区的<code class="highlighter-rouge">C[0..k]</code>。</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>COUNTING-SORT(A,B,k)
+1   let C[0..k] be a new array
+2   for i=0 to k
+3       C[i] = 0
+4   for j= 1 to A.length
+5       C[A[j]] = C[A[j]] + 1
+6   // C[i] now contains the number of elements equal to i
+7   for i = 1 to k
+8       C[i] = C[i] + C[i-1]
+9   // C[i] now contains the number of elements less than or equal to i
+19  for j = A.length downto 1
+11      B[C[A[j]]] = A[j]
+12      C[A[j]] = C[A[j]] - 1
+</code></pre>
+</div>
+
+<p>##基数排序</p>
+
+<p><strong>基数排序（radix sort）</strong>是一种用在老式穿卡机上的算法。其原理是将整数按<strong>位数</strong>切割成不同的数字，然后按每个位数分别比较。</p>
+
+<p>它是这样实现的：将所有待比较数值（正整数）统一为同样的数位长度，数位较短的数前面补零。然后，从最低位开始，依次进行一次排序。这样从最低位排序一直到最高位排序完成以后, 数列就变成一个有序序列。</p>
+
+<p>关于这个算法，很重要的一点就是按位排序要稳定。</p>
+
+<p>假设输入数组<code class="highlighter-rouge">A</code>的长度为<code class="highlighter-rouge">n</code>，且每个数字都有<code class="highlighter-rouge">d</code>位，其中第<code class="highlighter-rouge">1</code>位为最低位，第<code class="highlighter-rouge">d</code>位为最高位，代码如下：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>RADIX-SORT(A,d)
+1   for i = 1 to d
+2       use a stable sort to sort array A on digit i
+</code></pre>
+</div>
+
+<p><strong>引理8.3</strong> 给定<code class="highlighter-rouge">n</code>个<code class="highlighter-rouge">d</code>位数，每一个数位可以取<code class="highlighter-rouge">k</code>种可能的值。基数排序算法能以$\Theta(d(n+k))$的时间正确地对这些数排序。</p>
+
+<p><strong>证明</strong> 当每位数字都介于<code class="highlighter-rouge">0</code>到<code class="highlighter-rouge">k-1</code>，且<code class="highlighter-rouge">k</code>不太大时，可以使用计数排序。此时基数排序的总时间为$d\cdot\Theta(n+k)=\Theta(d(n+k))$。</p>
+
+<p><strong>引理8.4</strong> 给定<code class="highlighter-rouge">n</code>个<code class="highlighter-rouge">b-bit</code>数字和任意正整数$r\le b$，<code class="highlighter-rouge">RADIX-SORT</code>能在$\Theta((b/r)(n+2^r))$时间内正确地对这些数进行排序。</p>
+
+<p><strong>证明</strong> 对于有<code class="highlighter-rouge">n</code>个<code class="highlighter-rouge">b-bit</code>数字的数组，排序的时间是$\Theta(b(n+2))$。对于所有的正整数$r\le b$，可以令$d = \lceil b/r\rceil$，此时$k=2^r$，排序所用时间为$\Theta((b/r)(n+2^r))$。</p>
+
+<p>##桶排序</p>
+
+<p>桶排序的思想就是把区间<code class="highlighter-rouge">[0,1)</code>划分成<code class="highlighter-rouge">n</code>个相同大小的子区间，或称桶。然后，将<code class="highlighter-rouge">n</code>个输入数分布到各个桶中去。因为输入数均匀分布在<code class="highlighter-rouge">[0,1)</code>上，所以，一般不会有很多数落在一个桶中的情况。为得到结果，先对各个桶中的数进行排序，然后按次序把各桶中的元素列出来即可。</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>BUCKET-SORT(A)
+1   let B[0...n-1] be a new array
+2   n = A.length
+3   for i = 0 to n-1
+4       make B[i] an empty list
+5   for i = 1 to n
+6       insert A[i] into list B[nA[i]]
+7   for i = 0 to n-1
+8       sort list B[i] with insertion sort
+9   concatenate the lists B[0],B[1],...,B[n-1] together in order
+</code></pre>
+</div>
+
+<p>###桶排序的运行时间</p>
+
+<p>除第8行外，其它各行在最坏情况下的时间都是$O(n)$，要计算桶排序的运行时间，只需要分析$n$次调用插入排序的时间即可。</p>
+
+<p>设$n _ i$为表示桶$B[i]$中元素个数的随机变量，则桶排序的运行时间为</p>
+
+<script type="math/tex; mode=display">T(n)=\Theta(n)+\sum _ {i=0}^{n-1}O(n _ i^2)</script>
+
+<p>对上式两边取期望，并利用期望的线性性质，有</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{equation}\begin{split}\
+E[T(n)]&=E\left[\Theta(n)+\sum _ {i=0}^{n-1}O(n _ i^2)\right]\\
+&=\Theta(n)+\sum _ {i=0}^{n-1}E[O(n _ i^2)]\\
+&=\Theta(n)+\sum _ {i=0}^{n-1}O(E[n _ i^2])\
+\end{split}\end{equation} %]]></script>
+
+<p>对$i=0,1,2,\dots,n$和$j=1,2,\dots,n$，定义指示器随机变量</p>
+
+<script type="math/tex; mode=display">X _ {ij}=I\{A[j]\ falls\ in\ bucket\ i\}</script>
+
+<p>因此，有</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+n _ i=\sum _ {j=1}^nX _ {ij}\\
+\begin{equation}\begin{split}\
+E[n _ i^2]&=E\left[\left(\sum _ {j=1}^nX _ {ij}\right)^2\right]\\
+&=E\left[\sum _ {j=1}^n\sum _ {k=1}^nX _ {ij}X _ {ik}\right]\\
+&=E\left[\sum _ {j=1}^nX _ {ij}^2+\sum _ {1\le j\le n}\sum _ {1\le k\le n\ k\ne j}X _ {ij}X _ {ik}\right]\\
+&=\sum _ {j=1}^nE[X _ {ij}^2]+\sum _ {1\le j\le n}\sum _ {1\le k\le n\ k\ne j}E[X _ {ij}X _ {ik}]\
+\end{split}\end{equation} %]]></script>
+
+<p>由于指示器随机变量$X _ {ij}$为$1$的概率为$1/n$，其它情况为$0$。于是</p>
+
+<script type="math/tex; mode=display">E[X _ {ij}^2]=1\cdot\frac{1}{n}+0\cdot\left(1-\frac{1}{n}\right)=\frac{1}{n}\\
+E[X _ {ij}X _ {ik}]=E[X _ {ij}]E[X _ {ik}]=\frac{1}{n}\cdot\frac{1}{n}=\frac{1}{n^2}</script>
+
+<p>于是可得</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{equation}\begin{split}\
+E[n _ i^2]&=\sum _ {j=1}^n\frac{1}{n}+\sum _ {1\le j\le n}\sum _ {1\le k\le n\ k\ne j}\frac{1}{n^2}\\
+&=n\cdot\frac{1}{n}+n(n-1)\cdot\frac{1}{n^2}\\
+&=1+\frac{n-1}{n}\\
+&=2-\frac{1}{n}\
+\end{split}\end{equation} %]]></script>
+
+<p>于是可得桶排序的运行时间</p>
+
+<script type="math/tex; mode=display">T(n)=\Theta(n)+n\cdot O(2-1/n)=\Theta(n)</script>
+
+<blockquote>
+  <p>Written with <a href="https://stackedit.io/">StackEdit</a>.</p>
+</blockquote>
+
+
+  </div>
+</article>
+
+
+    <footer class="c-footer">
+  <div class="u-container c-footer__container">
+    <p>&copy; Gao Xu 2016</p>
+    <p>
+      <a href="https://twitter.com/gavin_china">Twitter</a>
+      <a href="https://github.com/gaoxuxu">Github</a>
+      
+      
+    </p>
+  </div>
+</footer>
+
+  </body>
+</html>

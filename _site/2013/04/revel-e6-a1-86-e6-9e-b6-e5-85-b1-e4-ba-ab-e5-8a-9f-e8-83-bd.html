@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html class="t-blue">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Revel框架——共享功能</title>
+  <meta name="description" content="##共享功能* * *Revel提供了在不同的域之间共享功能的途径：">
+
+  <link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic,700|Roboto+Mono:400,500' rel='stylesheet' type='text/css'>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="/material-jekyll-theme/css/main.css">
+  <link rel="canonical" href="http://gaoxuxu.github.io/material-jekyll-theme/2013/04/revel-e6-a1-86-e6-9e-b6-e5-85-b1-e4-ba-ab-e5-8a-9f-e8-83-bd">
+  <link rel="alternate" type="application/rss+xml" title="Gao Xu" href="http://gaoxuxu.github.io/material-jekyll-theme/feed.xml">
+</head>
+
+  <body>
+    <nav class="c-navigation is-fixed">
+  <div class="c-navigation__container u-container">
+    <a class="c-navigation__item " href="/material-jekyll-theme/">Home</a>
+    <a class="c-navigation__item " href="/material-jekyll-theme/articles/">Articles</a>
+    <a class="c-navigation__item " href="/material-jekyll-theme/about/">About</a>
+  </div>
+</nav>
+
+
+    <article class="c-article">
+  <header class="c-header c-article__header">
+    <div class="u-container">
+      <h1 class="c-header__title">Revel框架——共享功能</h1>
+    </div>
+  </header>
+
+  <div class="c-article__main">
+    <p>##共享功能
+* * *
+Revel提供了在不同的域之间共享功能的途径：</p>
+
+<ul>
+  <li>actions</li>
+  <li>controllers</li>
+  <li>applications</li>
+</ul>
+
+<p>##Actions
+* * *
+相关的actions共享一个单独的Controller类型。开发者可以为它添加数据域以便存储更多关于请求的上下文。拦截器可以在Revel运行前或后注册到Controller的任意action上。</p>
+
+<p>##Controllers
+* * *
+Revel允许将Controller混合在一起以便跨越不同的Controller类型共享字段、方法以及拦截器。
+下面是一个例子：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>    // MongoController提供访问我们的MongoDB
+    type MongoController struct {
+        *revel.Controller
+        Session *mgo.Session
+    }
+
+    func (c *MongoController) Begin() revel.Result {
+        c.Session = ...
+    }
+
+    func init() {
+        revel.InterceptMethod((*MongoController).Begin, revel.BEFORE)
+    }
+
+    type AppController struct {
+        *revel.Controller
+        MongoController
+    }
+</code></pre>
+</div>
+
+<p>在这个例子中，开发者创建了一个MongoController，它用来跨越整个应用，开发者可以将它混合到另外的Controller中。在这里，拦截器将会运行并且AppController上的action可以访问*mgo.Session。</p>
+
+<p>##Application
+* * *
+组件可以用来跨应用共享Controller类型、模板和资产。</p>
+
+
+  </div>
+</article>
+
+
+    <footer class="c-footer">
+  <div class="u-container c-footer__container">
+    <p>&copy; Gao Xu 2016</p>
+    <p>
+      <a href="https://twitter.com/gavin_china">Twitter</a>
+      <a href="https://github.com/gaoxuxu">Github</a>
+      
+      
+    </p>
+  </div>
+</footer>
+
+  </body>
+</html>

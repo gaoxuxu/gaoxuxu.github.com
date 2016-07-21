@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html class="t-blue">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>算法导论（第二章）</title>
+  <meta name="description" content="##Insertion SortInput:A sequence of n numbers Output:A permutation (reordering) INSERTION SORT(A)">
+
+  <link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic,700|Roboto+Mono:400,500' rel='stylesheet' type='text/css'>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="/material-jekyll-theme/css/main.css">
+  <link rel="canonical" href="http://gaoxuxu.github.io/material-jekyll-theme/2013/09/e7-ae-97-e6-b3-95-e5-af-bc-e8-ae-ba-ef-bc-88-e7-ac-ac-e4-ba-8c-e7-ab-a0-ef-bc-89">
+  <link rel="alternate" type="application/rss+xml" title="Gao Xu" href="http://gaoxuxu.github.io/material-jekyll-theme/feed.xml">
+</head>
+
+  <body>
+    <nav class="c-navigation is-fixed">
+  <div class="c-navigation__container u-container">
+    <a class="c-navigation__item " href="/material-jekyll-theme/">Home</a>
+    <a class="c-navigation__item " href="/material-jekyll-theme/articles/">Articles</a>
+    <a class="c-navigation__item " href="/material-jekyll-theme/about/">About</a>
+  </div>
+</nav>
+
+
+    <article class="c-article">
+  <header class="c-header c-article__header">
+    <div class="u-container">
+      <h1 class="c-header__title">算法导论（第二章）</h1>
+    </div>
+  </header>
+
+  <div class="c-article__main">
+    <p>##Insertion Sort
+<strong>Input</strong>:A sequence of <em>n</em> numbers <script type="math/tex">\langle a_1,a_2,\cdots,a_n \rangle</script><br />
+<strong>Output</strong>:A permutation (reordering) <script type="math/tex">\langle a_1^,, a_2^,,\cdots,a_n^,\rangle</script><br />
+<strong>INSERTION SORT(A)</strong></p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>for j = 2 to A.length
+	key = A[j]
+	//Insert A[j] into the sorted sequence A[1..j-1].
+	i = j - 1
+	while i &gt; 0 and A[i] &gt; key
+		A[i + 1] = A[i]
+		i = i - 1
+	A[i + 1] = key
+</code></pre>
+</div>
+
+<p>##Exercises 2.1</p>
+
+<p>###2.1-1</p>
+
+<p>Using Figure 2.2 as a model,illustrate the operation of INSERTION-SORT on the array <script type="math/tex">A = \langle 31, 41, 59, 26, 41, 38 \rangle</script>.<br />
+<script type="math/tex">a. \langle 31, 41, 59, 26, 41, 38 \rangle</script><br />
+<script type="math/tex">b. \langle 31, 41, 59, 26, 41, 38 \rangle</script><br />
+<script type="math/tex">c. \langle 26, 31, 41, 59, 41, 38 \rangle</script><br />
+<script type="math/tex">d. \langle 26, 31, 41, 41, 59, 38 \rangle</script><br />
+<script type="math/tex">e. \langle 26, 31, 38, 41, 41, 59 \rangle</script></p>
+
+<p>###2.1-2</p>
+
+<p>Rewrite the INSERTION-SORT procedure to sort into nonincreasing instead of nondecreasing order.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>for j = 2 to A.length
+	key = A[j]
+	i = j - 1
+	while i &gt; 0 and A[i] &lt; key
+		A[i + 1] = A[i]
+		i = i - 1
+	A[i + 1] = key
+</code></pre>
+</div>
+
+<p>###2.1-3</p>
+
+<p>Consider the <em>searching problem:</em><br />
+<strong>Input:</strong> A sequence of <script type="math/tex">n</script> numbers <script type="math/tex">A = \langle a_1, a_2, \cdots, a_n\rangle</script> and a value <script type="math/tex">v</script>.<br />
+<strong>Output:</strong> An index <script type="math/tex">i</script> such that <script type="math/tex">v = A[i]</script> or the special value <strong>NIL</strong> if <script type="math/tex">v</script> does not appear in <script type="math/tex">A</script>.<br />
+Write pseudocode for <em>linear search</em>,which scans through the sequence,looking for <script type="math/tex">v</script>.Using a loop invariant,prove that your algorighm is correct.Make sure that your loop invariant fulfills the three necessary properties.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>i = NIL
+for j = 1 to A.length
+	if A[j] = v
+		i = j
+		break
+</code></pre>
+</div>
+
+<p>###2.1-4</p>
+
+<p>Consider the problem of adding two <em>n</em>-bit binary integers,stored in two <em>n</em>-element arrays <em>A</em> and <em>B</em>.The sum of the two integers should be stored in binary form in an <script type="math/tex">(n + 1)</script>-element array <em>C</em>.State the problem formally and write pseudocode for adding the two integers.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>r = 0
+for j = n to 1//这里的顺序是反向的，即数组的最后一位正好是二进制数的第一位
+	if A[j] = B[j] then
+		C[j + 1] = r
+		r = A[j]
+	else
+		C[j + 1] = (r + 1) % 2
+C[1] = r
+</code></pre>
+</div>
+
+<p>有一种更普遍的算法：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>C = [0,...,0]
+for j = 1 to n
+	sum = A[j] + B[j] + C[j]
+	C[j] = sum % 2
+	C[j + 1] = sum / 2
+</code></pre>
+</div>
+
+<p>这个算法的证明如下：<br />
+根据题意，如果不考虑进位，则有</p>
+
+<script type="math/tex; mode=display">\langle c_1,\cdots, c_n, 0\rangle\iff\langle a_1+b_1,\cdots,a_n+b_n,0\rangle</script>
+
+<p>再考虑进位，则有</p>
+
+<script type="math/tex; mode=display">\langle (a_1+b_1)\%2,a_2+b_2+(a_1+b_1)/2,\cdots,a_n+b_n,0\rangle</script>
+
+<p>还有一种算法，其实质与上一个算法相同：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>c = 0
+for j = 1 to n
+	d = ⌊(A[j] + B[j] + c) / 2⌋
+	C[j] = A[j] + B[j] + c - 2⋅d
+	c = d
+C[n + 1] = c
+</code></pre>
+</div>
+
+<p>##Analyzing algorithms</p>
+
+<p>假设每一行伪代码的执行时间都是常数。</p>
+
+<p>###INSERTION-SORT</p>
+
+<p>第<script type="math/tex">(1)</script>行：			cost:	<script type="math/tex">c_1</script>			times:	<script type="math/tex">n</script><br />
+第<script type="math/tex">(2)</script>行：			cost:	<script type="math/tex">c_2</script>			times:	<script type="math/tex">n-1</script><br />
+第<script type="math/tex">(3)</script>行：			cost:	<script type="math/tex">c_3 = 0</script>		times:	<script type="math/tex">n-1</script><br />
+第<script type="math/tex">(4)</script>行：			cost:	<script type="math/tex">c_4</script>			times:	<script type="math/tex">n-1</script><br />
+第<script type="math/tex">(5)</script>行：			cost:	<script type="math/tex">c_5</script>			times:	<script type="math/tex">\sum_{j=2}^nt_j</script><br />
+第<script type="math/tex">(6)</script>行：			cost:	<script type="math/tex">c_6</script>			times:	<script type="math/tex">\sum_{j=2}^n(t_j-1)</script><br />
+第<script type="math/tex">(7)</script>行：			cost:	<script type="math/tex">c_7</script>			times:	<script type="math/tex">\sum_{j=2}^n(t_j-1)</script><br />
+第<script type="math/tex">(8)</script>行：			cost:	<script type="math/tex">c_8</script>			times:	<script type="math/tex">n-1</script></p>
+
+<p>由上可知，INSERTION-SORT的总时间为：</p>
+
+<script type="math/tex; mode=display">T(n) = c_1n + c_2(n-1) + c_4(n-1) + c_5\sum_{j=2}^nt_j + c_6\sum_{j=2}^n(t_j-1) + c_7\sum_{j=2}^n(t_j-1) + c_8(n-1)</script>
+
+<p>最佳情况下：</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{equation}\begin{split}T(n) &= c_1n + c_2(n-1) + c_4(n-1) + c_5(n-1) + c_8(n-1)\\&= (c_1 + c_2n + c_4n + c_5 + c_8)n - (c_2 + c_4 + c_5 + c_8)\\&= an + b\end{split}\end{equation} %]]></script>
+
+<p>最坏情况下：
+由于</p>
+
+<script type="math/tex; mode=display">\sum_{j=2}^nj = \frac{n(n + 1)}{2} - 1</script>
+
+<p>并且</p>
+
+<script type="math/tex; mode=display">\sum_{j=2}^n(j-1) = \frac{n(n - 1)}{2}</script>
+
+<p>因此</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{equation}\begin{split}T(n) &= c_1n + c_2(n - 1) + c_4(n-1) + c_5\left(\frac{n(n + 1)}{2} - 1\right) + c_6\left(\frac{n(n-1)}{2}\right) + c_7\left(\frac{n(n-1)}{2}\right) + c_8(n-1)\\&= \left(\frac{c_5 + c_6 + c_7}{2}\right)n^2 + \left(c_1 + c_2 + c_4 + \frac{c_5}{2} - \frac{c_6}{2} - \frac{c_7}{2} + c_8\right)n - (c_2 + c_4 + c_5 + c_8)\\&= a^,n^2 + b^,n + c\end{split}\end{equation} %]]></script>
+
+<p>##Exercises 2.2</p>
+
+<p>###2.2-1</p>
+
+<p>Express the function <script type="math/tex">n^3/1000 - 100n^2 -100n + 3</script> in terms of <script type="math/tex">\Theta</script>-notation.</p>
+
+<script type="math/tex; mode=display">\Theta(n^3)</script>
+
+<p>###2.2-2</p>
+
+<p>Consider sorting <em>n</em> numbers stored in array <em>A</em> by first finding the smallest element of <em>A</em> and exchanging it with the element in <em>A</em>[1].Then find the second smallest element of <em>A</em>,and exchange it with <em>A</em>[2].Continue in this manner for the first <em>n - 1</em> elements of <em>A</em>.Write pseudocode for this algorithm,which is known as <strong>selection sort</strong>.What loop invariant does this algorithm maintian?Why does it need to run for only the first <em>n - 1</em> elements,rather than for all <em>n</em> elements?Give the best-case and worst-case running times of selection sort in <script type="math/tex">\Theta</script>-notation.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>SELECTION-SORT(A):
+for j = 1 to A.length - 1
+	k = j
+	i = j + 1
+	while i &lt; A.length + 1 and A[i] &lt; A[k]
+		k = i
+		i = i + 1
+	t = A[k]
+	A[k] = A[j]
+	A[j] = t
+</code></pre>
+</div>
+
+<p>根据以上伪代码：</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{equation}\begin{split}T(n) &= c_1n + c_2(n - 1) + c_3(n - 1) + c_4\sum_{j=2}^nt_j + c_5\sum_{j=2}^n(t_j - 1) + c_6\sum_{j=2}^n(t_j - 1) + c_7(n - 1) + c_8(n - 1) + c_9(n - 1)\\&= c_1n + c_2(n - 1) + c_3(n - 1) + c_4\left(\frac{n(n + 1)}{2} - 1\right) + c_5\left(\frac{n(n - 1)}{2}\right) + c_6\left(\frac{n(n - 1)}{2}\right) + c_7(n - 1) + c_8(n - 1) + c_9(n - 1)\\&= \left(\frac{c_4 + c_5 + c_6}{2}\right)n^2 + \left(c_1 + c_2 +c_3 + \frac{c_4}{2} - \frac{c_5}{2} - \frac{c_6}{2} + c_7 + c_8 + c_9\right)n - (c_2 + c_3 + c_4 + c_7 + c_8 + c_9)\\&= an^2 + bn + c \\&= \Theta(n^2)\end{split}\end{equation} %]]></script>
+
+<p>###2.2-3</p>
+
+<p>Consider linear search again (see Exercises 2.1-3).How many elements of the input sequence need to be checked on the average,assuming that the element being searched for is equally likely to be any element int the array?How about in the worst case？What are the average-case and worst-case running times of linear search in <script type="math/tex">\Theta</script>-notation?Justify your answers.<br />
+Best Case: <script type="math/tex">1</script><br />
+Worst Case: <script type="math/tex">n</script><br />
+Avarge Case: <script type="math/tex">\frac{n + 1}{2}</script></p>
+
+<p>###2.2-4</p>
+
+<p>How can we modify almost any algorithm to have a good best-case running time?<br />
+要写出一个好的算法，应该把问题尽量拆分，然后根据拆分的问题组织算法。比如在排序算法中，我们可以先将其预先排成局部有序，再整体排序。</p>
+
+<p>##Designing algorithms</p>
+
+<p>###The divide-and-conquer approach</p>
+
+<p>“分治策略”：将原问题划分成<em>n</em>个规模较小而结构与原问题相似的子问题；递归地解决这些子问题，然后再合并其结果，最终得到原问题的解。<br />
+分治模式在每一层递归上都有3个步骤：</p>
+
+<ul>
+  <li><strong>分解（Divide）：</strong>将原问题分解成一系列子问题；</li>
+  <li><strong>解决（Conquer）：</strong>递归地解决各子问题。若子问题足够小，则直接求解。</li>
+  <li><strong>合并（Combine）：</strong>将子问题的结果合并成原问题的解。</li>
+</ul>
+
+<p>###MERGE SROT</p>
+
+<p>合并排序遵循的就是分治策略，合并时使用了哨兵值。合并排序递归时使用一个辅助过程，其伪代码如下：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>MERGE(A,p,q,r)
+1	n1 = q - p + 1
+2	n2 = r - q
+3	let L[1..n1+1] and R[1..n2+1] be new array
+4	for i = 1 to n1
+5		L[i] = A[p + i - 1]
+6	for j = 1 to n2
+7		R[j] = A[q + 1]
+8	L[n1 + 1] = $\infty$
+9	R[n2 + 1] = $\infty$
+10	i = 1
+11	j = 1
+12	for k = p to r
+13		if L[i] &lt;= R[j]
+14			A[k] = L[i]
+15			i = i + 1
+16		else A[k] = R[j]
+17			j = j + 1
+</code></pre>
+</div>
+
+<p>上面辅助过程的时间复杂度为<script type="math/tex">\Theta(n)</script>，因为其主要循环判断两个子数组的最小值的大小并将其放入结果数组中。</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>MERGE-SORT(A,p,r)
+(1)	if p &lt; r
+(2)		q = $\lfloor$(p + r) / 2$\rfloor$
+(3)		MERGE-SORT(A,p,q)
+(4)		MERGE-SORT(A,q+1,r)
+(5)		MERGE(A,p,q,r)
+</code></pre>
+</div>
+
+<p>###Analyzing divide-and-conquer algorithms</p>
+
+<p>分治算法中的递归式基于基本模式中的三个步骤（分解、解决、合并）。假设<script type="math/tex">T(n)</script>为一个规模为<script type="math/tex">n</script>的问题的运行时间。</p>
+
+<ul>
+  <li>假设问题规模足够小，使得<script type="math/tex">n \leqslant c</script>（c是一个常量），则得到它的直接解的时间为常量，写作<script type="math/tex">\Theta(1)</script>。</li>
+  <li>将原问题分解成<script type="math/tex">a</script>个子问题，每一个的大小是原问题的<script type="math/tex">1/b</script>。如果分解该问题和合并该问题的时间各为<script type="math/tex">D(n)</script>和<script type="math/tex">C(n)</script>，则可以得到递归式：</li>
+</ul>
+
+<script type="math/tex; mode=display">T(n) = \left\{\begin{array}{l}\Theta(1)\\aT(n/b) + D(n) + C(n)\end{array}\right.</script>
+
+<p>###Analysis of merge sort</p>
+
+<p>还是基于三个基本步骤来分析合并排序的运行时间，当<script type="math/tex">n > 1</script>时：</p>
+
+<ul>
+  <li>分解：这一步仅计算出子数组的中间位置，因此<script type="math/tex">D(n) = \Theta(1)</script>.</li>
+  <li>解决：递归地解决两个规模为<script type="math/tex">n/2</script>的子问题，时间为<script type="math/tex">2T(n/2)</script>.</li>
+  <li>合并：在一个含有<script type="math/tex">n</script>个元素的子数组上，MERGE过程的运行时间为<script type="math/tex">\Theta(n)</script>，则<script type="math/tex">C(n) = \Theta(n)</script>。</li>
+</ul>
+
+<p>由上所述，<script type="math/tex">D(n) + C(n) = \Theta(1) + \Theta(n) = \Theta(n) = cn</script>，于是:</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+T(n) = \left\{\begin{array}{1}\Theta(1)&n=1\\2T(n/2) + cn&n>1\end{array}\right. %]]></script>
+
+<p>解方程组，可以得到结果为：</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+T(n) = \left\{\begin{array}{1}\Theta(1)&n=1\\cn\lg{n} + cn = \Theta(n\lg n)&n>1\end{array}\right. %]]></script>
+
+<p>##Exercises 2.3</p>
+
+<p>###2.3-1</p>
+
+<p>Using Figure 2.4 as a model,illustrate the operation of merge sort on the array <script type="math/tex">A = \langle3,41,52,26,38,57,9,49\rangle</script>.</p>
+
+<p>###2.3-2</p>
+
+<p>Rewrite the MERGE procedure so that it does not use sentinels,instead stopping once either array <script type="math/tex">L</script> or <script type="math/tex">R</script> has had all its elements copied back to <script type="math/tex">A</script> and then copying the remainder of the other array into <script type="math/tex">A</script>.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>MERGE(A,p,q,r)
+1	n1 = q - p + 1
+2	n2 = r - q
+3	let L[1..n1] and R[1..n2] be new array
+4	for i = 1 to n1
+5		L[i] = A[p + i - 1]
+6	for j = 1 to n2
+7		R[j] = A[q + 1]
+8   i = 1
+9	j = 1
+10	for k = p to r
+11      if i &lt;= n1 and j &lt;= n2
+12	    	if L[i] &lt;= R[j]
+13		    	A[k] = L[i]
+14			    i = i + 1
+15  		else A[k] = R[j]
+16	    		j = j + 1
+17      else if i &gt; n1 and j &lt; n2
+18          A[k] = R[j]
+19          j = j + 1
+20      else if i &lt; n1 and j &gt; n2
+21          A[k] = L[i]
+22          i = i + 1
+</code></pre>
+</div>
+
+<p>###2.3-3</p>
+
+<p>Use mathematical induction to show that when <script type="math/tex">n</script> is an exact power of 2,the solution of the recurrence</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+T(n) = \left\{\begin{array}{1}2&if \ n = 2\\2T(n/2) + n & if \ n=2^k,for \ k > 1\end{array}\right. %]]></script>
+
+<p>is <script type="math/tex">T(n) = n\lg n.</script><br />
+解答：当<script type="math/tex">k = 1</script>时，有</p>
+
+<script type="math/tex; mode=display">T(2)=2=2\cdot\lg2</script>
+
+<p>假设<script type="math/tex">n=2^k(k>1)</script>时，有</p>
+
+<script type="math/tex; mode=display">T(2^k) = 2^k\lg{2^k}</script>
+
+<p>又根据方程组，当<script type="math/tex">n=2^{k+1}(k>1)</script>时，有</p>
+
+<script type="math/tex; mode=display">T(2^{k+1}) = 2T(2^k) + 2^{k+1} = 2\cdot2^k\lg{2^k} + 2^{k+1} = 2^{k+1}\lg{2^{k+1}}</script>
+
+<p>由上可知，<script type="math/tex">T(n)=n\lg n</script>方程成立。</p>
+
+<p>###2.3-4</p>
+
+<p>We can express insertion sort as a recursive procedure as follows.In order to sort <script type="math/tex">A[1\dots n]</script>,we recursively sort <script type="math/tex">A[1\dots n-1]</script> and then insert <script type="math/tex">A[n]</script> into the sorted array <script type="math/tex">A[1\dots n-1]</script>.Write a recurrence for the running time of this recursive version of insertion sort.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>INSERT(A,n)
+key = A[n]
+i = n - 1
+while i &gt; 1 and A[i] &gt; key
+    A[i+1] = A[i]
+    i = i - 1
+A[i + 1] = key
+</code></pre>
+</div>
+
+<p>很明显，INSERT(A,n)的运行时间为<script type="math/tex">\Theta(n)</script>.</p>
+
+<p>###2.3-5</p>
+
+<p>Referring back to the searching problem (see Exercise 2.1-3),observe that if the sequence <script type="math/tex">A</script> is sorted,we can check the midpoint of the sequence against <em>v</em> and eliminate half of the sequence from further consideration.The <em>binary search</em> algorithm repeats this rocedure,halving the size of the remaining portion of the sequence each time.Write pseudocode, either iterative or recursive, for binary search.Argue that the worst-case running time of binary search is <script type="math/tex">\theta(\lg{n})</script></p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>BINARY-SEARCH(A,l,h,value)
+if l &gt; h
+    return -1
+mid = (l + h)/2
+if A[mid] &gt; value
+    return BINARY-SEARCH(A,l,mid-1,value)
+else A[mid] &lt; value
+    return BINARY-SEARCH(A,mid+1,h,value)
+else
+    return A[mid]
+</code></pre>
+</div>
+
+<p>###2.3-6</p>
+
+<p>Observe that the <strong>while</strong> loop of lines 5-7 of the INSERTION-SORT procedure in Section 2.1 uses a linear search to scan (backward) through the sorted subarray <script type="math/tex">A[1\dots j-1]</script>.Can we use a binary search (see Exercise 2.3-5) instead to improve the overall worst-case running time of insertion sort to <script type="math/tex">\theta(n\lg{n})</script>?<br />
+如果是针对链表结构，这样确实可以达到<script type="math/tex">\theta(n\lg{n})</script>。但是针对数组的情况下，影响运行时间的是数组移位，所以这种情况下运行时间还是<script type="math/tex">\theta(n^2)</script>.</p>
+
+<p>###2.3-7 $4\star$$</p>
+
+<p>Describe a <script type="math/tex">\theta(n\lg{n})</script>-time algorithm that, given a set <script type="math/tex">S</script> of <script type="math/tex">n</script> integers and another integer <script type="math/tex">x</script>, determines whether or not there exist two elements in <script type="math/tex">S</script> whose sum is exactly <script type="math/tex">x</script>.<br />
+看到<script type="math/tex">\lg{n}</script>，很自然地想到二分查找上去了。最终代码如下：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>SEARCH-CHILD(S,x)
+(1) MERGE-SORT(S)
+(2) i = 1
+(3) j = S.length
+(4) while i &lt; j
+(5)     if S[i] + S[j] &gt; x
+(6)         j = j - 1
+(7)     else if S[i] + S[j] &lt; x
+(8)         i = i + 1
+(9)     else
+(10)        return true
+(11)return false
+</code></pre>
+</div>
+
+<p>使用二分法查找时先要保证数组是已排序的，于是有了第(1)步，这一步的运行时间是<script type="math/tex">\theta(n\lg{n})</script>。<code class="highlighter-rouge">while</code>循环的运行时间为<script type="math/tex">\theta(n)</script>，所以总时间就是<script type="math/tex">\theta(n\lg{n})</script>。</p>
+
+<p>##Problems</p>
+
+<p>###2.1 <em>Insertion sort on small arrays in merge sort</em></p>
+
+<p>Although merge sort runs in <script type="math/tex">\theta(n\lg{n})</script> worst-case time and insertion sort runs in <script type="math/tex">\theta(n^2)</script> worst-case time,the constant factors in insertion sort can make it faster in practice for small problem sizes on many machines.Thus,it makes sense to <strong><em>coarsen</em></strong> the leaves of the recursion by using insertion sort within merge sort when subproblems become sufficiently small.Consider a modification to merge sort in which <script type="math/tex">n/k</script> sublists of length <script type="math/tex">k</script> are sorted using insertion sort and then merged using the standard merging mechanism,where <script type="math/tex">k</script> is a value to be determined.</p>
+
+<p><strong><em>a.</em></strong> Show that insertion sort can sort the <script type="math/tex">n/k</script> sublists,each of length <script type="math/tex">k</script>,in <script type="math/tex">\Theta(nk)</script> worst-case time.<br />
+这个很简单，就是<script type="math/tex">n/k \cdot \Theta(k^2) = \Theta(nk)</script>。 <br />
+<strong><em>b.</em></strong> Show how to merge the sublists in <script type="math/tex">\Theta(n\lg(n/k))</script> worst-case time.<br />
+合并这些子列表的的总时间就是完全使用合并排序时排序整个列表的总时间减去排序<script type="math/tex">n/k</script>个子列表的总时间，也就是</p>
+
+<script type="math/tex; mode=display">T = \Theta(n\lg{n}) - n/k\cdot\Theta(k\lg{k}) = \Theta(n\lg{n}) - \Theta(n\lg{k}) = \Theta(n\lg{n/k})</script>
+
+<p><strong><em>c.</em></strong> Given that the modified algorithm runs in <script type="math/tex">\Theta(nk + n\lg(n/k))</script> worst-case time,what is the largest value of <script type="math/tex">k</script> as a function of <script type="math/tex">n</script> for which the modified algorithm has the same running time as standard merge sort,in terms of <script type="math/tex">\Theta</script>-notation?</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{align*}&\because \Theta(nk+n\lg(n/k)) = \Theta(nk + n\lg{n} - n\lg{k}) = \Theta(nk + n\lg{n})\\
+&\therefore 当k = \lg{n}时，有\Theta(nk + n\lg{n/k}) = \Theta(n\lg{n})\\\end{align*} %]]></script>
+
+<p><strong><em>d.</em></strong> How should we choose <script type="math/tex">k</script> in practice?<br />
+由c的答案可知，我们平时可以将$k$定位在$\lg{n}$附近。</p>
+
+<p>###2-2 <strong><em>Correctness of bubblesort</em></strong></p>
+
+<p>Bubblesort is a pupular,but inefficient,sorting algoritm.It works by repeatedly swapping adjacent elements that are out of order.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>BUBBLESORT(A)
+1   for i = 1 to A.length - 1
+2       for j = A.length downto i + 1
+3           if A[j] &lt; A[j - 1]
+4               exchange A[j] with A[j-1]
+</code></pre>
+</div>
+
+<p><strong><em>a.</em></strong> Let <script type="math/tex">A'</script> denote the output of BUBBLESORT(A).To prove that BUBBLESORT is correct,we need to prove that it terminates and that</p>
+
+<script type="math/tex; mode=display">A'[1] \le A'[2] \le \cdots \le A'[n]</script>
+
+<p>where <script type="math/tex">n=A.length</script>.In order to show that BUBBLESORT actually sorts,what else do we need to prove?<br />
+算法的几个准则：</p>
+
+<ul>
+  <li>输入（Input）：必须有0个或多个输入值，这些值取自某个特定对象集合。</li>
+  <li>输出（Output）：有1个或者多个输出值，这些输出值是与输入值有着特定关系的值。</li>
+  <li>有穷性（Finiteness）：一个算法必须总是（对任意合法的输入值）在执行有穷步之后结束，且每一步都可在有穷时间内完成。</li>
+  <li>确定性（Definiteness）：算法中的每一条指令必须有确切的含义，不会产生二义性。在任何条件下，算法只能有唯一的一条执行路径，即每条指令的含义都必须明确，没有二义性。</li>
+  <li>可行性（Effectiveness）：即算法中描述的操作都是可以通过已经实现的基本运算执行有限次来实现的。</li>
+</ul>
+
+<p>对比这几个准则，可以知道，要想证明BUBBLESORT是正确的，还得证明输出值中的元素都来自输入值，以及证明对于同样的输入，输出都一样。<br />
+<strong>The next two parts will prove inequality</strong><br />
+<strong><em>b.</em></strong> State precisely a loop invariant for the for loop in lines 2-4,and prove that this loop invariant holds.Your proof should use the structure of the loop invariant proof presented in this chapter.<br />
+初始化：<script type="math/tex">j=A.length</script>，此时子数组中只有一个值，所以它是在正确的位置上的。即循环不变式的初始条件是成立的。<br />
+保持：从最外层的for循环看，首先比较<script type="math/tex">A[n]</script>和<script type="math/tex">A[n-1]</script>，如果前者小于后者，则交换两者的值。然后再比较<script type="math/tex">A[n-1]</script>和<script type="math/tex">A[n-2]</script>，依比较情况决定是否交换值。如此循环，最终将整个子数组的最小值移动到最左端。所以这一步也是成立的。<br />
+终止：当<script type="math/tex">j=i</script>时，循环不变式终止，此时最小值已移到最左边，所以这一步也是成立的。<br />
+<strong><em>c.</em></strong> Using the termination condition of the loop invariant proved in part(b),state a loop invariant for the for loop in lines 1-4 that will allow you prove inequality.Your proof should use the structure of the loop invariant proof presented in this chapter.<br />
+初始化：当<script type="math/tex">i=1</script>时，此时子数组中只有一个值，所以它是排好序的。即循环不变式在第一轮迭代前是成立的。<br />
+保持：由<strong><em>b</em></strong>的结论可知，每轮迭代后，子数组<script type="math/tex">\langle A[i],\dots,A[n]\rangle</script>中，<script type="math/tex">A[i]</script>必定是最小的。这也意味着，每轮迭代后，子数组<script type="math/tex">\langle A[1],\dots,A[i]\rangle</script>是有序的，所以此过程也成立。<br />
+终止：当<script type="math/tex">i=n</script>时，循环终止，此时子数组<script type="math/tex">\langle A[1],\dots,A[n]\rangle</script>已经是有序的，因此终止条件也成立。<br />
+<strong><em>d.</em></strong> What is the worst-case running time of bubblesort?How does it compare to the running time of insertion sort?<br />
+运行时间由内层循环决定，此处最坏情况下运行时间为<script type="math/tex">\Theta(n^2)</script>。原因是</p>
+
+<script type="math/tex; mode=display">\sum_{j=2}^nj = \frac{n(n + 1)}{2} - 1</script>
+
+<p>###2-3 <strong><em>Correctness of Horner’s rule</em></strong></p>
+
+<p>The following code fragment implements Horner’s rule for evaluating a polynomial</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{equation}\begin{split}P(x)&=\sum_{k=0}^{n}a_kx^k\\&=a_0+x(a_1 + x(a_2+\cdots + x(a_{n-1} + xa_n)\cdots))\end{split}\end{equation} %]]></script>
+
+<p>given the coefficients <script type="math/tex">a_0,a_1,\dots,a_n</script> and a value for <script type="math/tex">x</script>:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>1   y=0
+2   for i = n downto 0
+3       y = a_i + x * y
+</code></pre>
+</div>
+
+<p><strong><em>a.</em></strong> In terms of <script type="math/tex">\Theta</script>-notation,what is the running time of this code fragment for Horner’s rule?<br />
+由代码可知，每次迭代前<script type="math/tex">y</script>的值都是确定的，所以Horner’s rule的运行时间是<script type="math/tex">\Theta(n)</script>。<br />
+<strong><em>b.</em></strong> Write pseudocode to implement the native polynomial-evaluation algorithm that computes each term of the polynomial from scratch.What is the running time of this algorithm?How does it compare to Horner’s rule?<br />
+Horner’s rule的朴素多项式为：</p>
+
+<script type="math/tex; mode=display">P(x)=a_0+a_1x+\cdots+a_nx^n</script>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>NATIVE-POLYNOMIAL
+1   y = 0
+2   for i = 0 to n
+3       z = 1
+4       for j = 1 to i
+5           z = z * x
+6       y = y + a_i * x
+</code></pre>
+</div>
+
+<p>由伪代码可知，Horner’s rule的朴素多项式求值的运行时间是<script type="math/tex">\Theta(n^2)</script><br />
+<strong><em>c.</em></strong> Consider the following loop invariant:<br />
+At the start of each iteration of the for loop of lines 2-3,</p>
+
+<script type="math/tex; mode=display">y=\sum_{k=0}^{n-(i+1)}a_{k+i+1}x^k.</script>
+
+<p>Interpret a summation with no terms as equaling 0.Following the structure of the loop invariant proof presented in this chapter,use this loop invariant to show that,at termination,<script type="math/tex">y=\sum_{k=0}^na_kx^k.</script><br />
+起始：第一次迭代前<script type="math/tex">y=\sum_{k=0}^{-1}a_{k+n+1}x^k=0</script>，根据题意，起始条件成立。<br />
+保持：当<script type="math/tex">i=j</script>时，有</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{equation}\begin{split}y_{j}&=\sum_{k=0}^{n-(j+1)}a_{k+j+1}x^k\\
+&=a_{j+1}+a_{j+2}x+\cdots+a_nx^{n-(j+1)}\end{split}\end{equation} %]]></script>
+
+<p>当<script type="math/tex">i=j-1</script>时，有</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{equation}\begin{split}y_{j-1}&=\sum_{k=0}^{n-j}a_{k+j}x^k\\
+&=a_{j}+a_{j+1}x+\cdots+a_nx^{n-j}\\&=a_{j}+x\cdot y_{j}\end{split}\end{equation} %]]></script>
+
+<p>以上可以证明循环不变式的主体成立。<br />
+终止：终止时，有<script type="math/tex">j=0</script>，有<script type="math/tex">j_{-1}=\sum_{k=0}^na_kx^k</script>，所以终止条件也成立。<br />
+<strong><em>d.</em></strong> Conclude by arguing that the given code fragment correctly evaluates a polynomial characterized by the coefficients <script type="math/tex">a_0,a_1,\cdots,a_n.</script><br />
+对于<script type="math/tex">i=n</script>来说，第一轮迭代后系数<script type="math/tex">a_n</script>刻划的项的级数为0，第二轮迭代后系数<script type="math/tex">a_n</script>刻划的项级数为1，直到第<script type="math/tex">n+1</script>轮后，系数<script type="math/tex">a_n</script>刻划的项级数为n。<br />
+同理，对于<script type="math/tex">i=k</script>来说，第<script type="math/tex">n-k+1</script>轮迭代后系数<script type="math/tex">a_k</script>刻划的项的级数为0，第<script type="math/tex">n-k+2</script>轮迭代后系数<script type="math/tex">a_n</script>刻划的项级数为1，直到第<script type="math/tex">n+1</script>轮后，系数<script type="math/tex">a_k</script>刻划的项级数为k。</p>
+
+<p>###2-4 <strong><em>Inversions</em></strong></p>
+
+<p>Let <script type="math/tex">A[1..n]</script> be an array of <script type="math/tex">n</script> distinct numbers.If <script type="math/tex">% <![CDATA[
+i < j %]]></script> and <script type="math/tex">A[i] > A[j]</script>,then the pair <script type="math/tex">(i,j)</script> is called an <strong><em>inversion</em></strong> of <script type="math/tex">A</script>.<br />
+<strong><em>a.</em></strong> List the five inversions of array <script type="math/tex">\langle2,3,8,6,1\rangle.</script><br />
+<script type="math/tex">(6,1),(8,1),(3,1),(2,1),(8,6)</script><br />
+<strong><em>b.</em></strong> What array with elements from the set <script type="math/tex">\{1,2,\dots,n\}</script> has the most inversions? How many does it have?<br />
+倒序的数组<script type="math/tex">\langle n, n-1,\dots,1\rangle</script>具有最多的倒序对，其数量是</p>
+
+<script type="math/tex; mode=display">\sum_{j=2}^nj=\frac{n(n+1)}{2}-1</script>
+
+<p><strong><em>c.</em></strong> What is the relationship between the running time of insertion sort and the number of inversions in the input array? Justify your answer.<br />
+插入排序的最坏情况，就是要排序的数组具有最多的倒序对，最终决定其运行时间为<script type="math/tex">\Theta(n^2)</script>。<br />
+<strong><em>d.</em></strong> Given an algorithm that determines the number of inversions in any permutation on <script type="math/tex">n</script> elements in <script type="math/tex">\Theta(n\lg n)</script> worst-case time.(Hint:Modifiy merge sort).</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>INVERSIONS(A,p,q,r)
+1   n1 = q - p + 1
+2   n2 = r - q
+3   let L[1..n_1+1] and R[1..n_2+1] be new arrays
+4   for i = 1 to n_1
+5       L[i] = A[p + i - 1]
+6   for j = 1 to n_2
+7       R[j] = A[q + j]
+8   L[n_1 + 1] = \infty
+9   R[n_2 + 1] = \infty
+10  i = 1
+11  j = 1
+12  s = 0
+13  for k = p to r
+14      if L[i] &lt;= R[j]
+15          i = i + 1
+16      else j = j + 1
+17          s = s + n_1 - i
+18  return s
+
+COUNT-INVERSIONS(A,p,r)
+1   count = 0
+2   if p &lt; r
+3       q = (p + r) / 2
+4       count = count + COUNT-INVERSIONS(A,p,q)
+5       count = count + COUNT-INVERSIONS(A,q,r)
+6       count = count + INVERSIONS(A,p,q,r)
+7   return count
+</code></pre>
+</div>
+
+<blockquote>
+  <p>Written with <a href="http://benweet.github.io/stackedit/">StackEdit</a>.aligned</p>
+</blockquote>
+
+
+  </div>
+</article>
+
+
+    <footer class="c-footer">
+  <div class="u-container c-footer__container">
+    <p>&copy; Gao Xu 2016</p>
+    <p>
+      <a href="https://twitter.com/gavin_china">Twitter</a>
+      <a href="https://github.com/gaoxuxu">Github</a>
+      
+      
+    </p>
+  </div>
+</footer>
+
+  </body>
+</html>

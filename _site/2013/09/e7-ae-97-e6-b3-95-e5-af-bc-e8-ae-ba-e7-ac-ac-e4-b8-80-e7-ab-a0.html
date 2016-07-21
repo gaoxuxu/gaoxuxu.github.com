@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html class="t-blue">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>算法导论第一章</title>
+  <meta name="description" content="##性能性能的好与坏，直接决定着可行与不可行，例如对实时的要求。性能所扮演的角色就像经济中的货币。">
+
+  <link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic,700|Roboto+Mono:400,500' rel='stylesheet' type='text/css'>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="/material-jekyll-theme/css/main.css">
+  <link rel="canonical" href="http://gaoxuxu.github.io/material-jekyll-theme/2013/09/e7-ae-97-e6-b3-95-e5-af-bc-e8-ae-ba-e7-ac-ac-e4-b8-80-e7-ab-a0">
+  <link rel="alternate" type="application/rss+xml" title="Gao Xu" href="http://gaoxuxu.github.io/material-jekyll-theme/feed.xml">
+</head>
+
+  <body>
+    <nav class="c-navigation is-fixed">
+  <div class="c-navigation__container u-container">
+    <a class="c-navigation__item " href="/material-jekyll-theme/">Home</a>
+    <a class="c-navigation__item " href="/material-jekyll-theme/articles/">Articles</a>
+    <a class="c-navigation__item " href="/material-jekyll-theme/about/">About</a>
+  </div>
+</nav>
+
+
+    <article class="c-article">
+  <header class="c-header c-article__header">
+    <div class="u-container">
+      <h1 class="c-header__title">算法导论第一章</h1>
+    </div>
+  </header>
+
+  <div class="c-article__main">
+    <p>##性能
+性能的好与坏，直接决定着可行与不可行，例如对实时的要求。<br />
+性能所扮演的角色就像经济中的货币。</p>
+
+<p>##算法
+算法分析是理论研究，是关于计算机程序性能和资源利用的研究，特别关注性能。<br />
+算法也可以理解为一系列的计算步骤，用来将输入数据转换成输出结果。《The Art of Computer Programming》中对算法的特征归纳为：</p>
+
+<ul>
+  <li>输入：一个算法必须有零个或以上输入量。</li>
+  <li>输出：一个算法应有一个或以上输出量，输出量是算法计算的结果。</li>
+  <li>明确性：算法的描述必须无歧义，以保证算法的实际执行结果是精确地符合要求或期望，通常要求实际运行结果是确定的。</li>
+  <li>有限性：依据图灵的定义，一个算法是能够被任何图灵完备系统模拟的一串运算，而图灵机只有有限个状态、有限个输入符号和有限个转移函数（指令）。而一些定义更规定算法必须在有限个步骤内完成任务。</li>
+  <li>有效性：又称可行性。能够实现，算法中描述的操作都是可以通过已经实现的基本运算执行有限次来实现。</li>
+</ul>
+
+<p>##Exercises 1.1</p>
+
+<p>###1.1-1
+Give a real-world example that requires sorting or a real-world example that requires computing a convex hull.<br />
+Sorting：很常见，比如一份商品列表，可以按销量排序，也可以按价格排序等等。<br />
+Convex Hull：图像处理、模式识别和地理信息系统等。</p>
+
+<p>###1.1-2
+Other than speed, what other measures of efficiency might one use in a real-world setting?<br />
+内存使用率、编程效率、算法的复杂度等。</p>
+
+<p>###1.1-3
+Select a data structure that you hava seen previously,and discuss its strengths and limitations.<br />
+链表是一种很常见的数据结构，其长处是很容易插入数据，插入时时间复杂度只有<script type="math/tex">\Theta(1)</script>，局限性是查找一个节点时的时间复杂度为<script type="math/tex">\Theta(n)</script>，对于有序链表，这个值为<script type="math/tex">\Theta(\lg n)</script>。</p>
+
+<p>###1.1-4
+How are the shortest-path and traveling-salesman problems given above similar?How are they different?<br />
+相同点：都是找到最短路线。不同点：查找最短路径不需要经过所有点；而TSP则需要经过所有点，并找出最短路线。</p>
+
+<p>###1.1-5
+Come up with a real-world problem in which only the best solution will do.Then come up with one in which a solution that is “approximately” the best is good enough.<br />
+就拿排序算法来说，数据量小时完全可以用时间复杂度为<script type="math/tex">\Theta(n^2)</script>的算法，不过数据量大时必须使用更好的算法。</p>
+
+<p>##学习算法的重要性
+计算机资源是有限的，好的算法能更有效率地使用有限的时间和空间。<br />
+对于同一个问题，不同的算法对问题的影响往往比硬件和软件方面大。<br />
+作为一种技术，算法无所不在，它处于更核心的位置。<br />
+具有良好的算法基础，可以做更多的事情。</p>
+
+<p>##Exercises 1.2</p>
+
+<p>###1.2-1
+Give an example of an application that requires algorithmic content at the application level,and discuss the function of the algorithms involved.<br />
+地图应用，路径查找。</p>
+
+<p>###1.2-2
+Suppose we are comparing implementations of insertion sort and merge sort on the same machine.For inputs of size <em>n</em>,insertion sort runs in <script type="math/tex">8n^2</script> steps,while merge sort runs in <script type="math/tex">64n\lg n</script> steps.For which values of <em>n</em> does insertion sort beat merge sort?<br />
+<script type="math/tex">8n^2 \le 64n\lg n</script><br />
+<script type="math/tex">n \le 8\lg n</script><br />
+<script type="math/tex">2 \le n \le 43</script> <br />
+最后一步求值的代码如下（Golang）：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>package main
+
+import "math"
+
+func main() {
+    n := 2
+	for {
+		if float64(n) &lt;= 8*math.Log2(float64(n)) {
+			n++
+		} else {
+			break
+		}
+	}
+	println(n)
+}
+</code></pre>
+</div>
+
+<p>###1.2-3
+What is the smallest value of <em>n</em> such that an algorithm whose running time is <script type="math/tex">100n^2</script> runs faster than an algorithm whose running time is <script type="math/tex">2^n</script> on the same machine?</p>
+
+<script type="math/tex; mode=display">100n^2 \ge 2^n</script>
+
+<script type="math/tex; mode=display">\Rightarrow n > 14</script>
+
+<script type="math/tex; mode=display">\Rightarrow n = 15</script>
+
+<p>求解代码如下:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>package main
+
+import "math"
+
+func main() {
+	var n float64 = 1
+	for {
+		if 100*n*n &gt; math.Exp2(n) {
+			n++
+		} else {
+			break
+		}
+	}
+	println(n)
+}
+</code></pre>
+</div>
+
+<p>##Problems</p>
+
+<p>###<em>1-1 Comparison of running times</em></p>
+
+<p>For each function <script type="math/tex">f(n)</script> and time <script type="math/tex">t</script> in the following table,determine the largest size <script type="math/tex">n</script> of a problem that can be solved in time <script type="math/tex">t</script>,assuming that the algorithm to solve the problem takes <script type="math/tex">f(n)</script> microseconds.<br />
+解决这个问题，有个通解的公式：</p>
+
+<script type="math/tex; mode=display">\frac{f(n)}{10^6} \le t</script>
+
+<p>其中t的单位为秒。</p>
+<table><tr><td></td><td>1 second</td><td>1 minute</td><td>1 hour</td><td>1 day</td><td>1 month</td><td>1 year</td><td>1 century</td></tr><tr><td>$$logn$$</td><td>$$2^1000$$</td><td>$$2^{6\cdot10^7}$$</td><td>$$2^{3.6\cdot10^9}$$</td><td>$$2^{8.64\cdot10^10}$$</td><td>$$2^{2.592\cdot10^11}$$</td><td>$$2^{3.11\cdot10^12}$$</td><td>$$2^{3.11\cdot10^14}$$</td></tr>
+<tr><td>$$\sqrt{n}$$</td><td>$$10^6$$</td><td>$$3.6\cdot10^9$$</td><td>$$1.296\cdot10^{13}$$</td><td>$$7.46\cdot10^{15}$$</td><td>$$6.72\cdot10^{18}$$</td><td>$$9.67\cdot10^{20}$$</td><td>$$9.67\cdot10^{24}$$</td></tr>
+<tr><td>$$n$$</td><td>$$10^6$$</td><td>$$6\cdot10^7$$</td><td>$$3.6\cdot10^9$$</td><td>$$8.64\cdot10^{10}$$</td><td>$$2.59\cdot10^{12}$$</td><td>$$3.11\cdot10^{13}$$</td><td>$$3.11\cdot10^{15}$$</td></tr>
+<tr><td>$$n\lg{n}$$</td><td>$$6.24\cdot10^4$$</td><td>$$2.80\cdot10^6$$</td><td>$$1.33\cdot10^8$$</td><td>$$2.76\cdot10^9$$</td><td>$$\infty$$</td><td>$$\infty$$</td><td>$$\infty$$</td></tr>
+<tr><td>$$n^2$$</td><td>$$10^3$$</td><td>$$6\cdot10^4$$</td><td>$$2.94\cdot10^5$$</td><td>$$1.61\cdot10^6$$</td><td>$$5.58\cdot10^6$$</td><td>$$5.58\cdot10^7$$</td></tr>
+<tr><td>$$n^2$$</td><td>$$10^3$$</td><td>$$7.75\cdot10^3$$</td><td>$$6\cdot10^4$$</td><td>$$2.94\cdot10^5$$</td><td>$$1.61\cdot10^6$$</td><td>$$5.58\cdot10^6$$</td><td>$$5.58\cdot10^7$$</td></tr>
+<tr><td>$$n^3$$</td><td>$$100$$</td><td>$$391$$</td><td>$$1532$$</td><td>$$4420$$</td><td>$$13736$$</td><td>$$31440$$</td><td>$$145935$$</td></tr>
+<tr><td>$$2^n$$</td><td>$$19$$</td><td>$$25$$</td><td>$$31$$</td><td>$$36$$</td><td>$$41$$</td><td>$$44$$</td><td>$$51$$</td></tr>
+<tr><td>$$n!$$</td><td>$$9$$</td><td>$$11$$</td><td>$$12$$</td><td>$$13$$</td><td>$$15$$</td><td>$$16$$</td><td>$$17$$</td></tr>
+</table>
+<p>以上就<script type="math/tex">n\lg{n}</script>和<script type="math/tex">n{!}</script>的相关值不好求，还是用golang写了个小程序，过程如下：<br />
+对于<script type="math/tex">n\lg{n}</script>，可以使用二分法找到合适的n值。<br />
+对于<script type="math/tex">n{!}</script>，由斯特林公式估计：</p>
+
+<script type="math/tex; mode=display">\because n! = \sqrt{2\pi{n}}\left(\frac{n}{e}\right)^n</script>
+
+<script type="math/tex; mode=display">\therefore \ln{n!} = n\ln{n} -n + \frac{1}{2}\ln{(2n\pi)}</script>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\because 10^l \le n! < 10^{l+1} %]]></script>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\therefore l \le \log\_{10}{n!} < l+1 %]]></script>
+
+<p><script type="math/tex">\therefore n{!}</script>的位数为<script type="math/tex">\log_{10}{n!} + 1 = \frac{\ln{n!}}{\ln{10}} + 1</script><br />
+<script type="math/tex">\therefore n{!}</script>的位数为<script type="math/tex">\frac{n\ln{n} -n + \frac{1}{2}\ln{(2n\pi)}}{\ln{10}} + 1</script></p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>package main
+
+import "math"
+
+func main() {
+//	var key float64 = 1000000
+//	var low float64 = 1
+	println(search_factorial(initHigh(7, 1000000), 1000000))
+	println(search_factorial(initHigh(8, 60000000), 60000000))
+	println(search_factorial(initHigh(10, 3600000000), 3600000000))
+	println(search_factorial(initHigh(11, 86400000000), 86400000000))
+	println(search_factorial(initHigh(13, 2592000000000), 2592000000000))
+	println(search_factorial(initHigh(15, 31080000000000), 31080000000000))
+	println(search_factorial(initHigh(17, 3108000000000000), 3108000000000000))
+//	println(binary_search(low, 1000000, key))
+//	println(binary_search(low, 60000000, 60000000))
+//	println(binary_search(low, 3600000000, 3600000000))
+//	println(binary_search(low, 86400000000, 86400000000))
+//	println(binary_search(low, 2592000000000, 2592000000000))
+//	println(binary_search(low, 31080000000000, 31080000000000))
+//	println(binary_search(low, 3108000000000000, 3108000000000000))
+}
+
+func binary_search(l, h, key float64) float64{
+	var mid float64 = (l + h)/2
+	var result float64 = f(mid)
+	if l &gt;= h {
+		return h
+	} else {
+		if result == key {
+			return mid
+		}else if result &lt; key {
+			return binary_search(mid, h, key)
+		}else {
+			return binary_search(l, mid, key)
+		}
+	}
+}
+
+func f(n float64) float64{
+//	return n * math.Log2(n)
+	return factorial(n)
+}
+
+func factorial(n float64) float64{
+	if n &lt;= 1 {
+		return 1
+	} else {
+		return n * factorial(n - 1)
+	}
+}
+
+func initHigh(figures int, key float64) int64{
+	var i int64 = 0
+	for ; i &lt; int64(key); i++{
+		var n float64 = float64(i)
+		var fig float64 = (n * math.Log(n) - n + 0.5 * math.Log(2 * n * math.Pi))/math.Log(10) + 1
+		if int(fig) &gt; figures {
+			return i
+		}
+	}
+	return -1
+}
+
+func search_factorial(h int64, key float64) int64{
+	var i int64 = 0
+	for ; i &lt; h; i++ {
+		var f float64 = factorial(float64(i))
+		if f == key {
+			return i
+		}else if f &gt; key {
+			return i - 1
+		}
+	}
+	return h - 1
+}
+</code></pre>
+</div>
+
+<blockquote>
+  <p>《算法导论》<br />
+<a href="http://zh.wikipedia.org/wiki/算法">维基百科——算法</a></p>
+</blockquote>
+
+
+  </div>
+</article>
+
+
+    <footer class="c-footer">
+  <div class="u-container c-footer__container">
+    <p>&copy; Gao Xu 2016</p>
+    <p>
+      <a href="https://twitter.com/gavin_china">Twitter</a>
+      <a href="https://github.com/gaoxuxu">Github</a>
+      
+      
+    </p>
+  </div>
+</footer>
+
+  </body>
+</html>

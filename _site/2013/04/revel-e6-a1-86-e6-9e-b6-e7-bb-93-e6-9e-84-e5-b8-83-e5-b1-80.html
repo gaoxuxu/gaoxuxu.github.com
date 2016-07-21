@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html class="t-blue">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Revel框架——结构布局</title>
+  <meta name="description" content="##结构Revel规定它自身和用户应用都要安装在通过Go命令行工具规定的GOPATH布局中。（参阅“GOPATH环境变量”）">
+
+  <link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic,700|Roboto+Mono:400,500' rel='stylesheet' type='text/css'>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="/material-jekyll-theme/css/main.css">
+  <link rel="canonical" href="http://gaoxuxu.github.io/material-jekyll-theme/2013/04/revel-e6-a1-86-e6-9e-b6-e7-bb-93-e6-9e-84-e5-b8-83-e5-b1-80">
+  <link rel="alternate" type="application/rss+xml" title="Gao Xu" href="http://gaoxuxu.github.io/material-jekyll-theme/feed.xml">
+</head>
+
+  <body>
+    <nav class="c-navigation is-fixed">
+  <div class="c-navigation__container u-container">
+    <a class="c-navigation__item " href="/material-jekyll-theme/">Home</a>
+    <a class="c-navigation__item " href="/material-jekyll-theme/articles/">Articles</a>
+    <a class="c-navigation__item " href="/material-jekyll-theme/about/">About</a>
+  </div>
+</nav>
+
+
+    <article class="c-article">
+  <header class="c-header c-article__header">
+    <div class="u-container">
+      <h1 class="c-header__title">Revel框架——结构布局</h1>
+    </div>
+  </header>
+
+  <div class="c-article__main">
+    <p>##结构
+Revel规定它自身和用户应用都要安装在通过Go命令行工具规定的GOPATH布局中。（参阅<a href="http://golang.org/cmd/go/">“GOPATH环境变量”</a>）</p>
+
+<p>##布局示例</p>
+
+<p>下面是一个名为sample的Revel应用的默认布局：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>    gocode                  GOPATH根目录
+      src                   GOPATH源码文件夹
+        revel               Revel源码
+          ...
+        sample              应用根目录
+          app               App源码目录
+            controllers     App controllers目录
+              init.go       拦截者注册器
+            models          App域模型
+            views           Templates（模版）
+          tests             Test suites测试套件
+          conf              配置文件目录
+            app.conf        主配置文件
+            routes          路由定义
+          messages          消息文件
+          public            公共目录
+            css             CSS文件目录
+            js              Javascript文件目录
+            images          图片文件目录
+</code></pre>
+</div>
+
+<p>##app/目录</p>
+
+<p>app/目录包含你的应用的源码以及模版。</p>
+
+<ul>
+  <li>app/controllers</li>
+  <li>app/models</li>
+  <li>app/views</li>
+</ul>
+
+<p>Revel规定：</p>
+
+<ul>
+  <li>所有的模版（template）都在app/views目录下</li>
+  <li>所有的Controller都在app/controllers目录下</li>
+</ul>
+
+<p>除此之外，应用可以按它希望的结构组织代码。Revel会监视app/目录下的所有文件夹，并在监视到改变时重新build应用。任何依赖于app/之外的改变不会被监视到，当必须这样时，就得程序员负责重新编译。</p>
+
+<p>另外，Revel在启动时会导入app/（或导入的模块）下所有包含init()方法的包，以此来确保程序员所有的代码被初始化。</p>
+
+<p>controllers/init.go文件是约定的本地用来注册所有拦截者的钩子（hooks）。对于同一个包中的源文件，init()方法的顺序是没有定义的，因此在同一个文件中收集所有的拦截者定义允许程序员指定（并且知道）它们运行的顺序。（它也可以用于未来其它顺序敏感的初始化）</p>
+
+<p>##conf/目录</p>
+
+<p>conf目录包含应用的配置文件，下面是两个主要的配置文件：</p>
+
+<ul>
+  <li>app.conf，应用主要的配置文件，它包含标准的配置参数</li>
+  <li>routes，路由定义文件</li>
+</ul>
+
+<p>##messages/目录</p>
+
+<p>messages目录包含所有本地的消息文件。</p>
+
+<p>##public/目录</p>
+
+<p>存储在public目录的资源是通过Web Server直接保存的静态资产。一般它被分割为三个标准的子文件夹来存放图片、CSS样式以及JavaScript文件。</p>
+
+
+  </div>
+</article>
+
+
+    <footer class="c-footer">
+  <div class="u-container c-footer__container">
+    <p>&copy; Gao Xu 2016</p>
+    <p>
+      <a href="https://twitter.com/gavin_china">Twitter</a>
+      <a href="https://github.com/gaoxuxu">Github</a>
+      
+      
+    </p>
+  </div>
+</footer>
+
+  </body>
+</html>

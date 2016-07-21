@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html class="t-blue">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Android之AIDL</title>
+  <meta name="description" content="###AIDL简介">
+
+  <link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic,700|Roboto+Mono:400,500' rel='stylesheet' type='text/css'>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="/material-jekyll-theme/css/main.css">
+  <link rel="canonical" href="http://gaoxuxu.github.io/material-jekyll-theme/2013/03/android-e4-b9-8baidl">
+  <link rel="alternate" type="application/rss+xml" title="Gao Xu" href="http://gaoxuxu.github.io/material-jekyll-theme/feed.xml">
+</head>
+
+  <body>
+    <nav class="c-navigation is-fixed">
+  <div class="c-navigation__container u-container">
+    <a class="c-navigation__item " href="/material-jekyll-theme/">Home</a>
+    <a class="c-navigation__item " href="/material-jekyll-theme/articles/">Articles</a>
+    <a class="c-navigation__item " href="/material-jekyll-theme/about/">About</a>
+  </div>
+</nav>
+
+
+    <article class="c-article">
+  <header class="c-header c-article__header">
+    <div class="u-container">
+      <h1 class="c-header__title">Android之AIDL</h1>
+    </div>
+  </header>
+
+  <div class="c-article__main">
+    <p>###AIDL简介</p>
+
+<p>AIDL（Android Interface Definition Language）与其它IDL类似，它允许定义一个客户端和Service都认同的编程接口以便它们可以使用IPC进行交互。在Android中，一个进程通常不能访问另外一个进程的内存。也就是说，应该将对象分解成操作系统可以理解的基本数据类型，并且伪装成对象跨越进程边界。编写这样的伪装代码是非常枯燥的，所以Android提供了AIDL工具。</p>
+
+<p>注意：应该只在其它应用想要通过IPC访问Service并且想要在Service中进行多线程处理的情况下才使用AIDL。如果不需要跨进程，就应该使用Binder；而如果想要执行IPC，但不需要处理多线程，就应该使用Messenger。</p>
+
+<p>在设计AIDL接口之前，应该知道对一个AIDL接口的调用是直接的方法调用。不应该对发生调用的线程做出假设。调用来自本地进程的线程和远程进程是不一样的：</p>
+
+<ol>
+  <li>调用来自本地进程，此时处理过程会在发生调用的线程中进行。因此，如果只有本地线程访问Service，应该完全控制执行代码的线程。</li>
+  <li>调用来自远程进程，此时这些调用由本地进程的一个线程池管理。因此必须准备在同一时间接收来自未知线程的多次调用，也就是说，AIDL接口的实现必须是完全线程安全的。</li>
+  <li>使用oneway关键字可以修改远程调用的行为，此时，远程调用不会阻塞，它只是简单地发送数据并立即返回。接口的实现最终接收到的是与正常的Binder线程池一样的普通远程调用。如果oneway用于本地调用，则不会造成任何影响，此时调用仍然是同步的。</li>
+</ol>
+
+<p>###定义一个AIDL接口</p>
+
+<p>首先在一个.aidl文件中使用Java语言的语法定义AIDL接口，然后将它保存在Service所在的应用以及其它所有需要绑定到此Service的应用的源代码文件夹(src)中。当编译包含.aidl文件的应用时，Android SDK tools会基于.aidl文件生成一个IBinder接口并将它保存在工程的gen文件夹中。Service必须适当地实现这个IBinder，然后客户端应用绑定到Service后就可以通过这个IBinder调用方法以执行IPC。</p>
+
+<p>要使用AIDL创建一个Bound Service，有以下几个步骤：</p>
+
+<ol>
+  <li>创建.aidl文件：这个文件定义了编程接口的方法签名。</li>
+  <li>实现这个接口：Android SDK tools会基于.aidl文件生成一个接口。这个接口包含一个名为Stub的继承自Binder的内部抽象类，Stub类包含AIDL接口声明的所有方法。必须继承Stub类并实现这些方法。</li>
+  <li>为客户端暴露接口：实现一个Service，重写onBind()方法并返回Stub类的实现。</li>
+</ol>
+
+<p>警告：AIDL接口的每一次改变都应该兼容上一个版本。</p>
+
+<p><strong>1.创建一个.aidl文件：</strong><br />
+AIDL的语法特别简单。可以声明一个包含一个或多个方法的接口，这些方法可以带有参数或返回类型。方法参数和返回值类型可以是任意AIDL支持的数据类型，或者其它AIDL生成的接口。</p>
+
+<p>必须使用Java语言构建.aidl文件，每一个.aidl文件必须定义一个单独的接口，并且只包含接口声明和方法签名。</p>
+
+<p>默认情况下，AIDL支持以下的数据类型：</p>
+
+<ol>
+  <li>所有Java中的基本数据类型（例如int、long、char、boolean等等）。</li>
+  <li>String</li>
+  <li>CharSequence</li>
+  <li>List：List中的所有元素必须是下列类型中的一种：1)AIDL支持的数据类型中的一种；2)其它AIDL生成的接口；3）已声明的可序列化的类型。支持泛型。而且就算方法签名中用的是List接口，在其它地方接收到的实际类型也是ArrayList。</li>
+  <li>Map：与List的元素的类型要求一样。而且其它地方接收到的实际类型总是HashMap。与List不同的是不支持泛型Map。</li>
+</ol>
+
+<p>需要注意的是，不在以上列表中的每一个用到的类型都必须加入到import语句中，即使这个类与接口在同一个包里。</p>
+
+<p>定义Service接口需要知道的事情：</p>
+
+<ol>
+  <li>方法可以有0个或多个参数，可以有返回值也可以没有。</li>
+  <li>所有非基本数据类型要有一个代表数据来路或去向的标签，这个标签可以是in、out或inout中的一个。</li>
+  <li>
+    <p>所有.aidl文件中的代码注释也会包含到生成的IBinder接口中（import语句与package语句之间的注释除外）。
+4.AIDL中仅支持方法，不能定义静态常量。</p>
+
+    <div class="highlighter-rouge"><pre class="highlight"><code> // IRemoteService.aidl
+ 	package com.example.android;
+</code></pre>
+    </div>
+
+ 	// Declare any non-default types here with import statements
+
+ 	/** Example service interface */
+ 	interface IRemoteService {
+ 	    /** Request the process ID of this service, to do evil things with it. */
+ 	    int getPid();
+
+ 	    /** Demonstrates some basic types that you can use as parameters
+ 	     * and return values in AIDL.
+ 	     */
+ 	    void basicTypes(int anInt, long aLong, boolean aBoolean, float aFloat,
+ 	            double aDouble, String aString);
+ 	}
+  </li>
+</ol>
+
+<p>将.aidl文件放入工程的src文件夹下并编译工程，SDK tools就会在gen文件夹下生成IBinder接口文件。且生成的文件名与.aidl文件名匹配，只不过是.java扩展名。</p>
+
+<p><strong>2.实现这个接口：</strong></p>
+
+<p>生成.java接口文件后，这个生成的接口包含了一个名为Stub的抽象类实现，这个实现中包含了所有在.aidl文件中声明的方法。</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>private final IRemoteService.Stub mBinder = new IRemoteService.Stub() {
+    public int getPid(){
+        return Process.myPid();
+    }
+    public void basicTypes(int anInt, long aLong, boolean aBoolean,
+        float aFloat, double aDouble, String aString) {
+        // Does nothing
+    }
+};
+</code></pre>
+</div>
+
+<p>这地方的mBinder就是Stub类的一个实例，这个Stub类描述了Service的RPC接口。在下一步中，会将这个实例提供给客户端。</p>
+
+<p>下面是一些实现AIDL接口时需要知道的规则：</p>
+
+<ol>
+  <li>接收到的调用不能保证是在主线程中执行的，因此需要考虑多线程并且将Service正确地构建为线程安全的。</li>
+  <li>RPC调用默认是同步的，如果知道Service不能在很短的时间内完成请求，就不应该在Activity的主线程中发送请求，因为这可能导致应用程序挂起。所以调用一般应该在客户端之外的线程进行。</li>
+  <li>没有可以抛给调用者的异常。</li>
+</ol>
+
+<p><strong>3.给客户端暴露接口：</strong></p>
+
+<p>一旦实现了Service的接口，就应该将它暴露给可以绑定到它的客户端。要暴露Service接口，就要继承Service类并且实现onBind()方法，并且返回一个生成的Stub类的实例。</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>public class RemoteService extends Service {
+    @Override
+    public void onCreate() {
+        super.onCreate();
+    }
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        // Return the interface
+        return mBinder;
+    }
+
+    private final IRemoteService.Stub mBinder = new IRemoteService.Stub() {
+        public int getPid(){
+            return Process.myPid();
+        }
+        public void basicTypes(int anInt, long aLong, boolean aBoolean,
+            float aFloat, double aDouble, String aString) {
+            // Does nothing
+        }
+    };
+}
+</code></pre>
+</div>
+
+<p>现在，当一个客户端调用bindService()连接到Service时，客户端的onServiceConnected()回调方法就会接收到Service的onBind()方法返回的mBinder实例。</p>
+
+<p>由于客户端必须可以访问这个接口，因此在客户端与Service属于不同应用的情况下，客户端应用必须将相关的.aidl文件复制到自己工程的src文件夹下。</p>
+
+<p>当客户端在onServiceConnected()回调中接收到IBinder实例后，必须调用YourServiceInterface.Stub.asInterface(service)将返回的参数转换为YourServiceInterface类型。</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>IRemoteService mIRemoteService;
+private ServiceConnection mConnection = new ServiceConnection() {
+    // Called when the connection with the service is established
+    public void onServiceConnected(ComponentName className, IBinder service) {
+        // Following the example above for an AIDL interface,
+        // this gets an instance of the IRemoteInterface, which we can use to call on the service
+        mIRemoteService = IRemoteService.Stub.asInterface(service);
+    }
+
+    // Called when the connection with the service disconnects unexpectedly
+    public void onServiceDisconnected(ComponentName className) {
+        Log.e(TAG, "Service has unexpectedly disconnected");
+        mIRemoteService = null;
+    }
+};
+</code></pre>
+</div>
+
+<p>###通过IPC传递对象</p>
+
+<p>如果想在进程间通过IPC接口传送自己的类，就需要确保这个类的代码对另一侧的IPC通道也是可用的，并且这个类必须支持Parcelable接口。支持Parcelable接口可以让Android系统将对象分解为基本数据类型，以便跨进程。</p>
+
+<p>要创建一个支持Parcelable协议的类，有以下几个步骤：</p>
+
+<ol>
+  <li>让这个类实现Parcelable接口。</li>
+  <li>实现writeToParcel方法，这个方法可以将对象当前的状态写入一个Parcel。</li>
+  <li>在类中添加一个名为CREATOR的静态常量，这个静态常量是Parcelable.Creator接口的一个实现。</li>
+  <li>后，创建一个.aidl文件声明这个类。这个.aidl文件在编译过程中不会被编译，它就类似于C语言中的头文件。</li>
+</ol>
+
+<p>例如，下面是Rect.aidl文件：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>package android.graphics;
+
+// Declare Rect so AIDL can find it and knows that it implements
+// the parcelable protocol.
+parcelable Rect;
+</code></pre>
+</div>
+
+<p>下面是Rect类实现Parcelable协议的一个例子：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>import android.os.Parcel;
+import android.os.Parcelable;
+
+public final class Rect implements Parcelable {
+    public int left;
+    public int top;
+    public int right;
+    public int bottom;
+
+    public static final Parcelable.Creator&lt;Rect&gt; CREATOR = new
+Parcelable.Creator&lt;Rect&gt;() {
+        public Rect createFromParcel(Parcel in) {
+            return new Rect(in);
+        }
+
+        public Rect[] newArray(int size) {
+            return new Rect[size];
+        }
+    };
+
+    public Rect() {
+    }
+
+    private Rect(Parcel in) {
+        readFromParcel(in);
+    }
+
+    public void writeToParcel(Parcel out) {
+        out.writeInt(left);
+        out.writeInt(top);
+        out.writeInt(right);
+        out.writeInt(bottom);
+    }
+
+    public void readFromParcel(Parcel in) {
+        left = in.readInt();
+        top = in.readInt();
+        right = in.readInt();
+        bottom = in.readInt();
+    }
+}
+</code></pre>
+</div>
+
+<p>###调用一个IPC方法</p>
+
+<p>下面是一个类调用AIDL定义的远程接口必需的步骤：</p>
+
+<ol>
+  <li>在工程的src文件夹下定义一个.aidl文件。</li>
+  <li>声明一个IBinder接口（基于AIDL生成）的实例。</li>
+  <li>实现ServiceConnection。</li>
+  <li>通过ServiceConnection实现调用Context.bindService()。</li>
+  <li>在onServiceConnected()实现中，会接收到一个名为service的IBinder实例。调用YourInterfaceName.Stub.asInterface((IBinder)service)方法将返回的参数转换为YourInterface类型。</li>
+  <li>调用在接口中定义的方法时，应该始终捕获DeadObjectException异常。</li>
+  <li>连接断开时，使用接口实例调用Context.unbindService()。</li>
+</ol>
+
+<p><strong>调用一个IPC Service的一些注释：</strong></p>
+
+<ol>
+  <li>对象被跨进程引用计数。</li>
+  <li>
+    <p>可以将匿名对象作为方法参数发送。</p>
+
+    <div class="highlighter-rouge"><pre class="highlight"><code> public static class Binding extends Activity {
+ 	    /** The primary interface we will be calling on the service. */
+ 	    IRemoteService mService = null;
+ 	    /** Another interface we use on the service. */
+ 	    ISecondary mSecondaryService = null;
+</code></pre>
+    </div>
+
+ 	    Button mKillButton;
+ 	    TextView mCallbackText;
+
+ 	    private boolean mIsBound;
+
+ 	    /**
+ 	     * Standard initialization of this activity.  Set up the UI, then 	wait
+ 	     * for the user to poke it before doing anything.
+ 	     */
+ 	    @Override
+ 	    protected void onCreate(Bundle savedInstanceState) {
+ 	        super.onCreate(savedInstanceState);
+
+ 	        setContentView(R.layout.remote_service_binding);
+
+ 	        // Watch for button clicks.
+ 	        Button button = (Button)findViewById(R.id.bind);
+ 	        button.setOnClickListener(mBindListener);
+ 	        button = (Button)findViewById(R.id.unbind);
+ 	        button.setOnClickListener(mUnbindListener);
+ 	        mKillButton = (Button)findViewById(R.id.kill);
+ 	        mKillButton.setOnClickListener(mKillListener);
+ 	        mKillButton.setEnabled(false);
+
+ 	        mCallbackText = (TextView)findViewById(R.id.callback);
+ 	        mCallbackText.setText(“Not attached.”);
+ 	    }
+
+ 	    /**
+ 	     * Class for interacting with the main interface of the service.
+ 	     */
+ 	    private ServiceConnection mConnection = new ServiceConnection() {
+ 	        public void onServiceConnected(ComponentName className,
+ 	                IBinder service) {
+ 	            // This is called when the connection with the service 	has been
+ 	            // established, giving us the service object we can use 	to
+ 	            // interact with the service.  We are communicating with our
+ 	            // service through an IDL interface, so get a client-side
+ 	            // representation of that from the raw service object.
+ 	            mService = IRemoteService.Stub.asInterface(service);
+ 	            mKillButton.setEnabled(true);
+ 	            mCallbackText.setText(“Attached.”);
+
+ 	            // We want to monitor the service for as long as we are
+ 	            // connected to it.
+ 	            try {
+ 	                mService.registerCallback(mCallback);
+ 	            } catch (RemoteException e) {
+ 	                // In this case the service has crashed before we could even
+ 	                // do anything with it; we can count on soon being
+ 	                // disconnected (and then reconnected if it can be restarted)
+ 	                // so there is no need to do anything here.
+ 	            }
+
+ 	            // As part of the sample, tell the user what happened.
+ 	            Toast.makeText(Binding.this, R.string.remote_service_connected,
+ 	                    Toast.LENGTH_SHORT).show();
+ 	        }
+
+ 	        public void onServiceDisconnected(ComponentName className) {
+ 	            // This is called when the connection with the service has been
+ 	            // unexpectedly disconnected – that is, its process crashed.
+ 	            mService = null;
+ 	            mKillButton.setEnabled(false);
+ 	            mCallbackText.setText(“Disconnected.”);
+
+ 	            // As part of the sample, tell the user what happened.
+ 	            Toast.makeText(Binding.this, R.string.remote_service_disconnected,
+ 	                    Toast.LENGTH_SHORT).show();
+ 	        }
+ 	    };
+
+ 	    /**
+ 	     * Class for interacting with the secondary interface of the service.
+ 	     */
+ 	    private ServiceConnection mSecondaryConnection = new ServiceConnection() {
+ 	        public void onServiceConnected(ComponentName className,
+ 	                IBinder service) {
+ 	            // Connecting to a secondary interface is the same as any
+ 	            // other interface.
+ 	            mSecondaryService = ISecondary.Stub.asInterface(service);
+ 	            mKillButton.setEnabled(true);
+ 	        }
+
+ 	        public void onServiceDisconnected(ComponentName className) {
+ 	            mSecondaryService = null;
+ 	            mKillButton.setEnabled(false);
+ 	        }
+ 	    };
+
+ 	    private OnClickListener mBindListener = new OnClickListener() {
+ 	        public void onClick(View v) {
+ 	            // Establish a couple connections with the service, binding
+ 	            // by interface names.  This allows other applications to be
+ 	            // installed that replace the remote service by implementing
+ 	            // the same interface.
+ 	            bindService(new Intent(IRemoteService.class.getName()),
+ 	                    mConnection, Context.BIND_AUTO_CREATE);
+ 	            bindService(new Intent(ISecondary.class.getName()),
+ 	                    mSecondaryConnection, Context.BIND_AUTO_CREATE);
+ 	            mIsBound = true;
+ 	            mCallbackText.setText(“Binding.”);
+ 	        }
+ 	    };
+
+ 	    private OnClickListener mUnbindListener = new OnClickListener() {
+ 	        public void onClick(View v) {
+ 	            if (mIsBound) {
+ 	                // If we have received the service, and hence registered with
+ 	                // it, then now is the time to unregister.
+ 	                if (mService != null) {
+ 	                    try {
+ 	                        mService.unregisterCallback(mCallback);
+ 	                    } catch (RemoteException e) {
+ 	                        // There is nothing special we need to do if the service
+ 	                        // has crashed.
+ 	                    }
+ 	                }
+
+ 	                // Detach our existing connection.
+ 	                unbindService(mConnection);
+ 	                unbindService(mSecondaryConnection);
+ 	                mKillButton.setEnabled(false);
+ 	                mIsBound = false;
+ 	                mCallbackText.setText(“Unbinding.”);
+ 	            }
+ 	        }
+ 	    };
+
+ 	    private OnClickListener mKillListener = new OnClickListener() {
+ 	        public void onClick(View v) {
+ 	            // To kill the process hosting our service, we need to know its
+ 	            // PID.  Conveniently our service has a call that will return
+ 	            // to us that information.
+ 	            if (mSecondaryService != null) {
+ 	                try {
+ 	                    int pid = mSecondaryService.getPid();
+ 	                    // Note that, though this API allows us to request to
+    <div class="highlighter-rouge"><pre class="highlight"><code>                 	// kill any process based on its PID, the kernel will
+                 	// still impose standard restrictions on which PIDs you
+                 	// are actually able to kill.  Typically this means only
+                 	// the process running your application and any additional
+                 	// processes created by that app as shown here; packages
+                 	// sharing a common UID will also be able to kill each
+                 	// other's processes.
+                 	Process.killProcess(pid);
+                 	mCallbackText.setText("Killed service process.");
+             	} catch (RemoteException ex) {
+                     // Recover gracefully from the process hosting the
+                 	// server dying.
+                 	// Just for purposes of the sample, put up a notification.
+                 	Toast.makeText(Binding.this,
+                         R.string.remote_call_failed,
+                         Toast.LENGTH_SHORT).show();
+             	}
+         	}
+     	}
+ 	};
+
+ 	// ----------------------------------------------------------------------
+ 	// Code showing how to deal with callbacks.
+ 	// ----------------------------------------------------------------------
+
+     /**
+      * This implementation is used to receive callbacks from the remote
+      * service.
+      */
+     private IRemoteServiceCallback mCallback = new IRemoteServiceCallback.Stub() {
+         /**
+          * This is called by the remote service regularly to tell us about
+          * new values.  Note that IPC calls are dispatched through a thread
+          * pool running in each process, so the code executing here will
+          * NOT be running in our main thread like most other things -- so,
+          * to update the UI, we need to use a Handler to hop over there.
+          */
+         public void valueChanged(int value) {
+             mHandler.sendMessage(mHandler.obtainMessage(BUMP_MSG, value, 0));
+         }
+     };
+
+     private static final int BUMP_MSG = 1;
+
+     private Handler mHandler = new Handler() {
+         @Override public void handleMessage(Message msg) {
+             switch (msg.what) {
+                 case BUMP_MSG:
+                     mCallbackText.setText("Received from service: " + msg.arg1);
+                     break;
+                 default:
+                     super.handleMessage(msg);
+             }
+         }
+
+     };
+ }
+</code></pre>
+    </div>
+  </li>
+</ol>
+
+
+  </div>
+</article>
+
+
+    <footer class="c-footer">
+  <div class="u-container c-footer__container">
+    <p>&copy; Gao Xu 2016</p>
+    <p>
+      <a href="https://twitter.com/gavin_china">Twitter</a>
+      <a href="https://github.com/gaoxuxu">Github</a>
+      
+      
+    </p>
+  </div>
+</footer>
+
+  </body>
+</html>

@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html class="t-blue">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>算法导论第六章——堆排序</title>
+  <meta name="description" content="#堆排序（Heapsort）">
+
+  <link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic,700|Roboto+Mono:400,500' rel='stylesheet' type='text/css'>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="/material-jekyll-theme/css/main.css">
+  <link rel="canonical" href="http://gaoxuxu.github.io/material-jekyll-theme/2013/10/Introduction-to-Algorithms-Chapter-6">
+  <link rel="alternate" type="application/rss+xml" title="Gao Xu" href="http://gaoxuxu.github.io/material-jekyll-theme/feed.xml">
+</head>
+
+  <body>
+    <nav class="c-navigation is-fixed">
+  <div class="c-navigation__container u-container">
+    <a class="c-navigation__item " href="/material-jekyll-theme/">Home</a>
+    <a class="c-navigation__item " href="/material-jekyll-theme/articles/">Articles</a>
+    <a class="c-navigation__item " href="/material-jekyll-theme/about/">About</a>
+  </div>
+</nav>
+
+
+    <article class="c-article">
+  <header class="c-header c-article__header">
+    <div class="u-container">
+      <h1 class="c-header__title">算法导论第六章——堆排序</h1>
+    </div>
+  </header>
+
+  <div class="c-article__main">
+    <p>#堆排序（Heapsort）</p>
+
+<hr />
+
+<p>##二叉堆</p>
+
+<hr />
+
+<p>一般所说的堆排序都是基于二叉堆的。二叉堆数据结构是一种数组对象，它可以被视为一颗完全二叉树。表示堆的数组<code class="highlighter-rouge">A</code>是一个具有两个属性的对象：</p>
+
+<ul>
+  <li><code class="highlighter-rouge">A.length</code>是数据中的元素个数，<code class="highlighter-rouge">A.heap-size</code>是堆中存放于<code class="highlighter-rouge">A</code>中的元素个数，有<code class="highlighter-rouge">0&lt;=A.heap-size&lt;=A.length</code>。</li>
+  <li>
+    <p>树的根元素是<code class="highlighter-rouge">A[1]</code>，给定节点的索引<code class="highlighter-rouge">i</code>，我们可以很容易计算它的父节点、左子节点和右子节点的索引。</p>
+
+    <div class="highlighter-rouge"><pre class="highlight"><code>  PARENT(i)
+  1   return ⌊i/2⌋
+    
+  LEFT(i)
+  1   return 2i
+    
+  RIGHT(i)
+  1   return 2i + 1
+</code></pre>
+    </div>
+  </li>
+</ul>
+
+<p>二叉堆有两种：</p>
+
+<ul>
+  <li>最大堆：<code class="highlighter-rouge">A[PARENT(i)]&gt;=A[i]</code></li>
+  <li>最小堆：<code class="highlighter-rouge">A[PARENT(i)]&lt;=A[i]</code></li>
+</ul>
+
+<p>堆中某个节点的高度定义为从本节点到叶子节点的最长简单下降路径上的数目，并且定义堆的高度为树根的高度。因为具有<code class="highlighter-rouge">n</code>个元素的堆是基于一颗完全二叉树的，因此其高度为<code class="highlighter-rouge">⌊lgn⌋</code>。下面是五个基本过程：</p>
+
+<ul>
+  <li><code class="highlighter-rouge">MAX-HEAPIFY</code>，运行时间为$O(\lg n)$，是保持最大堆特性的关键。</li>
+  <li><code class="highlighter-rouge">BUILD-MAX-HEAP</code>，运行时间为$O(n)$，可以构造一个基于无序输入数组的最大堆。</li>
+  <li><code class="highlighter-rouge">HEAPSORT</code>，运行时间为$O(n\lg n)$，将一个数组原地排序。</li>
+  <li><code class="highlighter-rouge">MAX-HEAP-INSERT</code>，<code class="highlighter-rouge">HEAP-EXTRACT-MAX</code>，<code class="highlighter-rouge">HEAP-INCREASE-KEY</code>，和<code class="highlighter-rouge">HEAP-MAXIMUM</code>。它们的运行时间都为$O(\lg n)$，可以让堆数据结构实现优先队列。</li>
+</ul>
+
+<p>###Maintaining the heap property</p>
+
+<p><strong>输入：</strong>数组<code class="highlighter-rouge">A</code>和下标<code class="highlighter-rouge">i</code>。</p>
+
+<p><strong>前提：</strong>假设根在索引<code class="highlighter-rouge">LEFT(i)</code>和<code class="highlighter-rouge">RIGHT(i)</code>的二叉树都是最大堆。</p>
+
+<p><strong>输出：</strong>根在索引<code class="highlighter-rouge">i</code>的二叉树为最大堆。</p>
+
+<p>伪代码：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>MAX-HEAPIFY(A,i)
+1   l = LEFT(i)
+2   r = RIGHT(i)
+3   if l&lt;=A.heap_size and A[l]&gt;A[i]
+4       largest = l
+5   else largest = i
+6   if r&lt;=A.heap_size and A[r]&gt;A[largest]
+7       largest = r
+8   if largest != i
+9       exchange A[i] with A[largest]
+10      MAX-HEAPIFY(A,largest)
+</code></pre>
+</div>
+
+<p>当最底层恰好半满时，<code class="highlighter-rouge">i</code>节点的子树大小最多为<code class="highlighter-rouge">2n/3</code>。因此，<code class="highlighter-rouge">MAX-HEAPIFY</code>的运行时间为</p>
+
+<script type="math/tex; mode=display">T(n)\le T(2n/3)+\Theta(1)=\Theta(\lg n)=\Theta(h)</script>
+
+<p>###Building a heap</p>
+
+<p><strong>输入：</strong>一个无序数组。</p>
+
+<p><strong>输出：</strong>一个最大堆</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>BUILD-MAX-HEAP(A)
+1   A.heap_size = A.length
+2   for i = ⌊A.length/2⌋ downto 1
+3       MAX-HEAPIFY(A,i)
+</code></pre>
+</div>
+
+<p>###正确性</p>
+
+<p><strong>初始化：</strong>针对有<code class="highlighter-rouge">n</code>个元素的数组<code class="highlighter-rouge">A</code>，第一轮迭代之前有<code class="highlighter-rouge">i=⌊n/2⌋</code>，而节点<code class="highlighter-rouge">⌊n/2⌋+1</code>、<code class="highlighter-rouge">⌊n/2⌋+2</code>…<code class="highlighter-rouge">n</code>都是叶子节点。</p>
+
+<p><strong>保持：</strong>由于节点<code class="highlighter-rouge">i</code>的子节点的编号总比<code class="highlighter-rouge">i</code>大，根据循环不变式，这些子节点都是最大堆的根。<code class="highlighter-rouge">MAX-HEAPIFY</code>的调用保持了节点<code class="highlighter-rouge">i+1</code>、<code class="highlighter-rouge">i+2</code>…<code class="highlighter-rouge">n</code>为最大堆的根的性质。递减<code class="highlighter-rouge">i</code>为下一次迭代重新建立循环不变式。</p>
+
+<p><strong>终止：</strong>当<code class="highlighter-rouge">i=0</code>时，循环终止。通过循环不变式，可知所有节点都是最大堆的根。</p>
+
+<p>###运行时间</p>
+
+<p><strong>简单界：</strong>可以简单认为，调用<code class="highlighter-rouge">MAX-HEAPIFY</code>过程的次数为$O(n)$，且每一次调用都用时$O(\lg n)$，因此可以认为其运行时间为$O(n\lg n)$。</p>
+
+<p><strong>紧确界：</strong>在树中不同高度的节点处调用<code class="highlighter-rouge">MAX-HEAPIFY</code>的时间不同。有这样一个性质：一个$n$元素堆的高度为$\lfloor\lg n\rfloor$，并且在任意高度$h$上，至多有$\lceil n/2^{h+1}\rceil$个节点。由于<code class="highlighter-rouge">MAX-HEAPIFY</code>过程的运行时间为$O(h)$，所以可得<code class="highlighter-rouge">BUILD-MAX-HEAP</code>的运行时间为</p>
+
+<script type="math/tex; mode=display">T(n)=\sum _{h=0}^{\lfloor\lg n\rfloor}\left\lceil\frac{n}{2^{h+1}}\right\rceil O(h)=O\left(n\sum _{h=0}^{\lfloor\lg n\rfloor}\frac{h}{2^h}\right)=O(n)</script>
+
+<p>###The heapsort algorithm</p>
+
+<p>给定一个输入数组<code class="highlighter-rouge">A</code>，堆排序算法的执行过程如下：</p>
+
+<ol>
+  <li>首先调用<code class="highlighter-rouge">BUILD-MAX-HEAP</code>过程将输入数组构造成一个最大堆。</li>
+  <li>此时数组中的最大元素为<code class="highlighter-rouge">A[1]</code>，将它与最后一个元素<code class="highlighter-rouge">A[n]</code>交换。</li>
+  <li>通过减小堆大小的方式丢弃最后一个节点，并且在新的根节点上调用<code class="highlighter-rouge">MAX-HEAPIFY</code>过程。</li>
+  <li>重复这种丢弃节点的过程，直到还剩1个节点，至此数组是有序的。</li>
+</ol>
+
+<p>伪代码：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>HEAPSORT(A)
+1   BUILD-MAX-HEAP(A)
+2   for i=A.length downto 2
+3       exchange A[1] and A[n]
+4       A.heap_size = A.heap_size - 1
+5       MAX-HEAPIFY(A,1)
+</code></pre>
+</div>
+
+<p>很明显，堆排序算法的运行时间为$T(n)=O(n)+(n-1)(O(1)+O(\lg n))=O(n\lg n)$。</p>
+
+<p>##Priority queue</p>
+
+<p>优先级队列是堆数据结构的一种常见应用。队列也有两种：最大优先级队列和最小优先级队列。下面讨论的是基于最大堆实现的最大优先级队列。</p>
+
+<p>优先队列是一种用来维护由一组元素构成的集合<code class="highlighter-rouge">S</code>的数据结构，这一组元素中的每一个都有一个关联的被称为<code class="highlighter-rouge">key</code>的值。一个最大优先队列支持以下操作：</p>
+
+<p><strong>INSERT(S，x)</strong> 将元素<code class="highlighter-rouge">x</code>插入集合<code class="highlighter-rouge">S</code>，相当于操作$S=S\cup{x}$。</p>
+
+<p><strong>MAXIMUM(S)</strong> 返回<code class="highlighter-rouge">S</code>中具有最大<code class="highlighter-rouge">key</code>的元素。</p>
+
+<p><strong>EXTRACT-MAX(S)</strong> 移除并返回<code class="highlighter-rouge">S</code>中具有最大<code class="highlighter-rouge">key</code>的元素。</p>
+
+<p><strong>INCREASE-KEY(S,x,k)</strong> 将<code class="highlighter-rouge">S</code>中元素<code class="highlighter-rouge">x</code>的<code class="highlighter-rouge">key</code>增加到新值<code class="highlighter-rouge">k</code>，这里<code class="highlighter-rouge">k&gt;=x.key</code>。</p>
+
+<p><code class="highlighter-rouge">HEAP-MAXIMUM</code>过程用$\Theta(1)$实现实现了<code class="highlighter-rouge">MAXIMUM</code>操作：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>HEAP-MAXIMUM(A)
+1   return A[1]
+</code></pre>
+</div>
+
+<p>程序<code class="highlighter-rouge">HEAP-EXTRACT-MAX</code>实现了<code class="highlighter-rouge">EXTRACT-MAX</code>操作，它的运行时间为$O(\lg n)$：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>HEAP-EXTRACT-MAX(A)
+1   if A.heap_size &lt; 1
+2       error "heap underflow"
+3   max = A[1]
+4   A[1] = A[A.heap_size]
+5   A.heap_size = A.heap_size - 1
+6   MAX-HEAPIFY(A,1)
+7   return max
+</code></pre>
+</div>
+
+<p>程序<code class="highlighter-rouge">HEAP-INCREASE-KEY</code>实现了<code class="highlighter-rouge">INCREASE-KEY</code>操作，它的运行时间为$O(\lg n)$：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>HEAP-INCREASE-KEY(A,i,key)
+1   if key &lt; A[i]
+2       error "new key is smaller than current key"
+3   A[i] = key
+4   while i &gt; 1 and A[PARENT] &lt; A[i]
+5       exchange A[i] with A[PARENT]
+6       i = PARENT(i)
+</code></pre>
+</div>
+
+<p>程序<code class="highlighter-rouge">MAX-HEAP-INSERT</code>实现了<code class="highlighter-rouge">INSERT</code>操作。它的运行时间为$O(\lg n)$：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>MAX-HEAP-INSERT(A,key)
+1   A.heap_size = A.heap_size + 1
+2   A[A.heap_size] = -∞
+3   HEAP-INCREASE-KEY(A,A.heap_size,key)
+</code></pre>
+</div>
+
+<p>##Problems</p>
+
+<p>###6-1 Building a heap using insertion</p>
+
+<p>We can build a heap by repeatedly calling <code class="highlighter-rouge">MAX-HEAP-INSERT</code> to insert the elements into the heap. Consider the following variation on the <code class="highlighter-rouge">BUILD-MAX-HEAP</code> procedure:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>BUILD-MAX-HEAP'(A)
+1   A.heap_size = 1
+2   for i = 2 to A.length
+3       MAX-HEAP-INSERT(A,A[i])
+</code></pre>
+</div>
+
+<p><strong>a.</strong> Do the procedures <code class="highlighter-rouge">BUILD-MAX-HEAP</code> and <code class="highlighter-rouge">BUILD-MAX-HEAP'</code> always create the same heap when run on the same input array? Prove that they do, or provide a counterexample.</p>
+
+<p>不一样，比如考虑数组$\langle 1,2,3\rangle$，前者的结果中，左节点为<code class="highlighter-rouge">2</code>，而后者的左节点为<code class="highlighter-rouge">1</code>。</p>
+
+<p><strong>b.</strong> Show that in the worst case, <code class="highlighter-rouge">BUILD-MAX-HEAP'</code> requires $\Theta(n\lg n)$ time to build an $n$-element heap.</p>
+
+<p>循环的次数为$n-1$，<code class="highlighter-rouge">MAX-HEAP-INSERT(A,A[i])</code>过程的运行时间为$O(\lg n)$，所以<code class="highlighter-rouge">BUILD-MAX-HEAP'</code>的运行时间上界为$O(n\lg n)$，其下界也很容易得到：</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{equation}\begin{split}\
+\sum _{i=1}^{n}\Theta(\lfloor\lg i\rfloor)\quad&\ge\quad\sum _{i=\lceil n/2\rceil}^n\Theta(\lfloor\lg \lceil n/2\rceil\rfloor)\\
+&\ge\quad\sum _{i=\lceil n/2\rceil}^n\Theta(\lfloor\lg(n/2)\rfloor)\\
+&=\quad\sum _{i=\lceil n/2\rceil}^n\Theta(\lfloor\lg n-1\rfloor)\\
+&\ge\quad n/2\cdot\Theta(\lg n)\\
+&=\quad\Omega(n\lg n)\
+\end{split}\end{equation} %]]></script>
+
+<p>###6-2 Analysis of d-ary heaps
+A <strong><em>d-ary heap</em></strong> is like a binary heap, but (with one possible exception) non-leaf nodes have <code class="highlighter-rouge">d</code> children instead of <code class="highlighter-rouge">2</code> children.</p>
+
+<p><strong>a.</strong> How would you represent a <code class="highlighter-rouge">d-ary</code> heap in an array?</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>D-ARY-PARENT(i)
+1   return (i-2)/d + 1
+
+D-ARY-CHILD(i,j)
+1   return (i-1)*d + j+1
+</code></pre>
+</div>
+
+<p><strong>b.</strong> What is the height of a <code class="highlighter-rouge">d-ary heap</code> of <code class="highlighter-rouge">n</code> elements in terms of <code class="highlighter-rouge">n</code> and <code class="highlighter-rouge">d</code> ?</p>
+
+<p>高度为$\Theta(\log _dn)$</p>
+
+<p><strong>c.</strong> Give an efficient implementation of <code class="highlighter-rouge">EXTRACT-MAX</code> in a <code class="highlighter-rouge">d-ary</code> max-heap. Analyze its running time in terms of <code class="highlighter-rouge">d</code> and <code class="highlighter-rouge">n</code>.</p>
+
+<p>运行时间为$T(n)=d\cdot O(\log _dn)=O(\log _dn)$，关键是<code class="highlighter-rouge">MAX-HEAPIFY</code>。</p>
+
+<p><strong>d.</strong> Give an efficient implementation of <code class="highlighter-rouge">INSERT</code> in a <code class="highlighter-rouge">d-ary</code> max-heap. Analyze its running time in terms of <code class="highlighter-rouge">d</code> and <code class="highlighter-rouge">n</code>.</p>
+
+<p>运行时间为$T(n)=O(\log _dn)$</p>
+
+<p><strong>e.</strong> Give an efficient implementation of <code class="highlighter-rouge">INCREASE-KEY(A, i, k)</code>, which flags an error if <code class="highlighter-rouge">k &lt; A[i]</code>, but otherwise sets <code class="highlighter-rouge">A[i] = k</code> and then updates the <code class="highlighter-rouge">d-ary</code> max-heap structure appropriately. Analyze its running time in terms of <code class="highlighter-rouge">d</code> and <code class="highlighter-rouge">n</code>.</p>
+
+<p>与<code class="highlighter-rouge">d</code>部分一样。</p>
+
+<p>###6-3 Young tableaus</p>
+
+<p>An $m\times n$ <strong><em>Young tableau</em></strong> is an $m\times n$ matrix such that the entries of each row are in sorted order from left to right and the entries of each column are in sorted order from top to bottom. Some of the entries of a Young tableau may be $\infty$, which we treat as nonexistent elements. Thus, a Young tableau can be used to hold $r\le mn$ finite numbers.</p>
+
+<p><strong>a.</strong> Draw a $4\times 4$ Young tableau containing the elements ${9, 16, 3, 2, 4, 8, 5, 14, 12}$</p>
+
+<p>略！</p>
+
+<p><strong>b.</strong> Argue that an $m\times n$ Young tableau $Y$ is empty if $Y[1, 1]=\infty$. Argue that $Y$ is full (contains $mn$ elements) if $Y[m, n] &lt; \infty$.</p>
+
+<p>很明显，<code class="highlighter-rouge">Y[1,1]</code>是<code class="highlighter-rouge">Y</code>中的最小值；而<code class="highlighter-rouge">Y[m,n]</code>是<code class="highlighter-rouge">Y</code>中的最大值。</p>
+
+<p><strong>c.</strong> Give an algorithm to implement <code class="highlighter-rouge">EXTRACT-MIN</code> on a nonempty $m\times n$ Young tableau that runs in $O(m+n)$ time. Your algorithm should use a recursive subroutine that solves an $m\times n$ problem by recursively solving either an $(m-1)\times n$ or an $m\times(n-1)$ subproblem. (Hint: Think about <code class="highlighter-rouge">MAX-HEAPIFY</code>.) Define $T(p)$, where $p=m+n$, to be the maximum running time of <code class="highlighter-rouge">EXTRACT-MIN</code> on any $m\times n$ Young tableau. Give and solve a recurrence for $T(p)$ that yields the $O(m+n)$ time bound.</p>
+
+<p><strong>d.</strong> Show how to insert a new element into a nonfull $m\times n$ Young tableau in $O(m+n)$ time.</p>
+
+<p><strong>e.</strong> Using no other sorting method as a subroutine, show how to use an $n\times n$ Young tableau to sort $n^2$ numbers in $O(n^3)$ time.</p>
+
+<p><strong>f.</strong> Give an $O(m+n)$-time algorithm to determine whether a given number is stored in a given $m\times n$ Young tableau.</p>
+
+<blockquote>
+  <p>Written with <a href="https://stackedit.io/">StackEdit</a>.</p>
+</blockquote>
+
+
+  </div>
+</article>
+
+
+    <footer class="c-footer">
+  <div class="u-container c-footer__container">
+    <p>&copy; Gao Xu 2016</p>
+    <p>
+      <a href="https://twitter.com/gavin_china">Twitter</a>
+      <a href="https://github.com/gaoxuxu">Github</a>
+      
+      
+    </p>
+  </div>
+</footer>
+
+  </body>
+</html>

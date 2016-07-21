@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html class="t-blue">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>C++类</title>
+  <meta name="description" content="类C++允许程序员使用类（class）定义特定程序中的数据类型，这些数据类型的实例被称为对象，这些实例可以包含程序员定义的成员变量、常量、成员函数、以及重载的运算符。示例：class class_name {    permission_label_1:        member1;    permission...">
+
+  <link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic,700|Roboto+Mono:400,500' rel='stylesheet' type='text/css'>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="/material-jekyll-theme/css/main.css">
+  <link rel="canonical" href="http://gaoxuxu.github.io/material-jekyll-theme/2013/08/c-e7-b1-bb">
+  <link rel="alternate" type="application/rss+xml" title="Gao Xu" href="http://gaoxuxu.github.io/material-jekyll-theme/feed.xml">
+</head>
+
+  <body>
+    <nav class="c-navigation is-fixed">
+  <div class="c-navigation__container u-container">
+    <a class="c-navigation__item " href="/material-jekyll-theme/">Home</a>
+    <a class="c-navigation__item " href="/material-jekyll-theme/articles/">Articles</a>
+    <a class="c-navigation__item " href="/material-jekyll-theme/about/">About</a>
+  </div>
+</nav>
+
+
+    <article class="c-article">
+  <header class="c-header c-article__header">
+    <div class="u-container">
+      <h1 class="c-header__title">C++类</h1>
+    </div>
+  </header>
+
+  <div class="c-article__main">
+    <h2 id="section">类</h2>
+<p>C++允许程序员使用类（class）定义特定程序中的数据类型，这些数据类型的实例被称为对象，这些实例可以包含程序员定义的成员变量、常量、成员函数、以及重载的运算符。示例：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>class class_name {
+    permission_label_1:
+        member1;
+    permission_label_2:
+        member2;
+    ...
+} object_name;
+</code></pre>
+</div>
+
+<p>其中<code class="highlighter-rouge">permission_label_1</code>可以是以下三个关键字中的任意一个：</p>
+
+<ul>
+  <li><code class="highlighter-rouge">private</code>：这个也是默认值，只有同一个类的其它成员或该类的友元类才可以访问这些成员。</li>
+  <li><code class="highlighter-rouge">protected</code>：在<code class="highlighter-rouge">private</code>的基础上，该类的子类也可以访问这些成员。</li>
+  <li><code class="highlighter-rouge">public</code>：开放访问。</li>
+</ul>
+
+<p>最后面的<code class="highlighter-rouge">object_name</code>是可选的，但最后的<code class="highlighter-rouge">;</code>必不可少。</p>
+
+<p>一个完整的例子：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>#include &lt;iostream&gt;
+#include &lt;string&gt;
+using namespace std;  
+class person {
+public:
+    string name;
+    int age;
+};  
+int main(){
+    person a, b;
+    a.name = "Gavin";
+    a.age = 24;
+    b.name = "Fleischer";
+    b.age = 42;  
+    cout &lt;&lt; a.name &lt;&lt; ": " &lt;&lt; a.age &lt;&lt; endl;
+    cout &lt;&lt; b.name &lt;&lt; ": " &lt;&lt; b.age &lt;&lt; endl;  
+    return 0;
+}
+</code></pre>
+</div>
+
+<p>执行以上程序，将会打印出：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>Gavin: 24
+Fleischer: 42
+</code></pre>
+</div>
+
+<h3 id="section-1">成员函数</h3>
+<p>成员函数是C++类与结构体的重要属性（C++中结构体可以有成员函数，与class相同。C++中结构体与类仅有的不同之处是成员和基类的访问权限）。每个数据类型可以包含其自身的内置函数（这些函数被称为方法）。这些函数可以访问其自身的所有成员。在这些非静态的函数体内，关键词this能够指代调用该函数的对象。示例：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>class person{
+    std::string name;
+    int age;
+public:
+    person() : age(5) {}
+    void print() const;
+};  
+void person::print() const {
+    cout &lt;&lt; name &lt;&lt; ";" &lt;&lt; this-&gt;age &lt;&lt; endl;
+}
+</code></pre>
+</div>
+
+
+  </div>
+</article>
+
+
+    <footer class="c-footer">
+  <div class="u-container c-footer__container">
+    <p>&copy; Gao Xu 2016</p>
+    <p>
+      <a href="https://twitter.com/gavin_china">Twitter</a>
+      <a href="https://github.com/gaoxuxu">Github</a>
+      
+      
+    </p>
+  </div>
+</footer>
+
+  </body>
+</html>

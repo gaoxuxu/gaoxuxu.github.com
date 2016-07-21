@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html class="t-blue">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>算法导论第七章——快速排序</title>
+  <meta name="description" content="##快速排序">
+
+  <link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic,700|Roboto+Mono:400,500' rel='stylesheet' type='text/css'>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="/material-jekyll-theme/css/main.css">
+  <link rel="canonical" href="http://gaoxuxu.github.io/material-jekyll-theme/2013/10/Introduction-to-Algorithms-Chapter-7">
+  <link rel="alternate" type="application/rss+xml" title="Gao Xu" href="http://gaoxuxu.github.io/material-jekyll-theme/feed.xml">
+</head>
+
+  <body>
+    <nav class="c-navigation is-fixed">
+  <div class="c-navigation__container u-container">
+    <a class="c-navigation__item " href="/material-jekyll-theme/">Home</a>
+    <a class="c-navigation__item " href="/material-jekyll-theme/articles/">Articles</a>
+    <a class="c-navigation__item " href="/material-jekyll-theme/about/">About</a>
+  </div>
+</nav>
+
+
+    <article class="c-article">
+  <header class="c-header c-article__header">
+    <div class="u-container">
+      <h1 class="c-header__title">算法导论第七章——快速排序</h1>
+    </div>
+  </header>
+
+  <div class="c-article__main">
+    <p>##快速排序</p>
+
+<ul>
+  <li>最坏运行时间为$\Theta(n^2)$。</li>
+  <li>期望运行时间为$\Theta(n\lg n)$，且常数因子很小。</li>
+  <li>原地排序。</li>
+  <li>基于分治模式的。</li>
+</ul>
+
+<p>对一个子数组<code class="highlighter-rouge">A[p,...,r]</code>，三个步骤为：</p>
+
+<p><strong>分解：</strong> 将数组<code class="highlighter-rouge">A[p,...,r]</code>分解（Partition）为两个（可能为空的）子数组<code class="highlighter-rouge">A[p,..,q-1]</code>和<code class="highlighter-rouge">A[q+1,..,r]</code>，<code class="highlighter-rouge">A[p,..,q-1]</code>中的每一个元素都小于等于<code class="highlighter-rouge">A[q]</code>，而<code class="highlighter-rouge">A[q]</code>小于等于<code class="highlighter-rouge">A[q+1,..,r]</code>中的每一个元素。分解的过程会计算出下标<code class="highlighter-rouge">q</code>的值。</p>
+
+<p><strong>解决：</strong> 递归调用快速排序将子数组<code class="highlighter-rouge">A[p,..,q-1]</code>和<code class="highlighter-rouge">A[q+1,..,r]</code>排序。</p>
+
+<p><strong>合并：</strong> 因为子数组都已经排好序，所以合并这一步不用做任何事情。</p>
+
+<p>快速排序的伪代码</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>QUICKSORT(A,p,r)
+1   if p &lt; r
+2       q = PARTITION(A,p,r)
+3       QUICKSORT(A,p,q-1)
+4       QUICKSORT(A,q+1,r)
+
+PARTITION(A,p,r)
+1   x = A[r]
+2   i = p - 1
+3   for j= p to r-1
+4       if A[j] &lt;= x
+5           i = i + 1
+6           exchange A[i] with A[j]
+7   exchange A[i+1] with A[r]
+8   return i + 1
+</code></pre>
+</div>
+
+<p>很明显，<code class="highlighter-rouge">PARTITION</code>过程的<code class="highlighter-rouge">3-6</code>行表示，在每一次迭代前，对任意的数组下标<code class="highlighter-rouge">k</code>，</p>
+
+<ol>
+  <li>如果<code class="highlighter-rouge">p&lt;=k&lt;=i</code>，则<code class="highlighter-rouge">A[k]&lt;=x</code>。</li>
+  <li>如果<code class="highlighter-rouge">i+1&lt;=k&lt;=j-1</code>，则<code class="highlighter-rouge">A[k]&gt;=x</code>。</li>
+  <li>如果<code class="highlighter-rouge">k=r</code>，则<code class="highlighter-rouge">A[k]=x</code>。</li>
+</ol>
+
+<p><strong>循环的正确性</strong>可证明如下：</p>
+
+<p><strong>初始化：</strong> 在循环的第一次迭代前，<code class="highlighter-rouge">i = p-1</code>并且<code class="highlighter-rouge">j = p</code>。因为<code class="highlighter-rouge">p</code>和<code class="highlighter-rouge">i</code>之间没有任何值，并且<code class="highlighter-rouge">i+1</code>和<code class="highlighter-rouge">j-1</code>之间没有任何值，所以上一部分最后的三个条件中前两个都成立，而第<code class="highlighter-rouge">1</code>行的赋值语句也使第三个条件成立。</p>
+
+<p><strong>保持：</strong> 有两种情况：</p>
+
+<ol>
+  <li><code class="highlighter-rouge">A[j]&gt;x</code>，则将<code class="highlighter-rouge">A[i+1]</code>和<code class="highlighter-rouge">A[j]</code>互换，并递增<code class="highlighter-rouge">i</code>和<code class="highlighter-rouge">j</code>。此时条件1与条件2都成立，条件3也成立。</li>
+  <li><code class="highlighter-rouge">A[j]&lt;=x</code>，则只递增<code class="highlighter-rouge">j</code>。此时条件1、2、3都成立。</li>
+</ol>
+
+<p><strong>终止：</strong> 当循环终止时，有<code class="highlighter-rouge">j = r</code>，此时<code class="highlighter-rouge">A[p,...,i]</code>中的每一个元素都小于或等于<code class="highlighter-rouge">A[r]</code>，而<code class="highlighter-rouge">A[r]</code>小于或等于<code class="highlighter-rouge">A[i+1,...,r-1]</code>中的每一个元素。</p>
+
+<p>##从直觉上分析快速排序的性能</p>
+
+<ul>
+  <li>快速排序的运行时间与划分是否对称有关。</li>
+  <li>如果划分是对称的，那么从渐近意义上来讲就与合并算法一样快。</li>
+  <li>如果划分是不对称的，那么从渐近意义上来讲就与插入算法一样慢。</li>
+</ul>
+
+<p>###最坏情况划分</p>
+
+<p>这种情况下划分的两个区域分别是：包含<code class="highlighter-rouge">n-1</code>个元素的集合和一个空集。假设算法的每一次递归调用中都出现了这种不对称划分，划分的时间代价为$\Theta(n)$。由于对一个大小为<code class="highlighter-rouge">0</code>的数组进行递归调用的时间代价为$T(0)=T(1)$，所以算法的运行时间可以表示为</p>
+
+<script type="math/tex; mode=display">T(n)=T(n-1)+T(0)+\Theta(n)=T(n-1)+\Theta(n)=\Theta(n^2)</script>
+
+<p>###最好情况划分</p>
+
+<p>最好情况，也就是最平衡的划分，即两个子问题的大小都不超过$n/2$，此时其中一个子问题的大小为$\lfloor n/2\rfloor$，另一个子问题的大小为$\lceil n/2\rceil - 1$。此时算法的运行时间为</p>
+
+<script type="math/tex; mode=display">T(n)\le 2T(n/2)+\Theta(n)=\Theta(n\lg n)</script>
+
+<p>###Exercises 7.2-6$\star$</p>
+
+<p>Argue that for any constant $0&lt;\alpha\le 1/2$,the probability is approximately $1-2\alpha$ that on a random input array,<code class="highlighter-rouge">PARTITION</code> produces a split more balanced than $1-\alpha$ to $\alpha$.</p>
+
+<script type="math/tex; mode=display">\begin{matrix}\
+\begin{matrix}\alpha \\
+\overbrace{-----}\end{matrix}\begin{matrix}1-\alpha\\
+\overbrace{\begin{matrix}\underbrace{----}\\
+1-2\alpha\end{matrix}\begin{matrix}\underbrace{-----}\\
+\alpha\end{matrix}}\end{matrix}\
+\end{matrix}</script>
+
+<p>图很粗糙，由图可以看出，对常数$0&lt;\alpha\le 1/2$，总有$1-2\alpha$的概率使划分比$1-\alpha:\alpha$更对称。</p>
+
+<p>##快速排序的随机化版本</p>
+
+<p>对主元进行随机化取样，可以确保在子数组的<code class="highlighter-rouge">r-p+1</code>个元素中，主元元素<code class="highlighter-rouge">x=A[r]</code>等可能地取其中一个。</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>RANDOMIZED-PARTITION(A,p,r)
+1   i = RANDOM(p,r)
+2   exchange A[r] with A[i]
+3   return PARTITION(A,p,r)
+
+RANDOMIZED-QUICKSORT(A,p,r)
+1   if p &lt; r
+2       q = RANDOMIZED-PARTITION(A,p,r)
+3       RANDOMIZED-QUICKSORT(A,p,r)
+4       RANDOMIZED-QUICKSORT(A,p,r)
+</code></pre>
+</div>
+
+<p>##快速排序性能的严格分析</p>
+
+<p>###最坏情况分析</p>
+
+<p>设$T(n)$是<code class="highlighter-rouge">QUICKSORT</code>作用于规模为$n$的输入上的最坏情况时间，假设$T(n)\le cn^2$，则有</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{equation}\begin{split}\
+T(n)&=\max _{0\le q\le n-1}(T(q)+T(n-q-1))+\Theta(n)\\
+&\le \max _{0\le q\le n-1}(cq^2+c(n-q-1)^2)+\Theta(n)\\
+&=c\cdot \max _{0\le q\le n-1}(q^2+(n-q-1)^2)+\Theta(n)\\
+&\le c\cdot (n-1)^2+\Theta(n)\\
+&=cn^2-c(2n-1)+\Theta(n)\\
+&\le cn^2\
+\end{split}\end{equation} %]]></script>
+
+<p>###期望的运行时间</p>
+
+<ol>
+  <li><code class="highlighter-rouge">QUICKSORT</code>的运行时间是由花在过程<code class="highlighter-rouge">PARTITION</code>上的时间所决定的。</li>
+  <li>每次调用<code class="highlighter-rouge">PARTITION</code>过程时都会选出一个主元，并且后续对<code class="highlighter-rouge">QUICKSORT</code>和<code class="highlighter-rouge">PARTTION</code>的各次递归调用都不包含该主元元素。所以，整个快速排序算法的执行过程中，最多只可能调用<code class="highlighter-rouge">PARTITION</code>过程$n$次。</li>
+  <li>调用一次<code class="highlighter-rouge">PARTITION</code>过程的时间为$O(1)$加上一段时间，这段时间与第<code class="highlighter-rouge">3-6</code>行中<code class="highlighter-rouge">for</code>循环中的迭代次数成正比。由于<code class="highlighter-rouge">for</code>循环中每一次迭代都要进行一次比较，因此，只要清楚第<code class="highlighter-rouge">4</code>行执行的总次数，就能够给出<code class="highlighter-rouge">QUICKSORT</code>所花时间的界了。</li>
+</ol>
+
+<p><strong>引理7.1</strong> 设当<code class="highlighter-rouge">QUICKSORT</code>在一个包含$n$个元素的数组上运行时，<code class="highlighter-rouge">PARTITION</code>在第<code class="highlighter-rouge">4</code>行中所做比较的次数为$X$。那么，<code class="highlighter-rouge">QUICKSORT</code>的运行时间为$O(n+X)$。</p>
+
+<p><strong>证明：</strong> 根据上面提到的3点，对<code class="highlighter-rouge">PARTITION</code>的调用共有<code class="highlighter-rouge">n</code>次，每一次调用都需做固定量的工作，再执行若干次<code class="highlighter-rouge">for</code>循环，在<code class="highlighter-rouge">for</code>循环的每一次迭代中，都要执行第<code class="highlighter-rouge">4</code>行。</p>
+
+<p>为了计算出$X$，必须了解算法什么时候要对数组中的两个元素进行比较，什么时候不进行比较。为便于分析，将数组$A$的各个元素命名为$z _1,z _2,\cdots,z _n$，其中$z _i$是数组$A$中第$i$小的元素。此外，还定义$Z _{ij}={z _i,z _{i+1},\cdots,z _j}$为$z _i$和$z _j$之间（包含边界）的元素集合。定义</p>
+
+<script type="math/tex; mode=display">X _{ij}=I\{z _i\ is\ compared\ to\ z _j\}</script>
+
+<p>观察可以发现，每对元素最多比较一次。并且在一次<code class="highlighter-rouge">PARTITION</code>调用结束后，该次调用所用到的主元元素就再也不会与其它任何元素进行比较了。所以算法所执行的总的比较次数</p>
+
+<script type="math/tex; mode=display">X=\sum _{i=1}^{n-1}\sum _{j=i+1}^{n}X _{ij}</script>
+
+<p>对上式两边取期望值，可以得到</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{equation}\begin{split}\
+E[X]\quad&=\quad E\left[\sum _{i=1}^{n-1}\sum _{j=i+1}^{n}X _{ij}\right]\\
+&=\quad \sum _{i=1}^{n-1}\sum _{j=i+1}^{n}E[X _{ij}]\\
+&=\quad \sum _{i=1}^{n-1}\sum _{j=i+1}^{n}\Pr\{z _i\ is\ compared\ to\ z _j\}\
+\end{split}\end{equation} %]]></script>
+
+<p>由于当主元落在$z _i$和$z _j$之间时，$z _i$和$z _j$不可能进行比较。所以</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{equation}\begin{split}\
+\Pr\{z _i\ is\ compared\ to\ z _j\}\ &=\ \Pr\{z _i\ or\ z _j\ is\ first\ pivot\ chosen\ from \ Z _{ij}\}\\
+&=\ \Pr\{z _i\ is\ first\ pivot\ chosen\ from \ Z _{ij}\}\\
+&\quad\quad+\Pr\{z _j\ is\ first\ pivot\ chosen\ from \ Z _{ij}\}\\
+&=\ \frac{1}{j-i+1}+\frac{1}{j-i+1}\\
+&=\ \frac{2}{j-i+1}\
+\end{split}\end{equation} %]]></script>
+
+<p>综合上面两式，令$k=j-i$，可以得到</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{equation}\begin{split}\
+E[X]\quad&=\quad\sum _{i=1}^{n-1}\sum _{j=i+1}^{n}\frac{2}{j-i+1}\\
+&=\quad\sum _{i=1}^{n-1}\sum _{j=i+1}^{n}\frac{2}{k+1}\\
+&<\quad\sum _{i=1}^{n-1}\sum _{j=i+1}^{n}\frac{2}{k}\\
+&=\quad\sum _{i=1}^{n-1}O(\lg n)\\
+&=\quad O(n\lg n)\
+\end{split}\end{equation} %]]></script>
+
+<p>##Problems</p>
+
+<p>###7-1 <strong><em>Hoare partition correctness</em></strong></p>
+
+<p>The version of <code class="highlighter-rouge">PARTITION</code> given in this chapter is not the original partitioning algorithm. Here is the original partition algorithm,which is due to C.A.R.Hoare:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>HOARE-PARTITION(A,p,r)
+1   x = A[p]
+2   i = p - 1
+3   j = r + 1
+4   while TRUE
+5       repeat
+6           j = j - 1
+7       until A[j]&lt;=x
+8       repeat
+9           i = i + 1
+10      until A[i]&gt;=x
+11      if i &lt; j
+12          exchange A[j] with A[i]
+13      else return j
+</code></pre>
+</div>
+
+<blockquote>
+  <p>Written with <a href="https://stackedit.io/">StackEdit</a>.</p>
+</blockquote>
+
+
+  </div>
+</article>
+
+
+    <footer class="c-footer">
+  <div class="u-container c-footer__container">
+    <p>&copy; Gao Xu 2016</p>
+    <p>
+      <a href="https://twitter.com/gavin_china">Twitter</a>
+      <a href="https://github.com/gaoxuxu">Github</a>
+      
+      
+    </p>
+  </div>
+</footer>
+
+  </body>
+</html>

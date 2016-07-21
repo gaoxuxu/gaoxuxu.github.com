@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html class="t-blue">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Java集合框架</title>
+  <meta name="description" content="看完《算法导论》的基本数据结构部分，突然想起我从来都没系统地总结过Java集合框架的知识，所以趁着这段时间好好写几篇这方面的笔记。">
+
+  <link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic,700|Roboto+Mono:400,500' rel='stylesheet' type='text/css'>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="/material-jekyll-theme/css/main.css">
+  <link rel="canonical" href="http://gaoxuxu.github.io/material-jekyll-theme/2013/11/Java-Collection-framework">
+  <link rel="alternate" type="application/rss+xml" title="Gao Xu" href="http://gaoxuxu.github.io/material-jekyll-theme/feed.xml">
+</head>
+
+  <body>
+    <nav class="c-navigation is-fixed">
+  <div class="c-navigation__container u-container">
+    <a class="c-navigation__item " href="/material-jekyll-theme/">Home</a>
+    <a class="c-navigation__item " href="/material-jekyll-theme/articles/">Articles</a>
+    <a class="c-navigation__item " href="/material-jekyll-theme/about/">About</a>
+  </div>
+</nav>
+
+
+    <article class="c-article">
+  <header class="c-header c-article__header">
+    <div class="u-container">
+      <h1 class="c-header__title">Java集合框架</h1>
+    </div>
+  </header>
+
+  <div class="c-article__main">
+    <p>看完《算法导论》的基本数据结构部分，突然想起我从来都没系统地总结过Java集合框架的知识，所以趁着这段时间好好写几篇这方面的笔记。</p>
+
+<p>##Java集合框架</p>
+
+<p><img src="http://www.codejava.net/images/articles/javacore/collections/collections%20framework%20overview.png" alt="Class diagram of Java Collections framework" /></p>
+
+<p>如图，<code class="highlighter-rouge">Collection</code>和<code class="highlighter-rouge">Map</code>接口是Java集合框架的两个顶层接口。其中<code class="highlighter-rouge">Collection</code>接口继承了<code class="highlighter-rouge">Iterable</code>接口，因此可以用增强<code class="highlighter-rouge">for</code>循环遍历任何<code class="highlighter-rouge">Collection</code>。</p>
+
+<p><code class="highlighter-rouge">Collection</code>接口描述的方法列表如下：</p>
+
+<ul>
+  <li>查询类方法：
+    <ul>
+      <li><code class="highlighter-rouge">int size()</code>：返回集合中的元素个数，如果元素个数大于<code class="highlighter-rouge">Integer.MAX_VALUE</code>，则返回<code class="highlighter-rouge">Integer.MAX_VALUE</code>。</li>
+      <li><code class="highlighter-rouge">boolean isEmpty()</code>：如果集合中没有元素，则返回<code class="highlighter-rouge">true</code>。</li>
+      <li><code class="highlighter-rouge">boolean contains(Object o)</code>：如果集合中至少有一个元素<code class="highlighter-rouge">e</code>满足条件<code class="highlighter-rouge">o==null ? e == null : o.equals(e)</code>，则返回<code class="highlighter-rouge">true</code>。</li>
+      <li><code class="highlighter-rouge">Iterator&lt;E&gt; iterator&lt;E&gt;()</code>：返回一个可以对集合中元素进行迭代的迭代器。需要注意的是，这里不保证返回的元素的顺序（除非这个集合的类型提供了一个保证机制）。</li>
+      <li><code class="highlighter-rouge">Object[] toArray()</code>：返回一个包含集合中所有元素的数组。数组中元素的顺序与集合的迭代器返回元素的顺序相同。返回的数组是“安全”的，即集合不维护对它的引用（也就是说，即使集合是基于数组的，这个也必定会分配一个新的数组）。这个方法也是基于数组和基于集合的API之间的桥梁。</li>
+      <li><code class="highlighter-rouge">&lt;T&gt; T[] toArray(T[] a)</code>：功能与<code class="highlighter-rouge">toArray()</code>相同，不过此方法允许对输出数组的运行时类型进行精确控制，并且在某些情况下可以节省分配开销。如果指定的数组能容纳该集合，并有剩余空间，那么会将数组中紧接集合尾部的元素设置为<code class="highlighter-rouge">null</code>；如果指定的数组无法容纳该集合，则分配一个具有指定运行时类型和此集合大小的新数组。</li>
+    </ul>
+  </li>
+  <li>修改操作：
+    <ul>
+      <li><code class="highlighter-rouge">boolean add(E e)</code>：这个方法会确保集合包含指定的元素（可选操作）。如果集合由于调用而被改变，则返回<code class="highlighter-rouge">true</code>；如果集合不允许元素重复并且已经包含了指定元素，则返回<code class="highlighter-rouge">false</code>。需要注意的是，如果集合由于某些原因（除已包含该元素的原因）拒绝添加指定元素，那么它应该抛出一个异常而不是返回<code class="highlighter-rouge">false</code>。</li>
+      <li><code class="highlighter-rouge">boolean remove(Object o)</code>：从集合中移除一个指定元素的单个实例，如果存在的话（可选操作）。确切地讲，就是如果集合中有一个或多个满足条件<code class="highlighter-rouge">(o == null ? e == null : o.equals(e))</code>的元素<code class="highlighter-rouge">e</code>，则移除一个这样的元素。如果集合由于调用而被改变，则返回<code class="highlighter-rouge">true</code>。</li>
+    </ul>
+  </li>
+  <li>批处理操作（这类方法实际使用中比较重要，后面会详细说明）：
+    <ul>
+      <li><code class="highlighter-rouge">boolean containsAll(Collection&lt;?&gt; c)</code>：如果集合中包含指定集合中所有的元素，则返回<code class="highlighter-rouge">true</code>。</li>
+      <li><code class="highlighter-rouge">boolean addAll(Collection&lt;? extends E&gt; c)</code>：将指定集合中的所有元素都添加到集合中（可选操作）。如果在操作的同时修改指定的集合，那么结果将是不确定的。</li>
+      <li><code class="highlighter-rouge">boolean removeAll(Collection&lt;?&gt; c)</code>：从集合中移除同时存在于指定集合中的元素（可选操作）。此操作后，此集合和指定集合的交集为空集。</li>
+      <li><code class="highlighter-rouge">boolean retainAll(Collection&lt;?&gt; c)</code>：仅保留存在于指定集合中的元素（可选操作）。即操作后的集合是此集合与指定集合的交集。</li>
+      <li><code class="highlighter-rouge">void clear()</code>：移除集合中的所有元素（可选操作），方法返回后此集合将为空。</li>
+    </ul>
+  </li>
+  <li>比较和散列：<code class="highlighter-rouge">equals()</code>和<code class="highlighter-rouge">hashCode()</code>，都是继承自<code class="highlighter-rouge">Object</code>类的。</li>
+</ul>
+
+<p>##Collection中的批处理</p>
+
+<p>###addAll</p>
+
+<p>如果集合是基于数组的，那么使用这个方法要比<code class="highlighter-rouge">Collections.addAll()</code>快很多，因为基于数组的集合使用<code class="highlighter-rouge">native</code>的<code class="highlighter-rouge">System.copyarray()</code>方法。</p>
+
+<p>如果集合是基于链表的，那么<code class="highlighter-rouge">Collections.addAll()</code>要比这个方法快很多，是因为后者需要先调用<code class="highlighter-rouge">c.toArray</code>。</p>
+
+<p>###removeAll</p>
+
+<p>批量删除，一个经典错误就是：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>for(int i = 0; i &lt; someint; i++) {
+    list.remove(i);
+}
+</code></pre>
+</div>
+
+<p>如果这样写代码，就会出错，因为在集合上的每一次<code class="highlighter-rouge">remove</code>都会改变集合的<code class="highlighter-rouge">size</code>及元素下标，所以上面的代码要么无法达到我们的期望，要么会抛出异常。</p>
+
+<p>解决问题的方法就是使用<code class="highlighter-rouge">iterator.remove()</code>，这种操作是安全的。<code class="highlighter-rouge">AbstractCollection</code>中实现的<code class="highlighter-rouge">removeAll()</code>核心代码如下：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>Iterator&lt;?&gt; it = iterator();
+while (it.hasNext()) {
+    if (c.contains(it.next())) {
+        it.remove();
+    }
+}
+</code></pre>
+</div>
+
+<p><code class="highlighter-rouge">ArrayList</code>中重写了<code class="highlighter-rouge">removeAll</code>方法，它会将集合中不包含在指定集合中的元素前移，最后将哨兵位置前置。</p>
+
+<p>###retainAll</p>
+
+<p>此方法解决的问题与<code class="highlighter-rouge">removeAll</code>类似。</p>
+
+<p>下一篇写<code class="highlighter-rouge">Collections</code>类。</p>
+
+<blockquote>
+  <p>Written with <a href="https://stackedit.io/">StackEdit</a>.</p>
+</blockquote>
+
+
+  </div>
+</article>
+
+
+    <footer class="c-footer">
+  <div class="u-container c-footer__container">
+    <p>&copy; Gao Xu 2016</p>
+    <p>
+      <a href="https://twitter.com/gavin_china">Twitter</a>
+      <a href="https://github.com/gaoxuxu">Github</a>
+      
+      
+    </p>
+  </div>
+</footer>
+
+  </body>
+</html>

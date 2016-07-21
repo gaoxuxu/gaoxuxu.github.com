@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html class="t-blue">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Android代码优化之斐波那契数列</title>
+  <meta name="description" content="刚到手《Android Performance》,其第一章斐波那契的例子很不错。以下代码的结果都在我的LG LU6200上运行得出，CPU型号为高通MSM8660，CPU频率为1.5GHz双核。">
+
+  <link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic,700|Roboto+Mono:400,500' rel='stylesheet' type='text/css'>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="/material-jekyll-theme/css/main.css">
+  <link rel="canonical" href="http://gaoxuxu.github.io/material-jekyll-theme/2014/03/optimizing-android-code-fibonacci">
+  <link rel="alternate" type="application/rss+xml" title="Gao Xu" href="http://gaoxuxu.github.io/material-jekyll-theme/feed.xml">
+</head>
+
+  <body>
+    <nav class="c-navigation is-fixed">
+  <div class="c-navigation__container u-container">
+    <a class="c-navigation__item " href="/material-jekyll-theme/">Home</a>
+    <a class="c-navigation__item " href="/material-jekyll-theme/articles/">Articles</a>
+    <a class="c-navigation__item " href="/material-jekyll-theme/about/">About</a>
+  </div>
+</nav>
+
+
+    <article class="c-article">
+  <header class="c-header c-article__header">
+    <div class="u-container">
+      <h1 class="c-header__title">Android代码优化之斐波那契数列</h1>
+    </div>
+  </header>
+
+  <div class="c-article__main">
+    <p>刚到手《Android Performance》,其第一章斐波那契的例子很不错。<br />
+以下代码的结果都在我的<code class="highlighter-rouge">LG LU6200</code>上运行得出，CPU型号为<code class="highlighter-rouge">高通MSM8660</code>，<code class="highlighter-rouge">CPU</code>频率为<code class="highlighter-rouge">1.5GHz双核</code>。</p>
+
+<p>###1.以递归的方式求第n项斐波那契数</p>
+
+<p>代码如下：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>public static long computeRecursively(int n){
+    if(n &gt; 1)
+        return computeRecursively(n-1) + computeRecursively(n-2);
+    return n;
+}
+</code></pre>
+</div>
+
+<p>用这段代码求斐波那契数列的第<code class="highlighter-rouge">30</code>项，结果如下：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>result:832040
+token:450milliseconds
+</code></pre>
+</div>
+
+<p>###2.利用恒等式优化代码
+斐波那契数列有如下性质，我们可以利用一下：</p>
+
+<script type="math/tex; mode=display">F_0+F_1+F_2+F3+\cdots+F_n=F_{n+2}-1</script>
+
+<p>代码如下：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>public static long computeRecursivelyWithLoop (int n){
+    if (n &gt; 1) {
+        long result = 1;
+        do {
+            result += computeRecursivelyWithLoop(n-2);
+            n--;
+        } while (n &gt; 1);
+        return result;
+    }
+    return n;
+}
+</code></pre>
+</div>
+
+<p>用这段代码求斐波那契数列的第<code class="highlighter-rouge">30</code>项，结果如下：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>result:832040
+token:297milliseconds
+</code></pre>
+</div>
+
+<p>###3.从递归到迭代</p>
+
+<p>递归算法的弊端是众所周知的，它会浪费大量的栈空间，并造成大量的方法调用，还有可能会导致栈溢出并导致应用崩溃。迭代版本的实现可以避免：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>public static long computeIteratively (int n){
+    if (n &gt; 1) {
+        long a = 0, b = 1;
+        do {
+            long tmp = b;
+            b += a;
+            a = tmp;
+        } while (--n &gt; 1);
+        return b;
+    }
+    return n;
+}
+</code></pre>
+</div>
+
+<p>用这段代码求斐波那契数列的第<code class="highlighter-rouge">30</code>项，结果如下：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>result:832040
+token:0milliseconds
+</code></pre>
+</div>
+
+<p>好吧，这段代码简直太快了，不到<code class="highlighter-rouge">1</code>毫秒。我们用这段代码求斐波那契数列的第<code class="highlighter-rouge">50000</code>项，结果如下：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>result:-806788626697678875
+token:4milliseconds
+</code></pre>
+</div>
+
+<p>只花<code class="highlighter-rouge">4</code>毫秒，不过结果溢出了。</p>
+
+<p>这段代码还可以将循环次数降为原来的一半：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>public static long computeIterativelyFaster (int n){
+    if (n &gt; 1) {
+        long a, b = 1;
+        n--;
+        a = n &amp; 1;
+        n /= 2;
+        while (n-- &gt; 0) {
+            a += b;
+            b += a;
+        }
+        return b;
+    }
+    return n;
+}
+</code></pre>
+</div>
+
+<p>用这段代码求斐波那契数列的第<code class="highlighter-rouge">50000</code>项，结果如下：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>result:-806788626697678875
+token:3milliseconds
+</code></pre>
+</div>
+
+<p>###4.用BigInteger</p>
+
+<p>上面的代码，求第<code class="highlighter-rouge">50000</code>项斐波那契数时溢出了，在Java中可以用<code class="highlighter-rouge">java.math.BigInteger</code>类修复这个问题。下面的代码是<code class="highlighter-rouge">computeIterativelyFaster</code>的<code class="highlighter-rouge">BigInteger</code>版本：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>public static BigInteger computeIterativelyFasterUsingBigInteger (int n){
+	if (n &gt; 1) {
+		BigInteger a, b = BigInteger.ONE;
+		n--;
+		a = BigInteger.valueOf(n &amp; 1);
+		n /= 2;
+		while (n-- &gt; 0) {
+			a = a.add(b);
+			b = b.add(a);
+		}
+		return b;
+	}
+	return (n == 0) ? BigInteger.ZERO : BigInteger.ONE;
+}
+</code></pre>
+</div>
+
+<p>运行时间为<code class="highlighter-rouge">914milliseconds</code>。</p>
+
+<p>另外，斐波那契数列的项有如下性质：</p>
+
+<script type="math/tex; mode=display">F_{2n-1}=F^2_n+F^2_{n-1}</script>
+
+<script type="math/tex; mode=display">F_{2n}=(2F_{n-1}+F_n)\cdot F_n</script>
+
+<p>根据以上恒等式修改<code class="highlighter-rouge">computeIterativelyFasterUsingBigInteger</code>：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>public static BigInteger computeRecursivelyFasterUsingBigInteger (int n){
+    if (n &gt; 1) {
+        // not obvious at first – wouldn’t it be great 
+        // to have a better comment here?
+        int m = (n / 2) + (n &amp; 1); 
+        BigInteger fM = computeRecursivelyFasterUsingBigInteger(m);
+        BigInteger fM_1 = computeRecursivelyFasterUsingBigInteger(m - 1);
+        if ((n &amp; 1) == 1) {
+            // F(m)^2 + F(m-1)^2
+            // three BigInteger objects created
+            return fM.pow(2).add(fM_1.pow(2));
+        } else {
+            // (2*F(m-1) + F(m)) * F(m)
+            // three BigInteger objects created
+            return fM_1.shiftLeft(1).add(fM).multiply(fM); 
+        }
+    }
+    // no BigInteger object created
+    return (n == 0) ? BigInteger.ZERO : BigInteger.ONE; 
+}
+</code></pre>
+</div>
+
+<p>用这个方法求第<code class="highlighter-rouge">50000</code>项斐波那契数耗时为<code class="highlighter-rouge">1550milliseconds</code>。</p>
+
+<p>上面这个方法运行太慢了，我们还可以继续优化。其实在上面的方法中，对<code class="highlighter-rouge">BigInteger</code>的使用有一个不正确的地方。我们知道，斐波那契数列的第<code class="highlighter-rouge">92</code>项在基本数据类型<code class="highlighter-rouge">long</code>的取值范围内，我们可以利用这项性质优化代码：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>public static BigInteger computeRecursivelyFasterUsingBigIntegerAndPrimitive(int n){
+	if (n &gt; 92) {
+		int m = (n / 2) + (n &amp; 1);
+		BigInteger fM = computeRecursivelyFasterUsingBigIntegerAndPrimitive(m);
+		BigInteger fM_1 = computeRecursivelyFasterUsingBigIntegerAndPrimitive(m - 1);
+		if ((n &amp; 1) == 1) {
+			return fM.pow(2).add(fM_1.pow(2));
+		} else {
+		    // shiftLeft(1) to multiply by 2
+			return fM_1.shiftLeft(1).add(fM).multiply(fM); 
+		}
+	}
+	return BigInteger.valueOf(computeIterativelyFaster(n));
+}
+</code></pre>
+</div>
+
+<p>这次快多了，求斐波那契第<code class="highlighter-rouge">50000</code>项的运行时间为<code class="highlighter-rouge">59milliseconds</code>，是纯递归版本的近<code class="highlighter-rouge">30</code>倍。</p>
+
+<p>与上面的方法思想差不多，还可以使用预计算结果优化代码，即：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>	static final int PRECOMPUTED_SIZE= 512;
+static BigInteger PRECOMPUTED[] = new BigInteger[PRECOMPUTED_SIZE];
+
+static {
+	PRECOMPUTED[0] = BigInteger.ZERO;
+	PRECOMPUTED[1] = BigInteger.ONE;
+	for (int i = 2; i &lt; PRECOMPUTED_SIZE; i++) {
+		PRECOMPUTED[i] = PRECOMPUTED[i-1].add(PRECOMPUTED[i-2]);
+	}
+}
+
+public static BigInteger computeRecursivelyFasterUsingBigIntegerAndTable(int n)	{
+	if (n &gt; PRECOMPUTED_SIZE - 1) {
+		int m = (n / 2) + (n &amp; 1);
+		BigInteger fM = computeRecursivelyFasterUsingBigIntegerAndTable (m);
+		BigInteger fM_1 = computeRecursivelyFasterUsingBigIntegerAndTable (m - 1);
+		if ((n &amp; 1) == 1) {
+			return fM.pow(2).add(fM_1.pow(2));
+		} else {
+			return fM_1.shiftLeft(1).add(fM).multiply(fM);
+		}
+	}
+	return PRECOMPUTED[n];
+}
+</code></pre>
+</div>
+
+<p>这次求第<code class="highlighter-rouge">50000</code>项斐波那契数的运行时间为<code class="highlighter-rouge">12milliseconds</code></p>
+
+<blockquote>
+  <p>Written with <a href="https://stackedit.io/">StackEdit</a>.</p>
+</blockquote>
+
+
+  </div>
+</article>
+
+
+    <footer class="c-footer">
+  <div class="u-container c-footer__container">
+    <p>&copy; Gao Xu 2016</p>
+    <p>
+      <a href="https://twitter.com/gavin_china">Twitter</a>
+      <a href="https://github.com/gaoxuxu">Github</a>
+      
+      
+    </p>
+  </div>
+</footer>
+
+  </body>
+</html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html class="t-blue">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Android代码红线:不要将敏感信息明文保存在外部存储设备（SD卡）上</title>
+  <meta name="description" content="##不要将敏感信息明文保存在外部存储设备（SD卡）上">
+
+  <link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic,700|Roboto+Mono:400,500' rel='stylesheet' type='text/css'>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="/material-jekyll-theme/css/main.css">
+  <link rel="canonical" href="http://gaoxuxu.github.io/material-jekyll-theme/2014/09/do-not-store-sensitive-information-on-external-storage-unless-encrypted-first">
+  <link rel="alternate" type="application/rss+xml" title="Gao Xu" href="http://gaoxuxu.github.io/material-jekyll-theme/feed.xml">
+</head>
+
+  <body>
+    <nav class="c-navigation is-fixed">
+  <div class="c-navigation__container u-container">
+    <a class="c-navigation__item " href="/material-jekyll-theme/">Home</a>
+    <a class="c-navigation__item " href="/material-jekyll-theme/articles/">Articles</a>
+    <a class="c-navigation__item " href="/material-jekyll-theme/about/">About</a>
+  </div>
+</nav>
+
+
+    <article class="c-article">
+  <header class="c-header c-article__header">
+    <div class="u-container">
+      <h1 class="c-header__title">Android代码红线:不要将敏感信息明文保存在外部存储设备（SD卡）上</h1>
+    </div>
+  </header>
+
+  <div class="c-article__main">
+    <p>##不要将敏感信息明文保存在外部存储设备（SD卡）上</p>
+
+<p>Android提供了几种数据存储方式，其中有一种就是<strong>外部存储设备（<code class="highlighter-rouge">/sdcard</code>,<code class="highlighter-rouge">/mnt/sdcard</code>）</strong>。“外部存储设备”的例子包括设备中的微型或者标准尺寸的SD卡，装载到PC的Android设备存储，以及<code class="highlighter-rouge">Android/obb</code>文件夹。</p>
+
+<p>在Android 4.1之前，外部存储设备中的文件是全球可读的（world-readable）。在Android 1之前，外部存储设备中的文件是全球可写的（world-writable）。从Android 1到Android 4.3，一个app要向其他app保存在外部存储设备上的文件写入，只需要一个权限<code class="highlighter-rouge">WRITE_EXTERNAL_STORAGE</code>。从Android 4.4开始，采用了基于文件夹结构创建的文件组和文件行为，它允许一个app利用权限来管理／读／写基于它包名的文件夹结构中的文件。从Android 4.4开始，用户（包括apps）从Android设备管理的其它app主要的外部存储空间脱离了开来。</p>
+
+<p>上面所说的缺乏限制的后果就是，保存在外部存储的文件可以被设备上安装其它的app读或者修改（对于允许读／写的Android版本）；如果存储到可以拆卸的外部存储设备的话，那么谁都可以访问这些文件，比如PC（还有一种情况就是，设备内部的外部存储设备被卸载并且装载到其它地方）。</p>
+
+<p>Android API指南<a href="http://developer.android.com/guide/topics/data/data-storage.html">Storage Options</a>的陈述如下：</p>
+
+<blockquote>
+  <p>Caution: External storage can become unavailable if the user mounts the external storage on a computer or removes the media, and there’s no security enforced upon files you save to the external storage. All applications can read and write files placed on the external storage and the user can remove them.</p>
+</blockquote>
+
+<p>开发者如果没有对敏感信息进行编码，就不能将其保存在外部存储设备上，因为保存在外部存储上的文件不能保证其可用性、完整性和机密性。</p>
+
+<p>###不符合该规则的代码示例</p>
+
+<p>下面的代码在外部存储中创建了一个文件，并将敏感信息写入了该文件：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>private String filename = "myfile";
+
+private String string = "sensitive data such as credit card number";
+FileOutputStream fos = null;
+
+try {
+  File file = new File(getExternalFilesDir(TARGET_TYPE), filename);
+  fos = new FileOutputStream(file, false);
+  fos.write(string.getBytes());
+} catch (FileNotFoundException e) {
+  // handle FileNotFoundException
+} catch (IOException e) {
+  // handle IOException
+} finally {
+  if (fos != null) {
+    try {
+      fos.close();
+    } catch (IOException e) {
+    
+    }
+  }
+}
+</code></pre>
+</div>
+
+<p>####验证</p>
+
+<p>一般来说，一个应用保存的文件位置如下：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>/sdcard/Android/data/com.company.app/files/save/appdata/save_appdata
+</code></pre>
+</div>
+
+<p>###解决方案1（将文件保存在内部存储）</p>
+
+<p>下面的代码使用了<code class="highlighter-rouge">openFileOutput()</code>方法在应用的<code class="highlighter-rouge">data</code>文件夹创建了文件<code class="highlighter-rouge">myfile</code>，并将其权限设置为<code class="highlighter-rouge">MODE_PRIVATE</code>，因此其他app无法访问这个文件：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>private String filename = "myfile";
+
+private String string = "sensitive data such as credit card number";
+FileOutputStream fos = null;
+
+try {
+  fos = openFileOutput(filename, Context.MODE_PRIVATE);
+  fos.write(string.getBytes());
+  fos.close();
+} catch (FileNotFoundException e) {
+  // handle FileNotFoundException
+} catch (IOException e) {
+  // handle IOException
+} finally {
+  if (fos != null) {
+    try {
+      fos.close();
+    } catch (IOException e) {
+    
+    }
+  }
+}
+</code></pre>
+</div>
+
+<p>###解决方案2</p>
+
+<p>在将数据保存在外部存储（比如SD卡）中之前，请先将数据安全地编码。</p>
+
+<p>翻译自<a href="https://www.securecoding.cert.org/confluence/display/java/DRD00-J.+Do+not+store+sensitive+information+on+external+storage+%28SD+card%29+unless+encrypted+first">CERT</a></p>
+
+
+  </div>
+</article>
+
+
+    <footer class="c-footer">
+  <div class="u-container c-footer__container">
+    <p>&copy; Gao Xu 2016</p>
+    <p>
+      <a href="https://twitter.com/gavin_china">Twitter</a>
+      <a href="https://github.com/gaoxuxu">Github</a>
+      
+      
+    </p>
+  </div>
+</footer>
+
+  </body>
+</html>

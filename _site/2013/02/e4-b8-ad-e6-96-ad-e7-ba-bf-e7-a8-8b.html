@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html class="t-blue">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>中断线程</title>
+  <meta name="description" content="本文的内容全部来自Core Java">
+
+  <link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic,700|Roboto+Mono:400,500' rel='stylesheet' type='text/css'>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="/material-jekyll-theme/css/main.css">
+  <link rel="canonical" href="http://gaoxuxu.github.io/material-jekyll-theme/2013/02/e4-b8-ad-e6-96-ad-e7-ba-bf-e7-a8-8b">
+  <link rel="alternate" type="application/rss+xml" title="Gao Xu" href="http://gaoxuxu.github.io/material-jekyll-theme/feed.xml">
+</head>
+
+  <body>
+    <nav class="c-navigation is-fixed">
+  <div class="c-navigation__container u-container">
+    <a class="c-navigation__item " href="/material-jekyll-theme/">Home</a>
+    <a class="c-navigation__item " href="/material-jekyll-theme/articles/">Articles</a>
+    <a class="c-navigation__item " href="/material-jekyll-theme/about/">About</a>
+  </div>
+</nav>
+
+
+    <article class="c-article">
+  <header class="c-header c-article__header">
+    <div class="u-container">
+      <h1 class="c-header__title">中断线程</h1>
+    </div>
+  </header>
+
+  <div class="c-article__main">
+    <p>本文的内容全部来自Core Java</p>
+
+<p>当线程的run方法执行完最后一条语句并return，或者出现了在方法中未捕获的异常时，线程将终止。</p>
+
+<p>interrupt()方法只是请求终止线程，当调用此方法时，线程的中断状态将被置位。每个线程都应该不时地检查这个标志，以判断线程是否被中断。</p>
+
+<p>当在一个被阻塞的线程（调用sleep或者wait）上调用interrupted方法时，阻塞调用将会被InterruptedException中断。</p>
+
+<p>没有任何一个语言方面的需求要求一个被中断的线程应该终止。中断一个线程不过是为了引起它的注意，被中断的线程可以决定如何响应中断。某些线程是如此重要以至于应该处理完异常后继续运行，而不是中断。更是，更普遍的情况是，线程将简单地将中断作为一个终止的请求。这种情况下线程的run方法具有如下形式：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>public void run(){
+    try{
+        while(!Thread.currentThread().isInterrupted()
+                &amp;&amp; more work to do){
+            do more work
+        }
+    }catch(InterruptedException e){
+        // thread was interrupted during sleep or wait
+    }finally{
+        cleanup,if required
+    }
+    //exiting the run method terminates the thread
+}
+</code></pre>
+</div>
+
+<p>如果在每次迭代之后都调用sleep方法（或者其它的可中断方法），isInterrupted检测就没有用处也没有必要。如果在中断状态被置位时调用sleep方法，它不会休眠。相反，它将清除这一状态并抛出InterruptedException。因此，如果你的循环调用sleep，不要检测中断状态，而是如下所示捕获InterruptedException：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>public void run(){
+    try{
+        while(more work to do){
+            do more work
+            Thread.sleep(delay);
+        }
+    }catch (InterruptedException e){
+        //thread was interrupted during sleep or wait
+    }finally{
+        cleanup,if required
+    }
+    //exiting the run method terminates the thread
+}
+</code></pre>
+</div>
+
+<p>有时候InterruptedException被抑制在很低的层次上，比如：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>void mySubTask(){
+    …
+    try{
+        sleep(dalay);
+    }catch(InterruptedException e){
+    
+    }
+    ...
+}
+</code></pre>
+</div>
+
+<p>这时候有一种更好的解决办法：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>void mySubTask(){
+    …
+    try{
+        sleep(dalay);
+    }catch(InterruptedException e){
+        Thread.currentThread().interrupt();
+    }
+}
+</code></pre>
+</div>
+
+<p>当然，最好的解决办法是：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>void mySubTask() throws InterruptedException{
+    …
+    sleep(dalay);
+    ...
+}
+</code></pre>
+</div>
+
+
+  </div>
+</article>
+
+
+    <footer class="c-footer">
+  <div class="u-container c-footer__container">
+    <p>&copy; Gao Xu 2016</p>
+    <p>
+      <a href="https://twitter.com/gavin_china">Twitter</a>
+      <a href="https://github.com/gaoxuxu">Github</a>
+      
+      
+    </p>
+  </div>
+</footer>
+
+  </body>
+</html>

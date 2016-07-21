@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html class="t-blue">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>算法导论第四章——代换法和递归树</title>
+  <meta name="description" content="##4.3 The substitution method(代换法) for solving recurrences">
+
+  <link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic,700|Roboto+Mono:400,500' rel='stylesheet' type='text/css'>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="/material-jekyll-theme/css/main.css">
+  <link rel="canonical" href="http://gaoxuxu.github.io/material-jekyll-theme/2013/10/Introduction-to-Algorithms-Chapter-4-2">
+  <link rel="alternate" type="application/rss+xml" title="Gao Xu" href="http://gaoxuxu.github.io/material-jekyll-theme/feed.xml">
+</head>
+
+  <body>
+    <nav class="c-navigation is-fixed">
+  <div class="c-navigation__container u-container">
+    <a class="c-navigation__item " href="/material-jekyll-theme/">Home</a>
+    <a class="c-navigation__item " href="/material-jekyll-theme/articles/">Articles</a>
+    <a class="c-navigation__item " href="/material-jekyll-theme/about/">About</a>
+  </div>
+</nav>
+
+
+    <article class="c-article">
+  <header class="c-header c-article__header">
+    <div class="u-container">
+      <h1 class="c-header__title">算法导论第四章——代换法和递归树</h1>
+    </div>
+  </header>
+
+  <div class="c-article__main">
+    <p>##4.3 The substitution method(代换法) for solving recurrences</p>
+
+<p>用代换法解递归式有两个步骤：</p>
+
+<ol>
+  <li>猜测解的形式</li>
+  <li>用数学归纳法找出使解真正有效的常数。</li>
+</ol>
+
+<p>代换法可以用来确定一个递归式的上界或下界，可以直接扩展边界条件，使递归假设对很小的$n$也成立。</p>
+
+<p>并不存在通用的方法来猜测递归式的正确解。这种猜测需要经验，有时甚至是创造性的。有一种方法是先证明递归式的较松的上下界，然后再缩小不确定性空间。</p>
+
+<p>有时或许能够猜出递归式解的渐近界，但却会在归纳证明时出现一些问题。通常，问题出在归纳假设不够强，无法证明其准确的界。遇到这种情况，可以去掉一个低阶项来修改所猜的界，以使证明顺利进行。</p>
+
+<p>在运用渐近表示时很容易出错。例如，对合并排序运行时间的上界，由假设$T(n)\le cn$并证明</p>
+
+<script type="math/tex; mode=display">T(n)\le 2(c\lfloor n/2\rfloor) + n\le cn+n=O(n)\quad\quad \Leftarrow wrong!!</script>
+
+<p>错误在于没有证明归纳假设的准确形式，即$T(n)\le cn$。</p>
+
+<p>有时，对一个递归式做一些简单的代数变换，就会使之变成熟悉的形式。例如，考虑</p>
+
+<script type="math/tex; mode=display">T(n)=2T(\lfloor\sqrt n\rfloor) + \lg n</script>
+
+<p>将其简化的方法是改变变量。设$m=\lg n$，得到</p>
+
+<script type="math/tex; mode=display">T(2^m)=2T(2^{m/2})+m</script>
+
+<p>设$S(m)=T(2^m)$，得到新的递归式</p>
+
+<script type="math/tex; mode=display">S(m)=2S(m/2)+m</script>
+
+<p>得到$S(m)=O(m\lg m)$，最终有$T(n)=T(2^m)=S(m)=O(m\lg m)=O(\lg n\lg\lg n)$</p>
+
+<p>##Exercises</p>
+
+<p>###4.3-1</p>
+
+<p>Show that the solution of $T(n)=T(n-1)+n$ is $O(n^2)$。<br />
+可以看出</p>
+
+<script type="math/tex; mode=display">T(n)=1+2+\cdots +n=\sum _{i=1}^ni=\frac{n(n+1)}{2}</script>
+
+<p>假设$c$为常数，对所有的$n\ge n _0$，都有$T(n)\le cn^2+bn$</p>
+
+<script type="math/tex; mode=display">T(n)=T(n-1)+n\le c(n-1)^2+(b+1)n-b=cn^2+(b+1-2c)n+c-b</script>
+
+<p>当$b=c\ge\frac{1}{2}$时，有</p>
+
+<script type="math/tex; mode=display">T(n)\le cn^2+bn</script>
+
+<p>###4.3-2</p>
+
+<p>Show that the solution of $T(n)=T(\lceil n/2\rceil)+1$ is $O(\lg n)$<br />
+假设有$T(n)=c\lg{(n-b)}$</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{equation}\begin{split}\
+T(n)&=T(\lceil n/2\rceil)+1\\
+&=c\lg{\lceil n/2 -b\rceil}+1\\
+&\le c\lg(\frac{n-2b+2}{2}) - 1\\
+&=c\lg(n-2b+2)\\
+&\le c\lg(n-b)\quad(if\ b\ge 2)\
+\end{split}\end{equation} %]]></script>
+
+<p>###4.3-3</p>
+
+<p>We saw that the solution of $T(n)=2T(\lfloor n/2\rfloor)+n$ is $O(n\lg n)$.Show that the solution of this recurrence is also $\Omega(n\lg n)$. Conclude that the solution is $\Theta(n\lg n)$.<br />
+假设$T(n)=cn\lg n$</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{equation}\begin{split}\
+T(n)&=2T(\lfloor n/2\rfloor)+2T(\lceil n/2\rceil)+n-2T(\lceil n/2\rceil)\\
+&=4T(n/2)+n-2T(\lceil n/2\rceil)\\
+&\ge 2cn\lg(n/2)+n-c(n+1)\lg(\frac{n+1}{2})\\
+&=2cn\lg n-2cn+n-cn\lg(n+1)-c\lg(n+1)+cn+c\\
+&\ge cn\lg n+c\lg{\left(\frac{n^n}{(n+1)^{n+1}}\right)}+(1-c)n+c\\
+&\ge cn\lg n\quad\quad(if\ n\ge \frac{1}{1-\frac{1}{c}},c>1)\\
+\Rightarrow T(n)=\Theta(n\lg n)\
+\end{split}\end{equation} %]]></script>
+
+<p>###4.3-4</p>
+
+<p>Show that by making a different inductive hypothesis, we can overcome the difficulty with the boundary condition $T(1)=1$ for recurrence(4.19) without adjusting the boundary conditions for the inductive proof.<br />
+假设$T(n)=cn\lg n+bn,b\ge 1$</p>
+
+<p>###4.3-5</p>
+
+<p>Show that $\Theta(nlgn)$ is the solution to the “exact” recurrence (4.3) for merge sort.<br />
+可以使用<a href="http://en.wikipedia.org/wiki/Akra-Bazzi _method">Akra-Bazzi method</a>：</p>
+
+<script type="math/tex; mode=display">T(x)=g(x)+\sum _{i=1}^ka _iT(b _ix+h _i(x))\quad\quad for\ x\ge x _0</script>
+
+<p>当$\sum _{i=1}^ka _ib _i^p=1$时，有</p>
+
+<script type="math/tex; mode=display">T(x)\in \Theta\left(x^p\left(1+\int _i^x\frac{g(u)}{u^{p+1}}du\right)\right)</script>
+
+<table>
+  <tbody>
+    <tr>
+      <td>将<a href="http://en.wikipedia.org/wiki/Akra-Bazzi _method">Akra-Bazzi method</a>应用到本题时，可得$p=1,</td>
+      <td>g(u)</td>
+      <td>\in n$，所以</td>
+    </tr>
+  </tbody>
+</table>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{equation}\begin{split}\
+T(n)&\in \Theta\left(n\left(1+\int _i^n\frac{u}{u^2}du\right)\right)\\
+&\in\Theta(n(1+\ln n))\\
+&\in \Theta(n\lg n)\
+\end{split}\end{equation} %]]></script>
+
+<p>###4.3-6</p>
+
+<p>Show that the solution to $T(n)=2T(\lfloor n/2\rfloor+17)+n$ is $O(nlgn)$.<br />
+解法同4.3-5，使用Akra-Bazzi method.</p>
+
+<p>###4.3-7</p>
+
+<p>Using the master method in Section 4.5, you can show that the solution to the recurrence $T(n)=4T(n/3)+n$ is $T(n)=\Theta(n^{\log _3^4})$. Show that a substitution proof with the assumption $T(n)\le cn^{log _3^4}$ fails. Then show how to subtract off a lower-order term to make a substitution proof work.</p>
+
+<p>###4.3-8</p>
+
+<p>Using the master method in Section 4.5, you can show that the solution to the recurrence $T(n)=4T(n/2)+n^2$ is $T(n)=\Theta(n^2)$. Show that a substitution proof with the assumption $T(n)\le cn^2$ fails. Then show how to subtract off a lower-order term to make a substitution proof work.</p>
+
+<p>###4.3-9
+Solve the recurrence $T(n)=3T(\sqrt n)+\log n$ by making a change of variables. Your solution should be asymptotically tight. Do not worry about whether values are integral.<br />
+令$n=2^m$，</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{equation}\begin{split}\
+T(n)&=3T(\sqrt n)+\lg n\\
+\Rightarrow\quad T(2^m)&=3T(2^{m/2})+m\\
+S(m)&=T(2^m)=3S(m/2)+m\\
+&=\Theta(m^{\lg 3})\\
+\Rightarrow\quad T(n)&=\Theta(\lg 3\lg n)\
+\end{split}\end{equation} %]]></script>
+
+<p>##The recursion-tree method for solving recurrences</p>
+
+<p>递归树方法能帮我们直接得到好的猜测。在递归树中，每一个节点都代表递归函数调用集合中一个子问题的代价。将树中每一层内的代价相加得到一个每层代价的集合，再将每层的代价相加得到所有层次的总代价。递归树很适合用于递归式表示分治算法运行时间的情况。</p>
+
+<p>递归树最适合用来产生好的猜测，然后用代换法验证。使用递归树产生好的猜测时，可以容忍小量的“不良量”。如果画递归树时非常仔细，那么就可以直接用递归树作为递归式解的证明。</p>
+
+<p>##Exercises</p>
+
+<p>###4.4-1</p>
+
+<p>Use a recursion tree to determine a good asymptotic upper bound on the recurrence $T(n)=3T(\lfloor n/2\rfloor)+n$.Use the substitution method to verify your answer.<br />
+由于$(\frac{1}{2})^{\lg n}n=1$，所以递归树的深度为$\lg n+1$.总代价为</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{equation}\begin{split}\
+T(n)&\le cn+\frac{3}{2}cn+\cdots+\left(\frac{3}{2}\right)^{\lg n-1}cn+\Theta(n^{\lg 3})\\
+&=\sum _{i=0}^{\lg n-1}\left(\frac{3}{2}\right)^icn+\Theta(n^{\lg 3})\\
+&=\frac{\left(\frac{3}{2}\right)^{\lg n}-1}{(3/2)-1}cn+\Theta(n^{\lg 3})\\
+&=2c\left(3^{\lg n}-2^{\lg n}\right)+\Theta(n^{\lg 3})=O(n^{\lg 3})\
+\end{split}\end{equation} %]]></script>
+
+<p>###4.4-2</p>
+
+<p>Use a recursion tree to determine a good asymptotic upper bound on the recurrence $T(n)=T(n/2)+n^2$.Use the substitution method to verify your answer.<br />
+与上题相同，树深为$\lg n+1$，总代价为</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{equation}\begin{split}\
+T(n)&=cn^2+\frac{1}{2}cn^2+\cdots+\left(\frac{1}{2}\right)^{\lg n-1}cn^2+\Theta(1)\\
+&=\sum _{i=0}^{\lg n-1}\left(\frac{1}{2}\right)^icn^2+\Theta(1)\\
+&<2cn^2+\Theta(1)=O(n^2)\
+\end{split}\end{equation} %]]></script>
+
+<p>###4.4-3</p>
+
+<p>Use a recursion tree to determine a good asymptotic upper bound on the recurrence $T(n)=4T(n/2+2)+n$.Use the substitution method to verify your answer.<br />
+树深为$\lg n+1$，总代价为</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{equation}\begin{split}\
+T(n)&=cn+4c(\frac{n}{2}+2)+\cdots+4^ic\left(\frac{n}{2^i}+\frac{2^{i-1}-1}{2^{i-2}}+2\right)+\cdots+4^{\lg n-1}c\left(\frac{n}{2^{\lg n-1}}+\frac{2^{\lg n-2}-1}{2^{\lg n-3}}+2\right)+\Theta(n^2)\\
+&=\sum _{i=0}^{\lg n-1}2^icn+\sum _{i=0}^{\lg n-1}4^{i+1}c-\sum _{i=0}^{\lg n-1}2^{i+2}c+\Theta(n^2)\\
+&=2cn(n-1)+\frac{4}{3}(n^2-1)-4(n-1)+\Theta(n^2)\\
+&\le O(n^2)\
+\end{split}\end{equation} %]]></script>
+
+<p>###4.4-4</p>
+
+<p>Use a recursion tree to determine a good aysmptotic upper bound on the recurrence $T(n)=2T(n-1)+1$.Use the substitution method to verify your answer.<br />
+树深为$n$，总代价为</p>
+
+<script type="math/tex; mode=display">T(n)=\sum _{i=0}^{n-1}2^ic=c(2^n-1)=O(2^n)</script>
+
+<p>###4.4-5</p>
+
+<p>Use a recursion tree to determine a good asymptotic upper bound on the recurrence $T(n)=T(n-1)+T(n/2)+n$.Use the substitution method to verify your answer.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>       4
+     /   \
+    3     2
+   / \   / \
+  2   1 1   1
+ / \
+1   1
+</code></pre>
+</div>
+
+<p>从递归树可以看出</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{equation}\begin{split}\
+T(n)&=\sum _{i=1}^nT(\frac{i}{2})+\sum _{i=1}^nci\\
+&\le nT(\frac{n}{2})+\frac{n(n-1)}{2}c\\
+&\le 2nT(\frac{n}{2})\
+\end{split}\end{equation} %]]></script>
+
+<p>令$n=2^m,S(m)=T(n)=2^{m+1}S(m-1)$，有</p>
+
+<p>$\lg{(S(m))}=m+1+\lg(S(m-1))$，令$\lg(S(m))=L(m)$，则</p>
+
+<p>$L(m)=L(m-1)+m+1=\frac{m(m+3)}{2}\le m^2$</p>
+
+<p>$\Rightarrow S(m)=2^{L(m)}\le 2^{m^2}$</p>
+
+<p>$\Rightarrow T(n)\le 2^{\lg^2 n}$</p>
+
+<p>###4.4-6</p>
+
+<p>Argue that the solution to the recurrence $T(n)=T(n/3)+T(2n/3)+cn$,where $c$ is a constant,is $\Omega(n\lg n)$ by appealing to a recursion tree.<br />
+树的最短深度为$\log _3n+1$，而且最短路径每一层的和都是$cn$，所以</p>
+
+<script type="math/tex; mode=display">T(n)>=(\log _3n+1)cn=\Omega(n\lg n)</script>
+
+<p>###4.4-7</p>
+
+<p>Draw the recursion tree for $T(n)=4T(\lfloor n/2\rfloor)+cn$,where $c$ is a constant,and provide a tight asymptotic bound on its solution.Verify your bound by the substitution method.<br />
+$T(n)=\Theta(n^2)$</p>
+
+<p>###4.4-8</p>
+
+<p>Use a recursion tree to give an asymptotically tight solution to the recurrence $T(n)=T(n-a)+T(a)+cn$,where $a\ge 1$ and $c&gt;0$ are constants.<br />
+$T(n)=\frac{n}{a}T(a)+c\frac{n}{a}\frac{n+1}{2}=cn+\frac{c}{2a}(n^2+n)=\Theta(n^2)$</p>
+
+<p>###4.4-9</p>
+
+<p>Use a recursion tree to give an asymptotically tight solution to the recurrence $T(n)=T(\alpha n)+T((1-\alpha)n)+cn$,where $\alpha$ is a constant in the range $0&lt;\alpha&lt;1$ and $c&gt;0$ is also a constant.<br />
+下界好证，参考4.4-6，$T(n)=\Omega(n\lg n)$，假设$T(n)=O(n\lg n)$</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{equation}\begin{split}\
+T(n)&=T(\alpha n)+T((1-\alpha)n) + cn\\
+&\le d\alpha n \lg(\alpha n) + d(1-\alpha)n\lg((1-\alpha)n) + cn\\
+&=d\alpha n\lg\alpha+d\alpha n\lg n+d(1-\alpha)n\lg(1-\alpha)+d(1-\alpha)n\lg n+cn\\
+&=dn\lg n+dn(\alpha\lg\alpha+(1-\alpha)\lg(1-\alpha))+cn\\
+&\le dn\lg n\quad\quad\left(for\ \  0<d\le\frac{-c}{\alpha\lg\alpha+(1-\alpha)\lg(1-\alpha)}\right)\
+\end{split}\end{equation} %]]></script>
+
+<blockquote>
+  <p>Written with <a href="http://benweet.github.io/stackedit/">StackEdit</a>.</p>
+</blockquote>
+
+
+  </div>
+</article>
+
+
+    <footer class="c-footer">
+  <div class="u-container c-footer__container">
+    <p>&copy; Gao Xu 2016</p>
+    <p>
+      <a href="https://twitter.com/gavin_china">Twitter</a>
+      <a href="https://github.com/gaoxuxu">Github</a>
+      
+      
+    </p>
+  </div>
+</footer>
+
+  </body>
+</html>

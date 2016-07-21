@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html class="t-blue">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Cocos2d-x学习（四）——ActionsTest</title>
+  <meta name="description" content="从这一篇起，算是真正开始学习cocos2d-x引擎了，顺序还是测试列表的顺序。">
+
+  <link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic,700|Roboto+Mono:400,500' rel='stylesheet' type='text/css'>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="/material-jekyll-theme/css/main.css">
+  <link rel="canonical" href="http://gaoxuxu.github.io/material-jekyll-theme/2013/08/cocos2d-x-e5-ad-a6-e4-b9-a0-ef-bc-88-e5-9b-9b-ef-bc-89">
+  <link rel="alternate" type="application/rss+xml" title="Gao Xu" href="http://gaoxuxu.github.io/material-jekyll-theme/feed.xml">
+</head>
+
+  <body>
+    <nav class="c-navigation is-fixed">
+  <div class="c-navigation__container u-container">
+    <a class="c-navigation__item " href="/material-jekyll-theme/">Home</a>
+    <a class="c-navigation__item " href="/material-jekyll-theme/articles/">Articles</a>
+    <a class="c-navigation__item " href="/material-jekyll-theme/about/">About</a>
+  </div>
+</nav>
+
+
+    <article class="c-article">
+  <header class="c-header c-article__header">
+    <div class="u-container">
+      <h1 class="c-header__title">Cocos2d-x学习（四）——ActionsTest</h1>
+    </div>
+  </header>
+
+  <div class="c-article__main">
+    <p>从这一篇起，算是真正开始学习cocos2d-x引擎了，顺序还是测试列表的顺序。</p>
+
+<h2 id="cocos2d-x">cocos2d-x动作集合</h2>
+
+<p>这一部分是转载，参见<a href="http://blog.csdn.net/cocos2der/article/details/7261774">原文</a></p>
+
+<h3 id="section">基本动作</h3>
+
+<p>Cocos2d提供的基本动作：瞬时动作、延时动作、运作速度。</p>
+
+<ul>
+  <li><strong>瞬时动作</strong>：就是不需要时间，马上就完成的动作。瞬时动作的共同基类是<code class="highlighter-rouge">InstantAction</code>。<br />
+Cocos2d提供以下瞬时动作：
+    <ul>
+      <li><strong>放置（Place）</strong>：效果类似于<code class="highlighter-rouge">node.Position = ccp(x, y)</code>。之所以作为一个动作来实现是为了可以与其他动作形成一个连续动作。</li>
+      <li><strong>隐藏（Hide）</strong>：效果类似于<code class="highlighter-rouge">node setVisible:NO</code>。之所以作为一个劢作来实现是为了可以与其他动作形成一个连续动作。</li>
+      <li><strong>显示（Show）</strong>：效果类似于<code class="highlighter-rouge">node setVisible:YES</code>。之所以作为一个动作来实现是为了可以与其他动作形成一个连续动作。</li>
+      <li><strong>可见切换（ToggleVisibility）</strong></li>
+    </ul>
+  </li>
+  <li><strong>延时动作</strong>：延时动作就是指动作的完成需要一定时间。因此<code class="highlighter-rouge">actionWithDuration</code>是延时动作执行时的第一个参数，延时动作的共同基类是<code class="highlighter-rouge">CCIntervalAction</code>(包含了组合动作类)。<br />
+Cocos2d提供以下瞬时动作（函数命名规则是：<code class="highlighter-rouge">XxxxTo</code>: 意味着运动到指定的位置；<code class="highlighter-rouge">XxxxBy</code>:意味着运动到按照指定的<code class="highlighter-rouge">x</code>、<code class="highlighter-rouge">y</code>增量的位置<code class="highlighter-rouge">x</code>、<code class="highlighter-rouge">y</code>可以是负值）：
+    <ul>
+      <li><strong>移动到</strong>：<code class="highlighter-rouge">CCMoveTo</code></li>
+      <li><strong>移动</strong>：<code class="highlighter-rouge">CCMoveBy</code></li>
+      <li><strong>跳跃到</strong>：<code class="highlighter-rouge">CCJumpTo</code>，设置终点位置和跳跃的高度和次数。</li>
+      <li><strong>跳跃</strong>：<code class="highlighter-rouge">CCJumpBy</code>，设置终点位置和跳跃的高度和次数。</li>
+      <li><strong>贝塞尔</strong>：<code class="highlighter-rouge">CCBezierBy</code>，支持<code class="highlighter-rouge">3</code>次贝塞尔曲线:<code class="highlighter-rouge">P0</code>指起点,<code class="highlighter-rouge">P1</code>指起点切线方向,<code class="highlighter-rouge">P2</code>指终点切线方向,<code class="highlighter-rouge">P3</code>指终点。</li>
+      <li><strong>放大到</strong>：<code class="highlighter-rouge">CCScaleTo</code>，设置放大倍数,是浮点型。</li>
+      <li><strong>放大</strong>：<code class="highlighter-rouge">CCScaleBy</code></li>
+      <li><strong>旋转到</strong>：<code class="highlighter-rouge">CCRotateTo</code></li>
+      <li><strong>旋转</strong>：<code class="highlighter-rouge">CCRotateBy</code></li>
+      <li><strong>闪烁</strong>：<code class="highlighter-rouge">CCBlink</code>，设定闪烁次数。</li>
+      <li><strong>色调变化到</strong>：<code class="highlighter-rouge">CCTintTo</code></li>
+      <li><strong>色调变换</strong>：<code class="highlighter-rouge">CCTintBy</code></li>
+      <li><strong>变暗到</strong>：<code class="highlighter-rouge">CCFadeTo</code></li>
+      <li><strong>由无变亮</strong>：<code class="highlighter-rouge">CCFadeIn</code></li>
+      <li><strong>由亮变无</strong>：<code class="highlighter-rouge">CCFadeOut</code></li>
+    </ul>
+  </li>
+  <li><strong>速度变化</strong>：基本动作和组合动作实现了针对精灵的各种运动、动画效果的改变，但这样的改变的速度是不变的，通过<code class="highlighter-rouge">CCEaseAction</code>为基类的类系和<code class="highlighter-rouge">CCSpped</code>类我们可以很方便的修改精灵执行劢作的速度：由快至慢还是由慢至快。
+    <ul>
+      <li><strong>EaseIn</strong>：由慢至快。</li>
+      <li><strong>EaseOut</strong>：由快至慢。</li>
+      <li><strong>EaseInOut</strong>：由慢至快再由快至慢。</li>
+      <li><strong>EaseSineIn</strong>：由慢至快。</li>
+      <li><strong>EaseSineOut</strong>：由快至慢。</li>
+      <li><strong>EaseSineInOut</strong>：由慢至快再由快至慢。</li>
+      <li><strong>EaseExponentialIn</strong>：由慢至极快。</li>
+      <li><strong>EaseExponentialOut</strong>：由极快至慢。</li>
+      <li><strong>EaseExponentialInOut</strong>：由慢至极快再由极快至慢。</li>
+      <li><strong>Speed</strong>：人工设定速度，还可通过<code class="highlighter-rouge">SetSpeed</code>不断调整。</li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="section-1">组合动作</h3>
+
+<p>按照一定的次序将上述基本动作组合起来，形成连贯的一套组合动作。</p>
+
+<p>组合动作包括以下几类:</p>
+
+<ul>
+  <li><strong>序列</strong>：<code class="highlighter-rouge">CCSequence</code>。<code class="highlighter-rouge">Sequence</code>的使用非常简单，该类也从<code class="highlighter-rouge">CCIntervalAction</code>派生，本身就可以被<code class="highlighter-rouge">CocosNode</code>对象执行。该类的作用就是线性排列若干个动作，然后按先后次序逐个执行。</li>
+  <li><strong>同步</strong>：<code class="highlighter-rouge">Spawn</code>。<code class="highlighter-rouge">Spawn</code>的使用非常简单，该类也从<code class="highlighter-rouge">IntervalAction</code>派生，本身就可以被<code class="highlighter-rouge">CocosNode</code>对象执行。该类的作用就是同时并列执行若干个动作，但要求动作都必须是可以同时执行的。比如：移动式翻转、变色、缩放等。</li>
+</ul>
+
+<p>需要特别注意的是，同步执行最后的完成时间由基本动作中用时最大者决定。</p>
+
+<ul>
+  <li><strong>重复有限次数</strong>：<code class="highlighter-rouge">Repeate</code>。重复有限次数的动作，该类也从<code class="highlighter-rouge">IntervalAction</code>派生,可以被<code class="highlighter-rouge">CocosNode</code>对象执行。</li>
+  <li><strong>反动作</strong>：<code class="highlighter-rouge">Reverse</code>。反动作就是反向(逆向)执行某个动作，支持针对动作序列的反动作序列。反动作不是一个专门的类，而是<code class="highlighter-rouge">CCFiniteAction</code>引入的一个接口。不是所有的类都支持反动作，<code class="highlighter-rouge">XxxxTo</code>类通常不支持反动作，<code class="highlighter-rouge">XxxxBy</code>类通常支持。</li>
+  <li><strong>动画</strong>：<code class="highlighter-rouge">Animation</code>。动画就是让精灵自身连续执行一段影像，形成模拟运动的效果：行走时的精灵状态、打斗时的状态等。</li>
+  <li><strong>无限重复</strong>：<code class="highlighter-rouge">RepeatForever</code>。<code class="highlighter-rouge">RepeatForever</code>是从<code class="highlighter-rouge">Action</code>类直接派生的，因此无法参与序列和同步；自身也无法反向执行。该类的作用就是无限期执行某个动作或动作序列，直到被停止。</li>
+</ul>
+
+<h3 id="section-2">扩展动作</h3>
+
+<ul>
+  <li><strong>延时动作</strong>：Delay，比如在动作序列中增加一个时间间歇。</li>
+  <li><strong>函数调用</strong></li>
+  <li><strong>函数</strong>：在动作序列中间或者结束调用某个函数，任何需要执行的任务：动作、状态修改等。<code class="highlighter-rouge">id acf = [CCCallFunc actionWithTarget:selfselector:@selector(CallBack1)]</code>；对应的函数为：<code class="highlighter-rouge">(void) CallBack1 {
+[sprite runAction:[CCTintBy actionWithDuration:0.5 red:255 green:0 blue:255]]; }</code></li>
+  <li><strong>带对象参数</strong>：调用自定义函数时，传递当前对象。<code class="highlighter-rouge">id acf = [CallFuncN actionWithTarget:selfselector:@selector(CallBack2:)]</code>；对应的自定义函数：（这里，我们直接使用了该对象）：<code class="highlighter-rouge">(void) CallBack2:(id)sender {
+[sender runAction:[CCTintBy actionWithDuration:1 red:255 green:0 blue:255]]; }</code></li>
+  <li><strong>传递对象、数据参数</strong>：用自定义函数时，传递当前对象和一个常量（也可以是指针）。<code class="highlighter-rouge">id acf = [CCCallFuncND actionWithTarget:selfselector:@selector(CallBack3:data:) data:(void*)2]</code>；对应的自定义函数，我们使用了传递的对象和数据：<code class="highlighter-rouge">(void) CallBack3:(id)sender data:(void*)data {
+[sender runAction:[CCTintBy actionWithDuration:(NSInteger)data red:255 green:0 blue:255]]; }</code></li>
+</ul>
+
+<h2 id="testactions">TEST_ACTIONS</h2>
+
+<p>测试中有41个布景，每个布景都有对应的<code class="highlighter-rouge">id</code>，位于<code class="highlighter-rouge">ActionsTest.h</code>文件中。先看<code class="highlighter-rouge">ActionsDemo</code>类的定义，此类继承自<code class="highlighter-rouge">CCLayer</code>，是这一组测试中所有布景的基类：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>class ActionsDemo : public CCLayer
+{
+protected:
+    //三个人物精灵
+    CCSprite*    m_grossini;
+    CCSprite*    m_tamara;
+    CCSprite*    m_kathia;
+public:
+    virtual void onEnter();
+    virtual void onExit();
+
+    //使精灵居中
+    void centerSprites(unsigned int numberOfSprites);
+    //使精灵左对齐
+    void alignSpritesLeft(unsigned int numberOfSprites);
+    virtual std::string title();
+    virtual std::string subtitle();
+
+    //界面下方几个菜单的事件处理方法
+    void restartCallback(CCObject* pSender);
+    void nextCallback(CCObject* pSender);
+    void backCallback(CCObject* pSender);
+};
+</code></pre>
+</div>
+
+<p>根据文件名创建精灵，目前只支持png和tiff：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>m_grossini = CCSprite::create(s_pPathGrossini);
+m_grossini-&gt;retain();
+
+addChild(m_grossini, 1);
+m_grossini-&gt;setPosition(ccp(VisibleRect::center().x, VisibleRect::bottom().y+VisibleRect::getVisibleRect().size.height/3));
+</code></pre>
+</div>
+
+<p>设置透明度是<code class="highlighter-rouge">setOpacity(GLubyte opacity)</code>，<code class="highlighter-rouge">GLubyte</code>的声明为<code class="highlighter-rouge">typedef unsigned char GLubyte;</code>。</p>
+
+<p><code class="highlighter-rouge">CCMoveTo</code>时，第二个参数代表一个点。<code class="highlighter-rouge">CCMoveBy</code>时，第二个参数代表的是一个矢量，精灵将按这个矢量的方向和长度移动。</p>
+
+<p><strong>总结</strong>：<code class="highlighter-rouge">XxxxTo</code>的参数，代表最终状态，而<code class="highlighter-rouge">XxxxBy</code>的参数代表的是增量。</p>
+
+<p>反动作：<code class="highlighter-rouge">actionBy-&gt;reverse();</code></p>
+
+<p>动作序列：<code class="highlighter-rouge">CCSequence::create(actionBy, actionByBack, NULL)</code></p>
+
+<p>无限重复：<code class="highlighter-rouge">CCRepeatForever::create(actionUp)</code></p>
+
+<blockquote>
+  <p>Written with <a href="http://benweet.github.io/stackedit/">StackEdit</a>.</p>
+</blockquote>
+
+
+  </div>
+</article>
+
+
+    <footer class="c-footer">
+  <div class="u-container c-footer__container">
+    <p>&copy; Gao Xu 2016</p>
+    <p>
+      <a href="https://twitter.com/gavin_china">Twitter</a>
+      <a href="https://github.com/gaoxuxu">Github</a>
+      
+      
+    </p>
+  </div>
+</footer>
+
+  </body>
+</html>

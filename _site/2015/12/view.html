@@ -1,0 +1,102 @@
+<p>##一般操作</p>
+
+<ul>
+  <li>设置属性：可以在xml中配置，或者在代码中设置。</li>
+  <li>设置焦点：framework会根据用户输入来焦点的移动，使用<code class="highlighter-rouge">requestFocus</code>方法强制将焦点移到特定的View。</li>
+  <li>设置监听者：比如焦点变化监听、点击事件监听等。</li>
+  <li>设置可见性：使用<code class="highlighter-rouge">setVisibility</code>方法来显示或者隐藏某个<code class="highlighter-rouge">View</code>。</li>
+</ul>
+
+<p>##自定义View</p>
+
+<p>实现一个自定义View，一般只需要重载几个特殊的方法即可：</p>
+
+<ul>
+  <li>创建：
+    <ul>
+      <li>构造器：使用代码或者布局文件，后者可以解析并应用定义在布局文件中的属性。</li>
+      <li><code class="highlighter-rouge">onFinishInflate()</code>：<code class="highlighter-rouge">View</code>和它的所有子视图都填充完后调用。</li>
+    </ul>
+  </li>
+  <li>布局：
+    <ul>
+      <li><code class="highlighter-rouge">onMeasure(int, int)</code>：确定该视图和它所有子视图需要的尺寸。</li>
+      <li><code class="highlighter-rouge">onLayout(boolean, int, int, int, int)</code>：当该视图需要给它所有的子视图分配尺寸和位置时调用。</li>
+      <li><code class="highlighter-rouge">onSizeChanged(int, int, int, int)</code>：当该视图的尺寸变化时调用。</li>
+    </ul>
+  </li>
+  <li>绘制：
+    <ul>
+      <li><code class="highlighter-rouge">onDraw(android.graphics.Canvas)</code>：当该视图需要渲染它的内容时调用。</li>
+    </ul>
+  </li>
+  <li>事件处理：
+    <ul>
+      <li><code class="highlighter-rouge">onKeyDown(int, KeyEvent)</code>：设备按键按下事件。</li>
+      <li><code class="highlighter-rouge">onKeyUp(int, KeyEvent)</code>：设备按键抬起事件。</li>
+      <li><code class="highlighter-rouge">onTrackballEvent(MotionEvent)</code>：轨迹球事件。</li>
+      <li><code class="highlighter-rouge">onTouchEvent(MotionEvent)</code>：屏幕触摸事件。</li>
+    </ul>
+  </li>
+  <li>焦点：
+    <ul>
+      <li><code class="highlighter-rouge">onFocusChanged(boolean, int, android.graphics.Rect)</code>：当该view捕获或者失去焦点时调用。</li>
+      <li><code class="highlighter-rouge">onWindowFocusChanged(boolean)</code>：当该窗口包含一个捕获或者失去焦点的视图时调用。</li>
+    </ul>
+  </li>
+  <li>Attaching：
+    <ul>
+      <li><code class="highlighter-rouge">onAttachedToWindow()</code>：当该视图固定到一个窗口上时调用。</li>
+      <li><code class="highlighter-rouge">onDetachedFromWindow</code>：当该视图从它的窗口上脱离时调用。</li>
+      <li><code class="highlighter-rouge">onWindowVisibilityChanged(int)</code>：当包含给视图的窗口可见性变化时调用。</li>
+    </ul>
+  </li>
+</ul>
+
+<p>##位置</p>
+
+<p><code class="highlighter-rouge">View</code>的几何形状是矩形。一个<code class="highlighter-rouge">View</code>的位置使用两组值表示：一组是左上顶点的坐标，一组是两个尺寸，及宽和高。位置的最小单位是像素。</p>
+
+<p>使用<code class="highlighter-rouge">getLeft()</code>和<code class="highlighter-rouge">getTop()</code>方法可以获得当前view在它直接上级中的位置，比如如果<code class="highlighter-rouge">getLeft()</code>方法返回20，则意味着该view距离它直接上级的左边缘距离为20。<code class="highlighter-rouge">getRight()</code>和<code class="highlighter-rouge">getBottom()</code>方法可以获得该view右下顶点的位置，使用<code class="highlighter-rouge">getRight()</code>方法等同于<code class="highlighter-rouge">getLeft() + getWidth()</code>。</p>
+
+<p>##尺寸、外边距、内边距</p>
+
+<p>view的尺寸即宽和高，一个view实际上有两组宽和高的值：</p>
+
+<ul>
+  <li>measured width和measured height：这组尺寸定义了一个view想要在它的父view中占据多大的位置。使用<code class="highlighter-rouge">getMeasuredWidth()</code>和<code class="highlighter-rouge">getMeasuredHeight()</code>方法获得这一组参数。</li>
+  <li>第二组就是简单的宽和高，或者说所谓的drawing width和drawing height。这组值是该view在绘制时和布局后实际在屏幕上的尺寸。这组值和测量的值不一定相同。使用<code class="highlighter-rouge">getWidth()</code>和<code class="highlighter-rouge">getHeight()</code>方法来获取这组参数。</li>
+</ul>
+
+<p>padding（内边距）就是视图内容的偏移距离，可以明确指定左、上、右、下的偏移值，比如左padding设置为2的话，内容就会偏移左边缘2像素。可以使用<code class="highlighter-rouge">setPadding(int, int, int, int)</code>和<code class="highlighter-rouge">setPaddingRelative(int, int, int, int)</code>方法来设置，以及使用<code class="highlighter-rouge">getPaddingLeft()</code>、<code class="highlighter-rouge">getPaddingTop()</code>、<code class="highlighter-rouge">getPaddingRight()</code>、<code class="highlighter-rouge">getPaddingBottom()</code>、<code class="highlighter-rouge">getPaddingStart()</code>和<code class="highlighter-rouge">getPaddingEnd()</code>方法来查询。</p>
+
+<p>margin（外边距）就是当前视图在上层布局（<code class="highlighter-rouge">ViewGroup</code>）中的偏移（页边），使用<code class="highlighter-rouge">android.view.ViewGroup.MarginLayoutParams</code>来设置。</p>
+
+<p>##布局（Layout）</p>
+
+<p>布局分为两个步骤：测量和布局。测量过程是通过在view tree上从上到下递归调用<code class="highlighter-rouge">measure(int, int)</code>方法来实现的，递归中<code class="highlighter-rouge">view</code>将尺寸规格推到树中的下级节点。测量过程结束后，每个<code class="highlighter-rouge">view</code>都将它的尺寸存储起来。布局过程也是从上到下执行的，不过是通过递归调用<code class="highlighter-rouge">layout(int, int, int, int)</code>方法来实现。在这个过程中每个<code class="highlighter-rouge">ViewParent</code>都负责通过在测量过程计算得到的尺寸来确定它所有子视图的位置。</p>
+
+<p>当一个<code class="highlighter-rouge">view</code>的<code class="highlighter-rouge">measure()</code>方法返回时，它以及它所有的后代视图的<code class="highlighter-rouge">getMeasuredWidth()</code>和<code class="highlighter-rouge">getMeasuredHeight()</code>方法的返回值都被设置。一个<code class="highlighter-rouge">view</code>的<code class="highlighter-rouge">measured width</code>和<code class="highlighter-rouge">measured height</code>必须考虑到它父视图对它强加的限制，这样可以保证在测量过程结束后，所有的父视图可以接受它们所有的子视图的尺寸。一个父视图可能会不止一次调用它子视图的<code class="highlighter-rouge">measure()</code>方法，例如，父视图以未指定尺寸测量每个子视图来确定它想要多大的空间，然后，如果所有的子视图加起来尺寸太大或太小的话，再以确定的值来测量每个子视图。</p>
+
+<p>测量过程使用两个类来传递尺寸，视图通过<code class="highlighter-rouge">MeasureSpec</code>类来告诉它们的父视图它们想要哪种方式来测量和确定位置。<code class="highlighter-rouge">LayoutParams</code>类（基类）定义了视图想要多大的宽和高，每种尺寸都可以设置为：</p>
+
+<ul>
+  <li>一个确定的值。</li>
+  <li><code class="highlighter-rouge">MATCH_PARENT</code>，意思是该视图想要和它的父视图一样大（减去padding）。</li>
+  <li><code class="highlighter-rouge">WRAP_CONTENT</code>，意思是该视图仅仅想要足以包裹其内容的大小（加上padding）。</li>
+</ul>
+
+<p><code class="highlighter-rouge">ViewGroup</code>的子类都有自己的继承自<code class="highlighter-rouge">LayoutParams</code>类的子类。例如，<code class="highlighter-rouge">AbsoluteLayout</code>就有它自己的<code class="highlighter-rouge">LayoutParams</code>子类，可以添加x和y坐标的值。</p>
+
+<p><code class="highlighter-rouge">MeasureSpecs</code>类被用来将需求从视图树上从上而下推进，<code class="highlighter-rouge">MeasureSpec</code>you三种模式：</p>
+
+<ul>
+  <li><code class="highlighter-rouge">UNSPECIFIED</code>：父视图用来确定子视图期望的尺寸。例如，一个<code class="highlighter-rouge">LinearLayout</code>调用它子视图的<code class="highlighter-rouge">measure()</code>方法时，高设置为<code class="highlighter-rouge">UNSPECIFIED</code>以及宽设置为<code class="highlighter-rouge">EXACTLY</code>240，这时它就要确定要给一个宽为240像素的子视图分配多少的高。</li>
+  <li><code class="highlighter-rouge">EXACTLY</code>：父视图用来强制给子视图一个确定的尺寸，子视图必须使用该尺寸，并且保证它的后代视图都在这个尺寸填充的范围内。</li>
+  <li><code class="highlighter-rouge">AT_MOST</code>：父视图用来强制给子视图一个最大的尺寸，子视图必须保证它以及它所有的后代视图都在这个尺寸填充的范围内。</li>
+</ul>
+
+<p>直接布局的话，调用<code class="highlighter-rouge">requestLayout()</code>方法即可。这个方法通常是由view自己调用的，调用时它相信它已经不再适合它当前的边界了。</p>
+
+<p>##绘制（Drawing）</p>
+

@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html class="t-blue">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>cocos2d-x学习（一）</title>
+  <meta name="description" content="Ubuntu下使用eclipse搭建cocos2d-x开发环境">
+
+  <link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic,700|Roboto+Mono:400,500' rel='stylesheet' type='text/css'>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="/material-jekyll-theme/css/main.css">
+  <link rel="canonical" href="http://gaoxuxu.github.io/material-jekyll-theme/2013/08/cocos2d-x-e5-ad-a6-e4-b9-a0-ef-bc-88-e4-b8-80-ef-bc-89">
+  <link rel="alternate" type="application/rss+xml" title="Gao Xu" href="http://gaoxuxu.github.io/material-jekyll-theme/feed.xml">
+</head>
+
+  <body>
+    <nav class="c-navigation is-fixed">
+  <div class="c-navigation__container u-container">
+    <a class="c-navigation__item " href="/material-jekyll-theme/">Home</a>
+    <a class="c-navigation__item " href="/material-jekyll-theme/articles/">Articles</a>
+    <a class="c-navigation__item " href="/material-jekyll-theme/about/">About</a>
+  </div>
+</nav>
+
+
+    <article class="c-article">
+  <header class="c-header c-article__header">
+    <div class="u-container">
+      <h1 class="c-header__title">cocos2d-x学习（一）</h1>
+    </div>
+  </header>
+
+  <div class="c-article__main">
+    <p>Ubuntu下使用eclipse搭建cocos2d-x开发环境</p>
+
+<h2 id="section">安装必要软件</h2>
+<p>Ubuntu上使用cocos2d-x开发游戏，需要安装一下一些软件：</p>
+
+<ul>
+  <li>git：使用git下载cocos2d-x源码。</li>
+  <li>eclipse+CDT：eclipse上使用CDT插件可以开发C/C++程序，不过感觉没visual studio好用，虽然Visual studio我没用过几次。</li>
+  <li>Python：创建项目时需要。</li>
+  <li>如果要开发Android平台的游戏，还需要JDK、ADT和ant。</li>
+</ul>
+
+<h2 id="section-1">下载源码</h2>
+<p>使用git下载cocos2d-x源码：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>git clone https://github.com/cocos2d/cocos2d-x.git
+</code></pre>
+</div>
+
+<p>目前最新源码是6.18发布的2.1.4版本，既然我是学习的目的，所以打算用最新代码：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>git checkout develop
+</code></pre>
+</div>
+
+<h2 id="cocos2d-x">cocos2d-x项目目录结构</h2>
+<p>进入<code class="highlighter-rouge">$COCOS2DX_ROOT/samples/Cpp/HelloCpp/</code>，可以看到一个cocos2d-x项目的目录结构如下：<br />
++–HelloCpp<br />
++——Classes<br />
++——proj.android<br />
++——proj.emscripten<br />
++——proj.ios<br />
++——proj.linux<br />
++——proj.mac<br />
++——proj.nacl<br />
++——proj.qt5<br />
++——proj.tizen<br />
++——proj.win32<br />
++——Resources</p>
+
+<p><code class="highlighter-rouge">Classes</code>文件夹放的是cocos2d-x项目的源代码，<code class="highlighter-rouge">Resources</code>文件夹放的是开发时用到的资源文件，<code class="highlighter-rouge">proj.*</code>文件夹则是各个平台下的项目。</p>
+
+<h2 id="eclipse">将项目导入到eclipse</h2>
+<p>前面做完后，在创建自己的项目之前，有必要知道如何将cocos2d-x项目导入到eclipse：</p>
+
+<p>好吧，这个很简单，以HelloCpp为例。eclipse左侧空白处右键，<code class="highlighter-rouge">import--&gt;C/C++--&gt;Existing Code as Makefile Project--&gt;选择$COCOS2DX_ROOT/samples/Cpp/HelloCpp/</code>目录，点击finish即可。</p>
+
+<h2 id="section-2">创建自己的项目</h2>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>cd $COCOS2DX_ROOT/tools/project-creator
+./create_project.py -project PROJECT_NAME -package PACKAGE_NAME -language PROGRAMING_LANGUAGE
+</code></pre>
+</div>
+
+<p>要是记不住用法，可以直接运行<code class="highlighter-rouge">create_project.py</code>，会有如下的提示：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>Usage: create_project.py -project PROJECT_NAME -package PACKAGE_NAME -language PROGRAMING_LANGUAGE
+Options:
+  -project   PROJECT_NAME          Project name, for example: MyGame
+  -package   PACKAGE_NAME          Package name, for example: com.MyCompany.MyAwesomeGame
+  -language  PROGRAMING_LANGUAGE   Major programing lanauge you want to used, should be [cpp | lua | javascript]
+
+Sample 1: ./create_project.py -project MyGame -package com.MyCompany.AwesomeGame
+Sample 2: ./create_project.py -project MyGame -package com.MyCompany.AwesomeGame -language javascript
+</code></pre>
+</div>
+
+<h3 id="android">创建Android平台上的项目</h3>
+<p>在前面的版本，包括最新的2.1.4版本中，创建Android项目可以用<code class="highlighter-rouge">$COCOS2DX_ROOT/create-android-project.sh</code>。不过这种方式在未来会弃用，各平台新建项目统一使用上面所说的方法。</p>
+
+<p>如果是第一次在Linux上开发Android应用，手机连接到电脑，可能Eclipse不识别。这种情况可以用下面的办法解决（<a href="http://developer.android.com/tools/device.html#setting-up">参阅谷歌官方文档</a>）：</p>
+
+<ul>
+  <li>在终端运行<code class="highlighter-rouge">lsusb</code>，结果中找到自己的手机，比如：
+<code class="highlighter-rouge">Bus 002 Device 002: ID 04e8:685e Samsung Electronics Co., Ltd</code>
+格式很清楚，最后一部分的信息是手机生产商。我们需要的是ID后面的四位，这里是”04e8”</li>
+  <li>终端运行<code class="highlighter-rouge">sudo gedit /etc/udev/rules.d/51-android.rules</code></li>
+  <li>文件打开后，输入<code class="highlighter-rouge">SUBSYSTEM=="usb", ATTR{idVendor}=="04e8", MODE="0666"</code>，保存并关闭。</li>
+  <li>终端运行<code class="highlighter-rouge">chmod a+r /etc/udev/rules.d/51-android.rules</code></li>
+  <li>重新连接手机或者重启adb服务。</li>
+</ul>
+
+<h3 id="id">完整的供应商ID列表</h3>
+<table>
+<tr>
+<th>Company</th>
+<th>USB Vendor ID</th>
+</tr>
+<tr>
+<td>Acer</td>
+<td>0502</td>
+</tr>
+<tr>
+<td>ASUS</td>
+<td><code>0b05</code></td>
+</tr>
+<tr>
+<td>Dell</td>
+<td><code>413c</code></td>
+</tr>
+<tr>
+<td>Foxconn</td>
+<td><code>0489</code></td>
+</tr>
+<tr>
+<td>Fujitsu</td>
+<td><code>04c5</code></td>
+</tr>
+<tr>
+<td>Fujitsu Toshiba</td>
+<td><code>04c5</code></td>
+</tr>
+<tr>
+<td>Garmin-Asus</td>
+<td><code>091e</code></td>
+</tr>
+<tr>
+<td>Google</td>
+<td><code>18d1</code></td>
+</tr>
+<tr>
+<td>Haier</td>
+<td><code>201E</code></td>
+</tr>
+<tr>
+<td>Hisense</td>
+<td><code>109b</code></td>
+</tr>
+<tr>
+<td>HTC</td>
+<td><code>0bb4</code></td>
+</tr>
+<tr>
+<td>Huawei</td>
+<td><code>12d1</code></td>
+</tr>
+<tr>
+<td>K-Touch</td>
+<td><code>24e3</code></td>
+</tr>
+<tr>
+<td>KT Tech</td>
+<td><code>2116</code></td>
+</tr>
+<tr>
+<td>Kyocera</td>
+<td><code>0482</code></td>
+</tr>
+<tr>
+<td>Lenovo</td>
+<td><code>17ef</code></td>
+</tr>
+<tr>
+<td>LG</td>
+<td><code>1004</code></td>
+</tr>
+<tr>
+<td>Motorola</td>
+<td><code>22b8</code></td>
+</tr>
+<tr>
+<td>MTK</td>
+<td><code>0e8d</code></td>
+</tr>
+<tr>
+<td>NEC</td>
+<td><code>0409</code></td>
+</tr>
+<tr>
+<td>Nook</td>
+<td><code>2080</code></td>
+</tr>
+<tr>
+<td>Nvidia</td>
+<td><code>0955</code></td>
+</tr>
+<tr>
+<td>OTGV</td>
+<td><code>2257</code></td>
+</tr>
+<tr>
+<td>Pantech</td>
+<td><code>10a9</code></td>
+</tr>
+<tr>
+<td>Pegatron</td>
+<td><code>1d4d</code></td>
+</tr>
+<tr>
+<td>Philips</td>
+<td><code>0471</code></td>
+</tr>
+<tr>
+<td>PMC-Sierra</td>
+<td><code>04da</code></td>
+</tr>
+<tr>
+<td>Qualcomm</td>
+<td><code>05c6</code></td>
+</tr>
+<tr>
+<td>SK Telesys</td>
+<td><code>1f53</code></td>
+</tr>
+<tr>
+<td>Samsung</td>
+<td><code>04e8</code></td>
+</tr>
+<tr>
+<td>Sharp</td>
+<td><code>04dd</code></td>
+</tr>
+<tr>
+<td>Sony</td>
+<td><code>054c</code></td>
+</tr>
+<tr>
+<td>Sony Ericsson</td>
+<td><code>0fce</code></td>
+</tr>
+<tr>
+<td>Teleepoch</td>
+<td><code>2340</code></td>
+</tr>
+<tr>
+<td>Toshiba</td>
+<td><code>0930</code></td>
+</tr>
+<tr>
+<td>ZTE</td>
+<td><code>19d2</code></td>
+</tr>
+</table>
+<p>### 最后的大招
+<code class="highlighter-rouge">51-android.rules</code>文件中可以写这么一行：</p>
+
+<p><code class="highlighter-rouge">SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", MODE="0666"</code></p>
+
+
+  </div>
+</article>
+
+
+    <footer class="c-footer">
+  <div class="u-container c-footer__container">
+    <p>&copy; Gao Xu 2016</p>
+    <p>
+      <a href="https://twitter.com/gavin_china">Twitter</a>
+      <a href="https://github.com/gaoxuxu">Github</a>
+      
+      
+    </p>
+  </div>
+</footer>
+
+  </body>
+</html>

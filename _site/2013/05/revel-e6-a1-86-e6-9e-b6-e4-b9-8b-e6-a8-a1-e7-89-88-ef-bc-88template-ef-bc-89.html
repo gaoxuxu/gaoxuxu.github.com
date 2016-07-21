@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html class="t-blue">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Revel框架之模版（Template）</title>
+  <meta name="description" content="模版">
+
+  <link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic,700|Roboto+Mono:400,500' rel='stylesheet' type='text/css'>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="/material-jekyll-theme/css/main.css">
+  <link rel="canonical" href="http://gaoxuxu.github.io/material-jekyll-theme/2013/05/revel-e6-a1-86-e6-9e-b6-e4-b9-8b-e6-a8-a1-e7-89-88-ef-bc-88template-ef-bc-89">
+  <link rel="alternate" type="application/rss+xml" title="Gao Xu" href="http://gaoxuxu.github.io/material-jekyll-theme/feed.xml">
+</head>
+
+  <body>
+    <nav class="c-navigation is-fixed">
+  <div class="c-navigation__container u-container">
+    <a class="c-navigation__item " href="/material-jekyll-theme/">Home</a>
+    <a class="c-navigation__item " href="/material-jekyll-theme/articles/">Articles</a>
+    <a class="c-navigation__item " href="/material-jekyll-theme/about/">About</a>
+  </div>
+</nav>
+
+
+    <article class="c-article">
+  <header class="c-header c-article__header">
+    <div class="u-container">
+      <h1 class="c-header__title">Revel框架之模版（Template）</h1>
+    </div>
+  </header>
+
+  <div class="c-article__main">
+    <h2 id="section">模版</h2>
+
+<p>Revel使用<a href="http://www.golang.org/pkg/text/template/">Go模版</a>，它从两个目录搜索模版：</p>
+
+<ul>
+  <li>应用的views目录（以及所有的子文件夹）。</li>
+  <li>Revel自己的templates目录。</li>
+</ul>
+
+<p>Revel提供了错误页面的模版（在开发模式下显示友好的编译错误），不过应用需要创建一个同名的模版来重写它们，比如app/views/errors/500.html。</p>
+
+<h2 id="render-context">Render Context</h2>
+
+<p>Revel使用RenderArgs数据映射表来执行模版。除应用提供的数据以外，Revel还提供以下两项：</p>
+
+<ul>
+  <li>“errors”——通过<a href="http://robfig.github.io/revel/docs/godoc/validation.html#Validation.ErrorMap">Validation.ErrorMap</a>返回的map。</li>
+  <li>“flash”——通过之前的请求闪存的数据。</li>
+</ul>
+
+<h2 id="section-1">模版函数</h2>
+
+<p>Go提供<a href="http://www.golang.org/pkg/text/template/#Functions">一些在你的模版中使用的函数</a>。Revel增加了一些。阅读下面的文档，或者<a href="http://robfig.github.io/revel/docs/godoc/template.html#variables">查看它们的源代码</a>。</p>
+
+<h3 id="eq">eq</h3>
+
+<p>简单地测试“a == b”。</p>
+
+<p>示例：</p>
+
+<p><code class="highlighter-rouge">&lt;div class="message you"&gt;</code></p>
+
+<h3 id="set">set</h3>
+
+<p>在给定的Context中设置一个变量。</p>
+
+<p>示例：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>&lt;h1&gt;&lt;/h1&gt;
+</code></pre>
+</div>
+
+<h3 id="append">append</h3>
+
+<p>在给定的Context中，向一个数组中添加一个元素，或者创建一个数组。</p>
+
+<p>示例：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>  &lt;link rel="stylesheet" type="text/css" href="/public/"&gt;
+</code></pre>
+</div>
+
+<h3 id="field">field</h3>
+
+<p>输入字段的一个辅助函数：</p>
+
+<p>给定一个字段名，它返回一个包含下列成员的结构体：</p>
+
+<ul>
+  <li>Id：字段名，转换为适当的HTML元素ID。</li>
+  <li>Name：字段名。</li>
+  <li>Value：该字段在当前RenderArgs中的值。</li>
+  <li>Flash：闪存中该字段的值。</li>
+  <li>Error：所有与该字段有关的错误信息。</li>
+  <li>ErrorClass：如果有错误，则为”hasError”，否则为”“；</li>
+</ul>
+
+<p><a href="http://robfig.github.io/revel/docs/godoc/field.html">查看文档</a>。</p>
+
+<p>示例：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>  &lt;p class=""&gt;
+    &lt;strong&gt;Check In Date:&lt;/strong&gt;
+    &lt;input type="text" size="10" name="" class="datepicker" value="" &gt;
+    * &lt;span class="error"&gt;&lt;/span&gt;
+  &lt;/p&gt;
+</code></pre>
+</div>
+
+<h3 id="option">option</h3>
+
+<p>结合字段助手，协助构建HTML option元素。</p>
+
+<p>示例：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>&lt;select name=""&gt;
+  
+  
+  
+&lt;/select&gt;
+</code></pre>
+</div>
+
+<h3 id="radio">radio</h3>
+
+<p>结合字段助手，协助构建HTML单选输入元素。</p>
+
+<p>示例：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>   Smoking
+   Non smoking
+</code></pre>
+</div>
+
+<h2 id="nl2br">nl2br</h2>
+
+<p>换行转换为HTML断行。</p>
+
+<p>示例：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>You said:
+&lt;div class="comment"&gt;&lt;/div&gt;  
+</code></pre>
+</div>
+
+<h3 id="pluralize">pluralize</h3>
+
+<p>辅助输入正确的单词复数。</p>
+
+<p>示例：</p>
+
+<p><code class="highlighter-rouge">There are  comment</code></p>
+
+<h2 id="including">Including</h2>
+
+<p>Go模版允许包含模版，例如：</p>
+
+<p>``</p>
+
+<p>这里需要注意两点：</p>
+
+<ul>
+  <li>路径相对于app/views。</li>
+  <li>所有被包含的模版必须放在根目录下（app/views），这是一个（希望是暂时的）限制。</li>
+</ul>
+
+<h2 id="section-2">提示</h2>
+
+<p>示例应用包括Revel都试图示范有效地利用Go模版。详情请参考：</p>
+
+<ul>
+  <li>revel/samples/booking/app/views/header.html</li>
+  <li>revel/samples/booking/app/views/Hotels/Book.html</li>
+</ul>
+
+<p>模版自身可以利用辅助函数设置title和外部的样式。</p>
+
+<p>例如，header可以像下面这样：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code><span class="nt">&lt;html&gt;</span>
+  <span class="nt">&lt;head&gt;</span>
+    <span class="nt">&lt;title&gt;&lt;/title&gt;</span>
+    <span class="nt">&lt;meta</span> <span class="na">http-equiv=</span><span class="s">"Content-Type"</span> <span class="na">content=</span><span class="s">"text/html; charset=utf-8"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;link</span> <span class="na">rel=</span><span class="s">"stylesheet"</span> <span class="na">type=</span><span class="s">"text/css"</span> <span class="na">media=</span><span class="s">"screen"</span> <span class="na">href=</span><span class="s">"/public/css/main.css"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;link</span> <span class="na">rel=</span><span class="s">"shortcut icon"</span> <span class="na">type=</span><span class="s">"image/png"</span> <span class="na">href=</span><span class="s">"/public/img/favicon.png"</span><span class="nt">&gt;</span>
+    
+      <span class="nt">&lt;link</span> <span class="na">rel=</span><span class="s">"stylesheet"</span> <span class="na">type=</span><span class="s">"text/css"</span> <span class="na">href=</span><span class="s">"/public/"</span><span class="nt">&gt;</span>
+    
+    <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"/public/js/jquery-1.3.2.min.js"</span> <span class="na">type=</span><span class="s">"text/javascript"</span> <span class="na">charset=</span><span class="s">"utf-8"</span><span class="nt">&gt;&lt;/script&gt;</span>
+    <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"/public/js/sessvars.js"</span> <span class="na">type=</span><span class="s">"text/javascript"</span> <span class="na">charset=</span><span class="s">"utf-8"</span><span class="nt">&gt;&lt;/script&gt;</span>
+    
+      <span class="nt">&lt;script </span><span class="na">src=</span><span class="s">"/public/"</span> <span class="na">type=</span><span class="s">"text/javascript"</span> <span class="na">charset=</span><span class="s">"utf-8"</span><span class="nt">&gt;&lt;/script&gt;</span>
+    
+  <span class="nt">&lt;/head&gt;</span>
+</code></pre>
+</div>
+
+<p>并且包含它的模版像下面这样：</p>
+
+<h2 id="section-3">自定义函数</h2>
+
+<p>应用可以注册在模版中使用的自定义函数。</p>
+
+<p>这里有一个例子：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>func init() {
+    revel.TemplateFuncs["eq"] = func(a, b interface{}) bool { return a == b }
+}
+</code></pre>
+</div>
+
+
+  </div>
+</article>
+
+
+    <footer class="c-footer">
+  <div class="u-container c-footer__container">
+    <p>&copy; Gao Xu 2016</p>
+    <p>
+      <a href="https://twitter.com/gavin_china">Twitter</a>
+      <a href="https://github.com/gaoxuxu">Github</a>
+      
+      
+    </p>
+  </div>
+</footer>
+
+  </body>
+</html>

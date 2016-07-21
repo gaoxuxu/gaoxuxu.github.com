@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html class="t-blue">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Java集合框架——Set、List和Queue</title>
+  <meta name="description" content="##List">
+
+  <link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic,700|Roboto+Mono:400,500' rel='stylesheet' type='text/css'>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="/material-jekyll-theme/css/main.css">
+  <link rel="canonical" href="http://gaoxuxu.github.io/material-jekyll-theme/2013/11/Java-Collection-framework-Set-List-Queue">
+  <link rel="alternate" type="application/rss+xml" title="Gao Xu" href="http://gaoxuxu.github.io/material-jekyll-theme/feed.xml">
+</head>
+
+  <body>
+    <nav class="c-navigation is-fixed">
+  <div class="c-navigation__container u-container">
+    <a class="c-navigation__item " href="/material-jekyll-theme/">Home</a>
+    <a class="c-navigation__item " href="/material-jekyll-theme/articles/">Articles</a>
+    <a class="c-navigation__item " href="/material-jekyll-theme/about/">About</a>
+  </div>
+</nav>
+
+
+    <article class="c-article">
+  <header class="c-header c-article__header">
+    <div class="u-container">
+      <h1 class="c-header__title">Java集合框架——Set、List和Queue</h1>
+    </div>
+  </header>
+
+  <div class="c-article__main">
+    <p>##List</p>
+
+<p><code class="highlighter-rouge">List</code>就是有序的<code class="highlighter-rouge">Collection</code>，它也是所有<code class="highlighter-rouge">Collection</code>中唯一对外界暴露索引的，即可以对<code class="highlighter-rouge">List</code>中每个元素的插入元素进行控制，或者根据元素的索引访问元素。</p>
+
+<p><code class="highlighter-rouge">List</code>与<code class="highlighter-rouge">Set</code>不同，<code class="highlighter-rouge">List</code>通常允许重复元素，即满足<code class="highlighter-rouge">(e1.equals(e2))</code>条件的两个元素。</p>
+
+<p><code class="highlighter-rouge">List</code>提供了一个方法可以获得一个受其支撑的<code class="highlighter-rouge">ListIterator</code>：<code class="highlighter-rouge">listIterator()</code>，它还有一个变种<code class="highlighter-rouge">listIterator(int index)</code>。后者以适当顺序返回列表迭代器。<code class="highlighter-rouge">ListIterator</code>有一个好处是可以进行双向搜索，这在有时候会非常有用，可以参考<code class="highlighter-rouge">Collections</code>的<code class="highlighter-rouge">iteratorBinarySearch()</code>。</p>
+
+<p>###ArrayList、Vector和LinkedList</p>
+
+<ol>
+  <li><code class="highlighter-rouge">ArrayList</code>和<code class="highlighter-rouge">Vector</code>都是基于数组的可随机访问列表，<code class="highlighter-rouge">LinkedList</code>基于链表，且实现了<code class="highlighter-rouge">List</code>和<code class="highlighter-rouge">Deque</code>两个接口。</li>
+  <li><code class="highlighter-rouge">Vector</code>是线程安全的，而<code class="highlighter-rouge">ArrayList</code>和<code class="highlighter-rouge">LinkedList</code>不是。</li>
+  <li>添加新元素时，如果<code class="highlighter-rouge">ArrayList</code>的容量已满，则会将其容量在当前规模的基础上增加一半；相同情况下<code class="highlighter-rouge">Vector</code>的容量会增加为现有规模的二倍。二者都提供了<code class="highlighter-rouge">trimToSize()</code>方法可以释放掉没有用到的数组空间。</li>
+  <li>基本操作运行时间：
+    <ul>
+      <li><code class="highlighter-rouge">get()</code>：<code class="highlighter-rouge">ArrayList</code>：$O(1)$，<code class="highlighter-rouge">LinkedList</code>：$O(n)$</li>
+      <li><code class="highlighter-rouge">add()</code>：<code class="highlighter-rouge">ArrayList</code>：$O(1)$，<code class="highlighter-rouge">LinkedList</code>：$O(1)$</li>
+      <li><code class="highlighter-rouge">remove()</code>：<code class="highlighter-rouge">ArrayList</code>：$O(n)$，<code class="highlighter-rouge">LinkedList</code>：$O(1)$</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">Java</code>还实现了<code class="highlighter-rouge">Stack</code>类，它继承自<code class="highlighter-rouge">Vector</code>，所以也是线程安全的。</li>
+</ol>
+
+<p>##Set</p>
+
+<p><code class="highlighter-rouge">Set</code>是一种不包含重复元素的<code class="highlighter-rouge">Collection</code>，确切地讲，就是不会存在两个满足条件的<code class="highlighter-rouge">(e1.equals(e2))</code>的元素<code class="highlighter-rouge">e1</code>和<code class="highlighter-rouge">e2</code>。<code class="highlighter-rouge">Set</code>中最多只能有一个<code class="highlighter-rouge">null</code>，<code class="highlighter-rouge">Set</code>是对数学概念上“集合”的抽象。</p>
+
+<p>注意：尽量不要将可变元素加入<code class="highlighter-rouge">Set</code>，如果在外界改变<code class="highlighter-rouge">Set</code>中某个元素的值（影响到了<code class="highlighter-rouge">equals()</code>的行为），那么<code class="highlighter-rouge">Set</code>的行为将是不确定的。</p>
+
+<p>最后注意：<code class="highlighter-rouge">Set</code>是通过桥接模式由<code class="highlighter-rouge">Map</code>支撑的，它们之间的关系见下图：</p>
+
+<p><img src="http://p.blog.csdn.net/images/p_blog_csdn_net/turkeyzhou/EntryImages/20081105/set.png" alt="" /></p>
+
+<p>###HashSet、LinkedHashSet和TreeSet</p>
+
+<ul>
+  <li>如上图，<code class="highlighter-rouge">HashSet</code>包装的是<code class="highlighter-rouge">HashMap</code>，<code class="highlighter-rouge">LinkedHashSet</code>包装的是<code class="highlighter-rouge">LinkedHashMap</code>，<code class="highlighter-rouge">TreeSet</code>包装的是<code class="highlighter-rouge">TreeMap</code>。</li>
+  <li><code class="highlighter-rouge">HashSet</code>无序，<code class="highlighter-rouge">LinkedHashSet</code>保持输入时的数据，<code class="highlighter-rouge">TreeSet</code>是有序的。</li>
+  <li><code class="highlighter-rouge">HashSet</code>和<code class="highlighter-rouge">LinkedHashSet</code>基于散列法存储列表信息，<code class="highlighter-rouge">TreeSet</code>基于树。</li>
+  <li><code class="highlighter-rouge">HashSet</code>和<code class="highlighter-rouge">LinkedHashSet</code>添加删除较快，<code class="highlighter-rouge">TreeSet</code>遍历快。</li>
+</ul>
+
+<p>##Queue</p>
+
+<p><code class="highlighter-rouge">Queue</code>是处理元素前用来存储信息的<code class="highlighter-rouge">Collection</code>。通常以<code class="highlighter-rouge">FIFO</code>的方式排序各个元素，不过也有其它情况，比如优先队列和<code class="highlighter-rouge">LIFO</code>队列（或堆栈）。</p>
+
+<p><code class="highlighter-rouge">Queue</code>的三类操作：</p>
+
+<ul>
+  <li>插入操作：<code class="highlighter-rouge">add(e)</code>和<code class="highlighter-rouge">offer(e)</code>，如果插入成功，则都返回<code class="highlighter-rouge">true</code>。在使用有容量限制的队列的情况下，如果当前没有可用空间，则前者会抛出<code class="highlighter-rouge">IllegalStateException</code>，后者会返回<code class="highlighter-rouge">false</code>。因此在一般情况下，后者会优于前者。</li>
+  <li>移除操作：<code class="highlighter-rouge">remove()</code>和<code class="highlighter-rouge">poll()</code>，这两个方法可以返回并移除队列的头，到底返回哪个元素取决于实现的排序策略。在队列为空时，前者会抛出一个异常，而后者返回<code class="highlighter-rouge">null</code>。</li>
+  <li>查询操作：<code class="highlighter-rouge">element()</code>和<code class="highlighter-rouge">peek()</code>，两者都会返回但不移除队列的头。当队列为空时，前者会抛出一个异常，而后者返回<code class="highlighter-rouge">null</code>。</li>
+</ul>
+
+<p><code class="highlighter-rouge">Queue</code>接口没有定义阻塞队列的方法，详情参考另一篇文章<a href="http://gaoxuxu.github.io/2013/02/28/blocking-queue/">阻塞队列</a>。</p>
+
+<blockquote>
+  <p>Written with <a href="https://stackedit.io/">StackEdit</a>.</p>
+</blockquote>
+
+
+  </div>
+</article>
+
+
+    <footer class="c-footer">
+  <div class="u-container c-footer__container">
+    <p>&copy; Gao Xu 2016</p>
+    <p>
+      <a href="https://twitter.com/gavin_china">Twitter</a>
+      <a href="https://github.com/gaoxuxu">Github</a>
+      
+      
+    </p>
+  </div>
+</footer>
+
+  </body>
+</html>

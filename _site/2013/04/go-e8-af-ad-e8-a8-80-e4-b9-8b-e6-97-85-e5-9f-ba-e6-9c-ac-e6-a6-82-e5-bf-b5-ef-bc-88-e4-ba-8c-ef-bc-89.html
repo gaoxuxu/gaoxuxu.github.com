@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html class="t-blue">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Go语言之旅——基本概念（二）</title>
+  <meta name="description" content="##结构体结构体是字段的集合，Go中使用type关键字来声明它。">
+
+  <link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic,700|Roboto+Mono:400,500' rel='stylesheet' type='text/css'>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="/material-jekyll-theme/css/main.css">
+  <link rel="canonical" href="http://gaoxuxu.github.io/material-jekyll-theme/2013/04/go-e8-af-ad-e8-a8-80-e4-b9-8b-e6-97-85-e5-9f-ba-e6-9c-ac-e6-a6-82-e5-bf-b5-ef-bc-88-e4-ba-8c-ef-bc-89">
+  <link rel="alternate" type="application/rss+xml" title="Gao Xu" href="http://gaoxuxu.github.io/material-jekyll-theme/feed.xml">
+</head>
+
+  <body>
+    <nav class="c-navigation is-fixed">
+  <div class="c-navigation__container u-container">
+    <a class="c-navigation__item " href="/material-jekyll-theme/">Home</a>
+    <a class="c-navigation__item " href="/material-jekyll-theme/articles/">Articles</a>
+    <a class="c-navigation__item " href="/material-jekyll-theme/about/">About</a>
+  </div>
+</nav>
+
+
+    <article class="c-article">
+  <header class="c-header c-article__header">
+    <div class="u-container">
+      <h1 class="c-header__title">Go语言之旅——基本概念（二）</h1>
+    </div>
+  </header>
+
+  <div class="c-article__main">
+    <p>##结构体
+结构体是字段的集合，Go中使用type关键字来声明它。</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>    package main
+
+    import "fmt" 
+    type Vertex struct { 
+        X int
+        y int
+    } 
+
+    func main() {
+        fmt.Println(Vertex{1, 2}) 
+    }
+</code></pre>
+</div>
+
+<p>可以使用点号来访问结构体字段：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>    package main
+
+    import "fmt"
+
+    type Vertex struct {
+        X int
+		Y int
+    }
+
+    func main() {
+    	v := Vertex{1, 2}
+		v.X = 4
+    	fmt.Println(v.X)
+    }
+</code></pre>
+</div>
+
+<p>Go有指针，但是没有指针运算。可以通过指针访问结构体字段，通过指针的间接访问是透明的。</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>    package main
+
+    import "fmt"
+
+    type Vertex struct {
+    	X int
+    	Y int
+    }
+
+    func main() {
+    	p := Vertex{1, 2}
+    	q := &amp;p
+    	q.X = 1e9
+    	fmt.Println(p)
+    }
+</code></pre>
+</div>
+
+<p>结构体字面量（Struct Literals）表示通过列出结构体字段的值来新分配一个结构体（Literal这个词不好理解，详情猛击<a href="http://en.wikipedia.org/wiki/Literal_(computer_programming)">维基百科</a>）。</p>
+
+<p>使用Name:语法可以只列出一部分字段，而且和字段名的顺序无关。</p>
+
+<p>使用特殊的前缀&amp;会构造一个结构体字面量的指针。</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>    package main
+
+    import "fmt"
+
+    type Vertex struct {
+    	X, Y int
+    }
+
+    var (
+    	p = Vertex{1, 2} // has type Vertex
+    	q = &amp;Vertex{1, 2} // has type *Vertex
+    	r = Vertex{X: 1} // Y:0 is implicit
+    	s = Vertex{} // X:0 and Y:0
+    )
+
+    func main() {
+    	fmt.Println(p, q, r, s)
+    }
+</code></pre>
+</div>
+
+<p>new(T)表达式分配一个零初始化的T值，并返回一个指向它的指针。</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>    var t *T = new(T)
+</code></pre>
+</div>
+
+<p>或：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>    t := new(T)
+</code></pre>
+</div>
+
+<p>示例：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>    package main
+
+    import "fmt"
+
+    type Vertex struct {
+    	X, Y int
+    }
+
+    func main() {
+    	v := new(Vertex)
+    	fmt.Println(v)
+    	v.X, v.Y = 11, 9
+    	fmt.Println(v)
+    }
+</code></pre>
+</div>
+
+<p>##Slices（切片）
+slice指向一个数组的值，同时还包含有长度信息。[]T是一个元素类型为T的slice。</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>    package main
+
+    import "fmt"
+
+    func main() {
+		p := []int{2, 3, 5, 7, 11, 13}
+		fmt.Println("p ==", p)
+
+		for i := 0; i &lt; len(p); i++ {
+   		 	    fmt.Printf("p[%d] == %d\n", i, p[i])	
+  		  	}
+    }
+</code></pre>
+</div>
+
+<p>slice可以重新切片，即创建一个新的切片指向同一个数组。</p>
+
+<p>表达式：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>    s[lo:hi]
+</code></pre>
+</div>
+
+<p>表示从lo到hi-1的元素的一个切片，包含边界。</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>    s[lo:lo]
+</code></pre>
+</div>
+
+<p>为空，但是：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>    s[lo:lo+1]
+</code></pre>
+</div>
+
+<p>有一个元素。示例代码：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>    package main
+
+    import "fmt"
+
+    func main() {
+		p := []int{2, 3, 5, 7, 11, 13}
+		fmt.Println("p ==", p)
+		fmt.Println("p[1:4] ==", p[1:4])
+
+		// missing low index implies 0
+   		 	fmt.Println("p[:3] ==", p[:3])
+
+		// missing high index implies len(s)
+   		 	fmt.Println("p[4:] ==", p[4:])
+    }
+</code></pre>
+</div>
+
+<p>使用make函数创建slice，它分配一个归零的数组并返回这个数组的slice：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>    a := make([]int, 5) // len(a)=5
+</code></pre>
+</div>
+
+<p>要指定容量的话，就要使用第三个参数：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>    b := make([]int, 0, 5) // len(b)=0, cap(b)=5
+
+    b = b[:cap(b)] // len(b)=5, cap(b)=5
+    b = b[1:]      // len(b)=4, cap(b)=4
+</code></pre>
+</div>
+
+<p>示例代码：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>    package main
+
+    import "fmt"
+
+    func main() {
+    	a := make([]int, 5)
+    	printSlice("a", a)
+    	b := make([]int, 0, 5)
+    	printSlice("b", b)
+    	c := b[:2]
+    	printSlice("c", c)
+    	d := c[2:5]
+    	printSlice("d", d)
+    }
+
+    func printSlice(s string, x []int) {
+    	fmt.Printf("%s len=%d cap=%d %v\n",
+    		s, len(x), cap(x), x)
+    }
+</code></pre>
+</div>
+
+<p>slice的零值是nil。一个nil slice的长度和容量都是0。</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>    package main
+
+    import "fmt"
+
+    func main() {
+		var z []int
+		fmt.Println(z, len(z), cap(z))
+  		  	if z == nil {
+			fmt.Println("nil!")
+  			}
+    }
+</code></pre>
+</div>
+
+<p>##Range
+使用for循环的range形式可以遍历map或slice：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>    package main
+
+    import "fmt"
+
+    var pow = []int{1, 2, 4, 8, 16, 32, 64, 128}
+
+    func main() {
+    	for i, v := range pow {
+                fmt.Printf("2**%d = %d\n", i, v)
+    	}
+    }
+</code></pre>
+</div>
+
+<p>如果想要略过索引或值，可以将其设置为_。如果只想使用索引，可以直接去掉“,value”部分：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>    package main
+
+    import "fmt"
+
+    func main() {
+    	pow := make([]int, 10)
+    	for i, value := range pow {
+    	    fmt.Printf("%d : %d\n", i, value)	
+    	}
+    	for i := range pow {
+    	    pow[i] = 1 &lt;&lt; uint(i)
+    	}
+    	for _, value := range pow {
+    	    fmt.Printf("%d\n", value)
+    	}
+    }
+</code></pre>
+</div>
+
+<p>##Map
+map是映射键到值的映射表。map必须在使用前用make函数创建（不是new），一个值为nil的map是空的，并且不能被赋值：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>    package main
+
+    import "fmt"
+
+    type Vertex struct {
+    	Lat, Long float64
+    }
+
+    var m map[string]Vertex
+
+    func main() {
+    	m = make(map[string]Vertex)
+    	m["Bell Labs"] = Vertex{
+    	    40.68433, -74.39967,
+    	}
+    	fmt.Println(m["Bell Labs"])
+    }
+</code></pre>
+</div>
+
+<p>map字面量与结构体字面量相似，只不过必须有键：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>    package main
+
+    import "fmt"
+
+    type Vertex struct {
+ 		   	Lat, Long float64
+    }
+
+    var m = map[string]Vertex{
+ 		   	"Bell Labs" : Vertex{
+ 		   	    40.68433, -74.39967,
+ 		   	},
+		"Google" : Vertex{
+		    37.42202, -122.08408,
+		},
+    }
+
+    func main() {
+		fmt.Println(m)
+    }
+</code></pre>
+</div>
+
+<p>如果顶层类型只有类型名的话，就可以忽略字面量中元素的类型：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>    package main
+
+    import "fmt"
+
+    type Vertex struct {
+ 		   	Lat, Long float64
+    }
+
+    var m = map[string]Vertex{
+ 		   	"Bell Labs" : {40.68433, -74.39967},
+ 		   	"Google" : {37.42202, -122.08408},
+    }
+
+    func main() {
+ 		   	fmt.Println(m)
+    }
+</code></pre>
+</div>
+
+<p>在map m中插入或更新一个元素：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>    m[key] = elem
+</code></pre>
+</div>
+
+<p>获得一个元素：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>    elem = m[key]
+</code></pre>
+</div>
+
+<p>删除一个元素：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>    delete[m, key]
+</code></pre>
+</div>
+
+<p>通过双赋值来检测某个键是否存在：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>    // 如果m中存在key，ok为true；否则ok为false，并且elem的值为map元素类型的零值。
+    // 同样，如果读取一个不存在于map中的元素时，得到的将会是map中元素类型的零值。
+    elem, ok := m[key]
+
+    package main
+
+    import "fmt"
+
+    func main() {
+    	m := make(map[string]int)
+
+    	m["Answer"] = 42
+    	fmt.Println("The value:", m["Answer"])
+
+    	m["Answer"] = 48
+    	fmt.Println("The value:", m["Answer"])
+
+    	delete(m, "Answer")
+    	fmt.Println("The value:", m["Answer"])
+
+    	v, ok := m["Answer"]
+    	fmt.Println("The value:", v, "Present?", ok)
+    }
+</code></pre>
+</div>
+
+<p>##函数
+函数也是值：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>    package main
+
+    import(
+		"fmt"
+		"math"
+    )
+
+    func main() {
+    	hypot := func(x, y float64) float64 {
+    	    return math.Sqrt(x*x + y*y)
+    	}
+	
+    	fmt.Println(hypot(3, 4))
+    }
+</code></pre>
+</div>
+
+<p>函数是完全闭包的。下例中，函数adder返回一个闭包，每个闭包都被绑定到了它自己的sum变量上：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>    package main
+
+    import "fmt"
+
+    func adder() func(int) int {
+    	sum := 0
+    	return func(x int) int {
+    	    sum += x
+    	    return sum
+    	}
+    }
+
+    func main() {
+    	pos, neg := adder(), adder()
+    	for i := 0; i &lt; 10; i++ {
+    	    fmt.Println(
+	    		pos(i),
+	    		neg(-2*i),
+    	    )
+    	}
+    }
+</code></pre>
+</div>
+
+<p>##Switch
+case体是自动break的，除非它以一个fallthrough语句结束。</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>    package main
+
+    import (
+ 		   	"fmt"
+ 		   	"runtime"
+    )
+
+    func main() {
+ 		   	fmt.Print("Go runs on ")
+ 		   	switch os := runtime.GOOS; os {
+ 		   	case "darwin":
+ 		   	    fmt.Println("OS X.")
+ 		   	case "linux":
+ 		   	    fmt.Println("Linux.")
+ 		   	case "windows":
+ 		   	    fmt.Println("Windows.")
+ 		   	    fallthrough
+ 		   	default:
+ 		   	    // freesd, openbsd
+ 		   	    // plan9
+ 		   	    fmt.Printf("%s.", os)
+ 		   	}
+    }
+</code></pre>
+</div>
+
+<p>switch的条件从上到下执行，当匹配成功时停止：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>    package main
+
+    import (
+    	"fmt"
+    	"time"
+    )
+
+    func main() {
+    	fmt.Println("When's Saturday?")
+    	today := time.Now().Weekday()
+    	switch time.Saturday {
+	   	case today + 0:
+		    fmt.Println("Today.")
+		case today + 1:
+		    fmt.Println("Tomorrow.")
+		case today + 2:
+		    fmt.Println("In two days.")
+		default:
+		    fmt.Println("Too far aways.") 
+		} 
+	}
+</code></pre>
+</div>
+
+<p>没有条件的switch与switch true一样。这种构造可以以一种更简洁的方式书写if-then-else：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>    package main
+
+    import (
+    	"fmt"
+    	"time"
+    )
+
+    func main() {
+    	t := time.Now()
+    	switch {
+    	case t.Hour() &lt; 12:
+    	    fmt.Println("Good morning!")
+    	case t.Hour() &lt; 17:
+    	    fmt.Println("Good afternoon.")
+    	default:
+    	    fmt.Println("Good evening")
+    	}
+    }
+</code></pre>
+</div>
+
+
+  </div>
+</article>
+
+
+    <footer class="c-footer">
+  <div class="u-container c-footer__container">
+    <p>&copy; Gao Xu 2016</p>
+    <p>
+      <a href="https://twitter.com/gavin_china">Twitter</a>
+      <a href="https://github.com/gaoxuxu">Github</a>
+      
+      
+    </p>
+  </div>
+</footer>
+
+  </body>
+</html>

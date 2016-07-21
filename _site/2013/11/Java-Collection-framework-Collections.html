@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html class="t-blue">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Java集合框架——Collections</title>
+  <meta name="description" content="本类完全由在collection上进行操作或返回collection的静态方法组成。包含多种在collection上操作的算法，即“包装器（Wrapper）”。注意这些方法如果接收的参数为null，都会抛出NullPointerException.">
+
+  <link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic,700|Roboto+Mono:400,500' rel='stylesheet' type='text/css'>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="/material-jekyll-theme/css/main.css">
+  <link rel="canonical" href="http://gaoxuxu.github.io/material-jekyll-theme/2013/11/Java-Collection-framework-Collections">
+  <link rel="alternate" type="application/rss+xml" title="Gao Xu" href="http://gaoxuxu.github.io/material-jekyll-theme/feed.xml">
+</head>
+
+  <body>
+    <nav class="c-navigation is-fixed">
+  <div class="c-navigation__container u-container">
+    <a class="c-navigation__item " href="/material-jekyll-theme/">Home</a>
+    <a class="c-navigation__item " href="/material-jekyll-theme/articles/">Articles</a>
+    <a class="c-navigation__item " href="/material-jekyll-theme/about/">About</a>
+  </div>
+</nav>
+
+
+    <article class="c-article">
+  <header class="c-header c-article__header">
+    <div class="u-container">
+      <h1 class="c-header__title">Java集合框架——Collections</h1>
+    </div>
+  </header>
+
+  <div class="c-article__main">
+    <p>本类完全由在<code class="highlighter-rouge">collection</code>上进行操作或返回<code class="highlighter-rouge">collection</code>的静态方法组成。包含多种在<code class="highlighter-rouge">collection</code>上操作的算法，即“包装器（Wrapper）”。注意这些方法如果接收的参数为<code class="highlighter-rouge">null</code>，都会抛出<code class="highlighter-rouge">NullPointerException</code>.</p>
+
+<p><code class="highlighter-rouge">Collections</code>类的方法主要有以下几个分类：</p>
+
+<ul>
+  <li>算法类操作。</li>
+  <li>不可修改包装器（这部分的API有问题，可以参考<a href="https://code.google.com/p/guava-libraries/">Google Guava Collections</a>）。</li>
+  <li>同步包装器。</li>
+  <li>动态类型安全包装器。</li>
+  <li>空集合。</li>
+  <li>单例集合。</li>
+  <li>其它操作。</li>
+</ul>
+
+<p>##算法类操作</p>
+
+<p>许多<code class="highlighter-rouge">List</code>的算法类操作都有两种实现：一些适用于可随机访问的<code class="highlighter-rouge">List</code>，另一些适用于顺序访问的<code class="highlighter-rouge">List</code>。</p>
+
+<p>###排序</p>
+
+<p>有两个为<code class="highlighter-rouge">List</code>排序的方法：<code class="highlighter-rouge">sort(List&lt;T&gt; list)</code>和<code class="highlighter-rouge">sort(List&lt;T&gt; list, Comparator&lt;? super T&gt; c)</code>，前者需要<code class="highlighter-rouge">List</code>存储的元素类型<code class="highlighter-rouge">T</code>实现<code class="highlighter-rouge">Comparator</code>接口。</p>
+
+<p>这两个方法实际排序时使用的都是<code class="highlighter-rouge">Arrays.sort</code>方法，此方法使用合并排序算法，最坏情况运行时间为$O(n\lg n)$。</p>
+
+<p>###二分查找</p>
+
+<p><code class="highlighter-rouge">binarySearch(List&lt;? extends Comparable&lt;? super T&gt;&gt; list, T key)</code>和<code class="highlighter-rouge">binarySearch(List&lt;? extends T&gt; list, T key, Comparator&lt;? super T&gt; c)</code>。与<code class="highlighter-rouge">sort</code>方法一样，前者要求<code class="highlighter-rouge">list</code>中存储的元素类型实现<code class="highlighter-rouge">Comparator</code>接口。进行二分查找的前提是<code class="highlighter-rouge">list</code>必须是有序的。</p>
+
+<p>对于可随机访问的<code class="highlighter-rouge">List</code>和<code class="highlighter-rouge">size &lt;= 5000</code>的顺序访问<code class="highlighter-rouge">List</code>，这两个方法都使用<code class="highlighter-rouge">indexedBinarySearch</code>进行查找，对于大于此阈值的顺序访问<code class="highlighter-rouge">List</code>，使用<code class="highlighter-rouge">iteratorBinarySearch</code>查找:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>public static &lt;T&gt;
+int binarySearch(List&lt;? extends Comparable&lt;? super T&gt;&gt; list, T key) {
+    if (list instanceof RandomAccess || list.size()&lt;BINARYSEARCH_THRESHOLD)
+        return Collections.indexedBinarySearch(list, key);
+    else
+        return Collections.iteratorBinarySearch(list, key);
+}
+</code></pre>
+</div>
+
+<p>前者与后者的区别在于定位中间元素时的策略，前者使用<code class="highlighter-rouge">list.get(mid)</code>，而后者利用了<code class="highlighter-rouge">ListIterator</code>来进行移动。在规模较大时，后者的效率是很显著的。</p>
+
+<p>###反转</p>
+
+<p><code class="highlighter-rouge">reverse(List&lt;?&gt; list)</code>会将<code class="highlighter-rouge">list</code>中元素的顺序倒转，以线性时间运行。</p>
+
+<p>###洗牌算法（shuffle）</p>
+
+<p>此方法会将<code class="highlighter-rouge">list</code>中的元素打乱顺序。同样有两种实现，对可随机访问的以及规模小于阈值<code class="highlighter-rouge">5</code>的<code class="highlighter-rouge">List</code>直接调用<code class="highlighter-rouge">swap(List list, int i, int j)</code>，否则先以数组形式打乱顺序，再使用迭代器<code class="highlighter-rouge">set</code>。</p>
+
+<p>###交换元素（swap）</p>
+
+<p>同样有两种实现：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>public static void swap(List&lt;?&gt; list, int i, int j) {
+    final List l = list;
+    l.set(i, l.set(j, l.get(i)));
+}
+
+private static void swap(Object[] arr, int i, int j) {
+    Object tmp = arr[i];
+    arr[i] = arr[j];
+    arr[j] = tmp;
+}
+</code></pre>
+</div>
+
+<p>###使用指定元素填充（fill）</p>
+
+<p><code class="highlighter-rouge">fill(List&lt;? super T&gt; list, T obj)</code>可以将<code class="highlighter-rouge">list</code>中的所有元素都替换为<code class="highlighter-rouge">obj</code>。</p>
+
+<p>###将一个List中的元素复制到另一个List中</p>
+
+<p><code class="highlighter-rouge">copy(List&lt;? super T&gt; dest, List&lt;? extends T&gt; src)</code>将<code class="highlighter-rouge">src</code>中的元素复制到<code class="highlighter-rouge">dest</code>中，<code class="highlighter-rouge">dest</code>至少要与<code class="highlighter-rouge">src</code>的长度相同。</p>
+
+<p>###最大值与最小值</p>
+
+<p>有四个相关方法，都以线性时间运行。</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>&lt;T extends Object &amp; Comparable&lt;? super T&gt;&gt; T min(Collection&lt;? extends T&gt; coll);
+&lt;T&gt; T min(Collection&lt;? extends T&gt; coll, Comparator&lt;? super T&gt; comp);
+&lt;T extends Object &amp; Comparable&lt;? super T&gt;&gt; T max(Collection&lt;? extends T&gt; coll);
+&lt;T&gt; T max(Collection&lt;? extends T&gt; coll, Comparator&lt;? super T&gt; comp)
+</code></pre>
+</div>
+
+<p>###回转（rotate）</p>
+
+<p>当调用<code class="highlighter-rouge">Collections.rotate(list, distance)</code>后，<code class="highlighter-rouge">list</code>中位于索引<code class="highlighter-rouge">i</code>的将是之前位于索引<code class="highlighter-rouge">(i - distance) mod list.size()</code>的元素。此方法可以用于在列表中回转移动一个或多个元素，<code class="highlighter-rouge">distance</code>就是移动的距离。</p>
+
+<p>###全部替换（replaceAll）</p>
+
+<p><code class="highlighter-rouge">boolean replaceAll(List&lt;T&gt; list, T oldVal, T newVal)</code>，将<code class="highlighter-rouge">list</code>中所有值为<code class="highlighter-rouge">oldVal</code>的元素都替换为<code class="highlighter-rouge">newVal</code>。</p>
+
+<p>###子列表第一次出现的位置（indexOfSubList）</p>
+
+<p><code class="highlighter-rouge">int indexOfSubList(List&lt;?&gt; source, List&lt;?&gt; target)</code>：如果<code class="highlighter-rouge">target</code>存在于<code class="highlighter-rouge">source</code>中，则返回<code class="highlighter-rouge">target</code>在<code class="highlighter-rouge">source</code>中第一次出现的位置（即满足这样条件的i——<code class="highlighter-rouge">source.subList(i, i+target.size()).equals(target)</code>）。如果不存在，则返回<code class="highlighter-rouge">-1</code>。</p>
+
+<p>###子列表最后一次出现的位置（lastIndexOfSubList）</p>
+
+<p><code class="highlighter-rouge">lastIndexOfSubList</code>方法与<code class="highlighter-rouge">indexOfSubList</code>方法类似，只不过前者从高位索引开始向前查找，而后者从低位索引开始向后查找。</p>
+
+<p>##不可修改包装器</p>
+
+<p>此类方法提供将<code class="highlighter-rouge">Collection</code>变为无法修改的<code class="highlighter-rouge">Collection</code>的包装器，不过有个问题，如果修改（指<code class="highlighter-rouge">add</code>或<code class="highlighter-rouge">remove</code>操作）源<code class="highlighter-rouge">Collection</code>，照样可以成功。</p>
+
+<p>##同步包装器</p>
+
+<p>这部分操作返回一个线程安全的集合。需要注意的是，在返回的集合上进行迭代时，必须手工同步：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>Collection c = Collections.synchronizedCollection(myCollection);
+    ...
+synchronized (c) {
+    Iterator i = c.iterator(); // Must be in the synchronized block
+    while (i.hasNext())
+        foo(i.next());
+}
+</code></pre>
+</div>
+
+<p>或者</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>Map m = Collections.synchronizedMap(new HashMap());
+    ...
+Set s = m.keySet();  // Needn't be in synchronized block
+    ...
+synchronized(m) {  // Synchronizing on m, not s!
+    Iterator i = s.iterator(); // Must be in synchronized block
+    while (i.hasNext())
+        foo(i.next());
+}
+</code></pre>
+</div>
+
+<p>##动态类型安全包装器</p>
+
+<p>此类操作会返回指定集合的动态类型安全版本。试图在返回的集合中插入一个类型错误的元素会立即抛出<code class="highlighter-rouge">ClassCastException</code>。</p>
+
+<p>##空集合</p>
+
+<p>此类操作会返回类型安全且可序列化的空集合，此类空集合的作用与赋值字段相同，但是类型安全的。</p>
+
+<p>##单例集合</p>
+
+<p>此类操作返回的集合仅仅包含指定的元素，并且是不可修改的。</p>
+
+<p>##其它操作</p>
+
+<p>###nCopies</p>
+
+<p><code class="highlighter-rouge">List&lt;T&gt; nCopies(int n, T o)</code>返回一个不可修改的<code class="highlighter-rouge">List</code>，此<code class="highlighter-rouge">List</code>中包含<code class="highlighter-rouge">n</code>个<code class="highlighter-rouge">o</code>的副本。返回的<code class="highlighter-rouge">List</code>是可序列化的。</p>
+
+<p>###reverseOrder</p>
+
+<p>有两个版本：<code class="highlighter-rouge">reverseOrder()</code>强行逆转了实现<code class="highlighter-rouge">Comparator</code>接口的对象的自然顺序；<code class="highlighter-rouge">reverseOrder(Comparator&lt;T&gt; cmp)</code>强行逆转了指定比较器<code class="highlighter-rouge">cmp</code>的顺序。两者返回的比较器都是可序列化的。</p>
+
+<p>###枚举类操作（enumeration和list）</p>
+
+<p><code class="highlighter-rouge">Enumeration&lt;T&gt; enumeration(final Collection&lt;T&gt; c)</code>返回一个指定<code class="highlighter-rouge">Collection</code>上的枚举。</p>
+
+<p><code class="highlighter-rouge">ArrayList&lt;T&gt; list(Enumeration&lt;T&gt; e)</code>返回一个与指定枚举返回顺序相同的数组列表。</p>
+
+<p>###指定元素出现的频率</p>
+
+<p><code class="highlighter-rouge">int frequency(Collection&lt;?&gt; c, Object o)</code>方法返回指定<code class="highlighter-rouge">Collection</code>中指定对象的元素数。确切地讲，返回<code class="highlighter-rouge">c</code>中满足<code class="highlighter-rouge">(o == null ? e == null : o.equals(e))</code>的元素<code class="highlighter-rouge">e</code>的个数。</p>
+
+<p>###两个Collection的交集是否为空</p>
+
+<p><code class="highlighter-rouge">boolean disjoint(Collection&lt;?&gt; c1, Collection&lt;?&gt; c2)</code>：如果<code class="highlighter-rouge">c1</code>与<code class="highlighter-rouge">c2</code>中没有相同的元素，则返回<code class="highlighter-rouge">true</code>。在使用此方法时，要保证两个<code class="highlighter-rouge">Collection</code>都使用相同的相等性测试方法。</p>
+
+<p>需要注意的是，在两个<code class="highlighter-rouge">Collection</code>都为<code class="highlighter-rouge">null</code>时，返回值是<code class="highlighter-rouge">true</code>。</p>
+
+<p>###addAll</p>
+
+<p><code class="highlighter-rouge">boolean addAll(Collection&lt;? super T&gt; c, T... elements)</code>方法与<code class="highlighter-rouge">c.addAll(Arrays.asList(elements))</code>的行为相同，但大多数实现下要比它快很多。</p>
+
+<p>###newSetFromMap</p>
+
+<p><code class="highlighter-rouge">newSetFromMap(Map&lt;E, Boolean&gt; map)</code>方法返回指定<code class="highlighter-rouge">Map</code>支撑的<code class="highlighter-rouge">Set</code>，返回的<code class="highlighter-rouge">Set</code>与底层的<code class="highlighter-rouge">Map</code>有同样的顺序、并发性和性能特征。每次在返回的<code class="highlighter-rouge">Set</code>上调用方法都将导致在底层的<code class="highlighter-rouge">Map</code>或其<code class="highlighter-rouge">KeySet</code>上调用该方法一次，并伴随一个异常。</p>
+
+<p>调用此方法时，指定的<code class="highlighter-rouge">Map</code>必须为空，并且不能在此方法返回后直接访问。一种可以保证这些条件的代码方法如下：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>Set&lt;Object&gt; weakHashSet = Collections.newSetFromMap(
+    new WeakHashMap&lt;Object, Boolean&gt;());
+</code></pre>
+</div>
+
+<p>###asLifoQueue</p>
+
+<p><code class="highlighter-rouge">Queue&lt;T&gt; asLifoQueue(Deque&lt;T&gt; deque)</code>可以返回一个<code class="highlighter-rouge">Deque</code>（双向队列）的后进先出形式的<code class="highlighter-rouge">Queue</code>。方法<code class="highlighter-rouge">add</code>被映射到<code class="highlighter-rouge">push</code>，<code class="highlighter-rouge">remove</code>被映射到<code class="highlighter-rouge">pop</code>等等。</p>
+
+<blockquote>
+  <p>Written with <a href="https://stackedit.io/">StackEdit</a>.</p>
+</blockquote>
+
+
+  </div>
+</article>
+
+
+    <footer class="c-footer">
+  <div class="u-container c-footer__container">
+    <p>&copy; Gao Xu 2016</p>
+    <p>
+      <a href="https://twitter.com/gavin_china">Twitter</a>
+      <a href="https://github.com/gaoxuxu">Github</a>
+      
+      
+    </p>
+  </div>
+</footer>
+
+  </body>
+</html>

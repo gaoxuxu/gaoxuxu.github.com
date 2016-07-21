@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html class="t-blue">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>算法导论第四章——主方法以及Problems</title>
+  <meta name="description" content="##The master method for solving recurrences">
+
+  <link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic,700|Roboto+Mono:400,500' rel='stylesheet' type='text/css'>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="/material-jekyll-theme/css/main.css">
+  <link rel="canonical" href="http://gaoxuxu.github.io/material-jekyll-theme/2013/10/Introduction-to-Algorithms-Chapter-4-3">
+  <link rel="alternate" type="application/rss+xml" title="Gao Xu" href="http://gaoxuxu.github.io/material-jekyll-theme/feed.xml">
+</head>
+
+  <body>
+    <nav class="c-navigation is-fixed">
+  <div class="c-navigation__container u-container">
+    <a class="c-navigation__item " href="/material-jekyll-theme/">Home</a>
+    <a class="c-navigation__item " href="/material-jekyll-theme/articles/">Articles</a>
+    <a class="c-navigation__item " href="/material-jekyll-theme/about/">About</a>
+  </div>
+</nav>
+
+
+    <article class="c-article">
+  <header class="c-header c-article__header">
+    <div class="u-container">
+      <h1 class="c-header__title">算法导论第四章——主方法以及Problems</h1>
+    </div>
+  </header>
+
+  <div class="c-article__main">
+    <p>##The master method for solving recurrences</p>
+
+<p>###<strong><em>Theorem 4.1(Master method)</em></strong></p>
+
+<p>Let $a\ge 1$ and $b&gt;1$ be constants,let $f(n)$ be a function,and let $T(n)$ be defined on the nonnegative integers by the recurrence</p>
+
+<p>$T(n)=aT(n/b)+f(n)$</p>
+
+<p>where we interpret $n/b$ to mean either $\lfloor n/b\rfloor$ or $\lceil n/b\rceil$. Then $T(n)$ has the following asymptotic bounds:</p>
+
+<ol>
+  <li>If $f(n)=O(n^{\log_ba-\epsilon})$ for some constant $\epsilon&gt;0$,then $T(n)=\Theta(n^{\log_ba})$.</li>
+  <li>If $f(n)=\Theta(n^{\log_ba})$,then $T(n)=\Theta(n^{\log_ba}\lg n)$.</li>
+  <li>If $f(n)=\Omega(n^{\log_ba+\epsilon})$ for some constant $\epsilon&gt;0$, and if $af(n/b)\le cf(n)$ for some constant $c&lt;1$ and all sufficiently large $n$,then $T(n)=\Theta(f(n))$.</li>
+</ol>
+
+<p>##Exercises</p>
+
+<p>###4.5-1</p>
+
+<p>Use the master method to give tight asymptotic bounds for the following recurrences.</p>
+
+<p>a. $T(n)=2T(n/4)+1=\Theta(\sqrt n)$.</p>
+
+<p>b.$T(n)=2T(n/4)+\sqrt n=\Theta(\sqrt n\lg n)$</p>
+
+<p>c.$T(n)=2T(n/4)+n=\Theta(n)$</p>
+
+<p>d.$T(n)=2T(n/4)+n^2=\Theta(n^2)$</p>
+
+<p>###4.5-2</p>
+
+<p>Professor Caesar wishes to develop a matrix-multiplication algorithm that is asymptotically faster than Strassen’s algorithm.His algorithm will use the divide-and-conquer method,dividing each matrix into pieces of size $n\times n$,and the divide and combine steps together will take $\Theta(n^2)$ time.He needs to determine how many subproblems his algorithm has to create in order to beat Strassen’s algorithm.If his algorithm creates $a$ subproblems,then the recurrence for the running time $T(n)$ becomes $T(n)=aT(n/4)+\Theta(n^2)$.What is the largest integer value of $a$ for which Professor Caesar’s algorithm would be asymptotically faster than Strassen’s algorithm?<br />
+Strassen’s algorithm的运行时间为$T_1(n)=\Theta(n^{\lg7})$，要使凯撒教授的算法比Strassen算法快，只需$a=48(7^2-1)$即可。</p>
+
+<p>###4.5-3</p>
+
+<p>Use the master method to show that the solution to the binary-search recurrence $T(n)=T(n/2)+\Theta(1)$ is $T(n)=\Theta(\lg n)$.<br />
+$a=1,b=2,n^{\log_ba}=n^0,f(n)=1=n^0$，所以$T(n)=\Theta(n^{\log_21}\lg n)=\Theta(\lg n)$</p>
+
+<p>###4.5-4</p>
+
+<p>Can the master method be applied to the recurrence $T(n)=4T(n/2)+n^2\lg n$?Why or why not?Give an asymptotic upper bound for this currence.<br />
+不适用，因为针对第三种情况，$af(n/b)$不是多项式大于$f(n)$的。</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{equation}\begin{split}\
+T(n)&=\sum_{i=0}^{\lg n}\left(\frac{n}{2^i}\right)^2\lg \frac{n}{2^i}\\
+&=\sum_{i=0}^{\lg n}\left(\frac{n}{2^i}\right)^2\lg n+\sum_{i=1}^{\lg n}\left(\frac{n}{2^i}\right)^2i\\
+&=\frac{(\lg n+1)n^2\lg n}{2^{\lg n+1}-1}+\frac{\frac{1}{2}\lg n(n^2+n^2\lg n)}{2^{\lg n+1}-2}\\
+&=O(n^2\lg^2n)\
+\end{split}\end{equation} %]]></script>
+
+<p>###4.5-5  $\star$</p>
+
+<p>Consider the regularity condition $af(n/b)\le cf(n)$ for some constant $c&lt;1$,which is part of case 3 of the master theorem.Give an example of constant $a\ge 1$ and $b&gt;1$ and a function $f(n)$ that satisfies all the conditions in case 3 of the master theorem except the regularity condition.</p>
+
+<p>##Problems</p>
+
+<p>###4-1 <strong><em>Recurrence examples</em></strong></p>
+
+<p>Give asymptotic upper and lower bounds for $T(n)$ in each of the following recurrences. Assume that $T(n)$ is constant for $n\le 2$. Make your bounds as tight as possible,and justify your answers.</p>
+
+<p><strong>a.</strong> $T(n)=2T(n/2)+n^4=\Theta(n^4)$</p>
+
+<p><strong>b.</strong> $T(n)=T(7n/10)+n=\Theta(n)$</p>
+
+<p><strong>c.</strong> $T(n)=16T(n/4)+n^2=\Theta(n^2\lg n)$</p>
+
+<p><strong>d.</strong> $T(n)=7T(n/3)+n^2=\Theta(n^2)$</p>
+
+<p><strong>e.</strong> $T(n)=7T(n/2)+n^2=\Theta(n^{\lg 7})$</p>
+
+<p><strong>f.</strong> $T(n)=2T(n/4)+\sqrt n=\Theta(\sqrt n\lg n)$</p>
+
+<p><strong>g.</strong> $T(n)=T(n-2)+n^2=\Theta(n^4)$</p>
+
+<p>###4.2 <strong><em>Parameter-passing costs</em></strong></p>
+
+<p>Throughout this book,we assume that parameter passing during procedure calls takes constant time,even if an N-element array is being passed. This assumption is valid in most systems because a pointer to the array is passed,not the array itself. This problem examines the implications of three parameter-passing strategies:</p>
+
+<ol>
+  <li>An array is passed by pointer. Time=$\Theta(1)$.</li>
+  <li>An array is passed by copying. Time=$\Theta(N)$,where $N$ is the size of array.</li>
+  <li>An array is passed by coping only the subrange that might be accessed by the called procedure. Time=$\Theta(q-p+1)$ if the subarray $A[p..q]$ is passed.</li>
+</ol>
+
+<p><strong>a.</strong> Consider the recursive binary search algorithm for finding a number in a sorted array (see Exercises 2.3-5). Give recurrences for the worst-case running times of binary search when arrays are passed using each of the three method above, and give good upper bounds on the solutions of the recurrences. Let $N$ be the size of the original problem and $n$ be the size of a subproblem.</p>
+
+<ol>
+  <li>$T(n)=O(\lg n)$</li>
+  <li>$T(n)=O(N\lg n)$</li>
+  <li>$T(n)=O(n)$</li>
+</ol>
+
+<p><strong>b.</strong> Redo part(a) for the MERGE-SORT algorithm from Section 2.3.1.</p>
+
+<ol>
+  <li>$T(n)=O(n\lg n)$</li>
+  <li>$T(n)=O(nN)$</li>
+  <li>$T(n)=O(n\lg n)$</li>
+</ol>
+
+<p>###4.3 <strong><em>More recurrence example</em></strong></p>
+
+<p>Give asymptotic upper and lower bounds for $T(n)$ in each of the following recurrences. Assume that $T(n)$ is constant for sufficiently small $n$. Make your bounds as tight as possible,and justify your answers.</p>
+
+<p><strong>a.</strong> $T(n)=4T(n/3)+n\lg n=\Theta(n^{\lg 3})$</p>
+
+<p><strong>b.</strong> $T(n)=3T(n/3)+n/\lg n=\Theta(n\lg\lg n)$</p>
+
+<p><strong>c.</strong> $T(n)=4T(n/2)+n^2\sqrt n=\Theta(n^2\sqrt n)$</p>
+
+<p><strong>d.</strong> $T(n)=3T(n/3-2)+n/2=\Theta(n\lg n)$</p>
+
+<p><strong>e.</strong> $T(n)=2T(n/2)+n/\lg n=\Theta(n\lg\lg n)$</p>
+
+<p><strong>f.</strong> $T(n)=T(n/2)+T(n/4)+T(n/8)+n=\Theta(n)$</p>
+
+<p><strong>g.</strong> $T(n)=T(n-1)+1/n=\Theta(\lg n)$</p>
+
+<p><strong>h.</strong> $T(n)=T(n-1)+\lg n=\Theta(n\lg n)$</p>
+
+<p><strong>i.</strong> $T(n)=T(n-2)+1/\lg n=\Theta(\lg\lg n)$</p>
+
+<p><strong>j.</strong> $T(n)=\sqrt nT(\sqrt n)+n=\Theta(n\lg\lg n)$</p>
+
+<p>###4-4 <strong><em>Fibonacci numbers</em></strong></p>
+
+<p>This problem develops properties of the Fibonacci numbers,which are defined by recurrence(3.22). We shall use the technique of generating functions to solve the Fibonacci recurrence. Define the <strong><em>generating function</em></strong> (or <strong><em>formal power series</em></strong>) $\mathcal{F}$ as</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{equation}\begin{split}\
+\mathcal{F}(z)&=\sum_{i=0}^\infty F_iz^i\\
+&=0+z+z^2+2z^3+3z^4+5z^5+8z^6+13z^7+21z^8+\cdots\
+\end{split}\end{equation} %]]></script>
+
+<p>where $F_i$ is the $i$th Fibonacci number.</p>
+
+<p><strong>a.</strong> Show that $\mathcal{F}(z)=z+z\mathcal{F}(z)+z^2\mathcal{F}(z)$</p>
+
+<p>假设$H(z)=z+z\mathcal{F}(z)+z^2\mathcal{F}(z)$，则</p>
+
+<script type="math/tex; mode=display">% <![CDATA[
+\begin{equation}\begin{split}\
+H_i(z)&=z+z^2&+z^3+2z^4+3z^5+5z^6+8z^7+13z^8+\cdots\\
+&&+z^3+z^4+2z^5+3z^6+5z^7+8z^8+\cdots\\
+&=\mathcal{F}(z)\
+\end{split}\end{equation} %]]></script>
+
+<p><strong>b.c.d</strong>略</p>
+
+<p>###4.5 <strong><em>Chip testing</em></strong></p>
+
+<p>Professor Diogenes has $n$ supposedly identical integrated-circuit chips that in principle are capable of testing each other. The professor’s test jig accommodates two chips at a time. When the jig is loaded, each chip tests the other and reports whether it is good or bad. A good chip always reports accurately whether the other chip is good or bad, but the professor cannot trust the answer of a bad chip. Thus, the four possible outcomes of a test are as follows:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>Chip A says     Chip B says     Conclusion
+--------------------------------------------
+B is good       A is good       both are good, or both are bad
+B is good       A is bad        at least one is bad
+B is bad        A is good       at least one is bad
+B is bad        A is bad        at least one is bad
+</code></pre>
+</div>
+
+<p><strong>a.</strong> Show that if more than $n/2$ chips are bad, the professor cannot necessarily determine which chips are good using any strategy based on this kind of pairwise test. Assume that the bad chips can conspire to fool the professor.</p>
+
+<p>这个很简单，只要有至少与好芯片数量相同的坏芯片联合起来伪装好芯片，就不可能找出好芯片。</p>
+
+<p><strong>b.</strong> Consider the problem of finding a single good chip from amongnchips, assuming that more than $n/2$ of the chips are good. Show that $\lfloor n/2\rfloor$ pairwise tests are sufficient to reduce the problem to one of nearly half the size.</p>
+
+<p>这里可以分为三种情况：</p>
+
+<ol>
+  <li>芯片A与芯片B互相报告对方是好的，假设这种情况有$k$对。</li>
+  <li>芯片A与芯片B中有一方报告对方是好的，另外一方报告对方是坏的，假设这种情况有$m$对。</li>
+  <li>芯片A与芯片B互相报告对方是坏的，假设这种情况有$p$对。</li>
+</ol>
+
+<p>对第2种情况，假设芯片A报告芯片B是好的，而芯片B报告芯片A是坏的，那么芯片A就一定是坏的。于是，在第二种情况中可以排除掉$m$个坏芯片。第3种情况中，可以确定其中至少有$p$个坏芯片，可以将这种情况下的$p$对芯片全部排除。对第1种情况，芯片A与B有可能都是好的也有可能都是坏的，此时随机将其中的一个排除，也能保证在第1种情况下坏芯片与好芯片的比例不变。而第2种情况与第3种情况又排除了尽可能多的坏芯片，所以在这样的排除规则下仍旧至少维持了原比例不变（有可能好芯片的比例更高）。此时还剩下$k+m$个芯片，由于$k+m+p=\lfloor n/2\rfloor$，所以命题得证。</p>
+
+<p><strong>c.</strong> Show that the good chips can be identified with $\Theta(n)$ pairwise tests, assuming that more than $n/2$ of the chips are good. Give and solve the recurrence that describes the number of tests.</p>
+
+<p>根据b部分的结论，有$\sum_{i=1}^{\lg n}\frac{n}{2^i}=\Theta(n)$.</p>
+
+<p>###4.6 <strong><em>Monge arrays</em></strong></p>
+
+<p>略</p>
+
+<blockquote>
+  <p>Written with <a href="http://benweet.github.io/stackedit/">StackEdit</a>.</p>
+</blockquote>
+
+
+  </div>
+</article>
+
+
+    <footer class="c-footer">
+  <div class="u-container c-footer__container">
+    <p>&copy; Gao Xu 2016</p>
+    <p>
+      <a href="https://twitter.com/gavin_china">Twitter</a>
+      <a href="https://github.com/gaoxuxu">Github</a>
+      
+      
+    </p>
+  </div>
+</footer>
+
+  </body>
+</html>

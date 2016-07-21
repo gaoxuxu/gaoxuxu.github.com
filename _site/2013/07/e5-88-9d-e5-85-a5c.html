@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html class="t-blue">
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>初入C++</title>
+  <meta name="description" content="设计原则Bjarne Stroustrup在《C++语言的设计和演化》一书中描述了他在设计C++时，所使用的一些原则。以下总结的一些设计原则出自《C++语言的设计和演化》：">
+
+  <link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic,700|Roboto+Mono:400,500' rel='stylesheet' type='text/css'>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="/material-jekyll-theme/css/main.css">
+  <link rel="canonical" href="http://gaoxuxu.github.io/material-jekyll-theme/2013/07/e5-88-9d-e5-85-a5c">
+  <link rel="alternate" type="application/rss+xml" title="Gao Xu" href="http://gaoxuxu.github.io/material-jekyll-theme/feed.xml">
+</head>
+
+  <body>
+    <nav class="c-navigation is-fixed">
+  <div class="c-navigation__container u-container">
+    <a class="c-navigation__item " href="/material-jekyll-theme/">Home</a>
+    <a class="c-navigation__item " href="/material-jekyll-theme/articles/">Articles</a>
+    <a class="c-navigation__item " href="/material-jekyll-theme/about/">About</a>
+  </div>
+</nav>
+
+
+    <article class="c-article">
+  <header class="c-header c-article__header">
+    <div class="u-container">
+      <h1 class="c-header__title">初入C++</h1>
+    </div>
+  </header>
+
+  <div class="c-article__main">
+    <h2 id="section">设计原则</h2>
+<p>Bjarne Stroustrup在《C++语言的设计和演化》一书中描述了他在设计C++时，所使用的一些原则。以下总结的一些设计原则出自《C++语言的设计和演化》：</p>
+
+<ul>
+  <li>C++设计成直接的和广泛的支持多种程序设计风格（过程化程序设计、数据抽象化、面向对象程序设计、泛型程序设计）。</li>
+  <li>C++设计成给程序设计者多种选择，即使可能导致程序设计者错误。</li>
+  <li>C++设计成尽可能与C兼容，借此提供一个从C到C++的平滑过渡。</li>
+  <li>C++避免平台限定或没有普遍用途的特性。</li>
+  <li>C++不使用会带来额外开销的特性。</li>
+  <li>C++设计成无需复杂的程序设计环境。</li>
+</ul>
+
+<h2 id="section-1">编程传统</h2>
+<p>C++融合了<strong>三种不同的编程传统</strong>：</p>
+
+<ul>
+  <li><strong>面向过程编程（Procedure Oriented programming）</strong>：强调数据被处理的过程，以功能为中心组织代码，基本的组织方式为函数，功能由一组相关的过程和函数序列组成。</li>
+  <li><strong>面向对象编程（Object Oriented programming）</strong>：这种编程思想将现实世界抽象成一个个对象，因此其组织方式也更贴近现实。具体应用时，将对象的属性和行为与外部环境区分开来，因此具有更好的封装型和安全性。</li>
+  <li><strong>通用编程（General-purpose programming）</strong>：编写的代码不为特定领域服务，即可以用于各种领域。</li>
+</ul>
+
+<h2 id="section-2">语言特性</h2>
+
+<h3 id="section-3">操作符</h3>
+
+<ul>
+  <li>算术操作符：可重载</li>
+  <li>比较运算符：可重载</li>
+  <li>移位运算符：可重载</li>
+  <li>其它运算符：除成员操作符（.）、间接成员操作符（.*）、三元条件、作用域解析（::）、sizeof和typeid操作符外，都可以重载。具体信息在以后补齐。</li>
+</ul>
+
+<h3 id="section-4">预处理器</h3>
+
+<p>C++主要有三个编译阶段（最后两个阶段一般视为真正的“编译”）：</p>
+
+<ul>
+  <li>预处理：将<strong>预处理指令</strong>替换为源代码，然后送到下一个编译阶段。</li>
+  <li>转译成目标代码：</li>
+  <li>链接</li>
+</ul>
+
+<h3 id="template">模板（Template）</h3>
+
+<p>指C++编程语言中的函数模板（function template）和类型模板（class template）。观念来自于Simula的泛型程序设计。采用typename和class两个关键字，来标识模板类型的类型参数。</p>
+
+<h3 id="section-5">类型与对象</h3>
+
+<p><strong>对象</strong>是数据和处理数据的指令的联合。对象有三种特质：状态（State）、行为（Behavior）、同一性身份（Identity），使用信息来引发彼此间的交互。</p>
+
+<p><strong>类型</strong>是对象的蓝图，定义了对象的抽象特质，包括对象的属性特质和对象的行为特质，属性的值即为对象的状态。</p>
+
+<p><strong>面向对象三大特性：</strong></p>
+
+<ul>
+  <li><strong>封装</strong>：将数据和处理数据的过程组合起来，仅对外公开接口，以达到隐藏信息的作用。封装能够减少耦合（Coupling）。C++中的类型对其成员分为三种封装状态：<strong>公有</strong>（public）、<strong>保护</strong>（protected）和<strong>私有</strong>（private）。</li>
+  <li><strong>继承</strong>：指子类继承超类，会自动获得超类除私有特质外的全部特质，同一类型的所有实例都会自动有该类型的全部特质，以达到代码复用的目的。C++只支持类型构成式继承，即虽然同一类型的所有实例都有该类型的全部特质，但是实例能够共享的只限于行为，而不能共享状态，除非特质为参考类型的属性，或使用指针来间接共享。C++支持的继承关系为：
+    <ul>
+      <li>公有继承（public inheritance）：子类与超类为“is-a”关系，代表了在完全使用公有继承的对象类型之间的层次结构体系。</li>
+      <li>保护继承（protected inheritance）：基类的公有和保护内容可以被派生类以及由此派生的其它类使用，但是基类对外界是不可见的。派生类的用户不能访问基类的内容、不能把派生类型转换为基类的指针或引用。</li>
+      <li>私有继承（private inheritance）：基类的公有和保护内容仅可以被派生类访问，含义是“implemented-in-term-of”。但基类对派生类的子类和外部环境都是不可见的，不能把派生类转换为基类的指针或引用。</li>
+    </ul>
+  </li>
+  <li><strong>多态</strong>：面向对象的精神在于多态（Polymorphism）。一般所谓多态，是指动态多态，即使用继承和动态绑定实现。使用多态可创建继承体系。类型与继承只是达成多态中的一种手段，所以称作面向对象而不是类型导向。</li>
+</ul>
+
+<p>多态又分为静态多态和动态多态。C++支持的动态多态必须结合继承和动态绑定实现。静态多态是指编译时决定的多态，包括重载和以模板实现多态的方法即参数化类型（Parameterized Type），使用宏的“代码膨胀法”达到多态效果。</p>
+
+<p>类型转换也是一种区域多态的概念，C++提供dynamic_cast、static_cast等运算对象来实现强制类型转换。运算对象重载和函数重载也算是多态的概念。</p>
+
+<h2 id="c">与C语言的区别</h2>
+
+<h3 id="section-6">新增特性</h3>
+
+<p>和C语言相比，C++引入了很多特性，具体包括：陈述性声明、类似函数的强制转型、new/delete操作符、bool类型、参考类型、默认参数、函数重载、命名空间、类型（包括继承、成员函数、虚函数、抽象类型和构造函数）、操作符重载、模板、域解析操作符（::）、异常处理和运行时识别。</p>
+
+<h3 id="c-1">与C不同之处</h3>
+
+<p>最常见的区别之一，就是C允许从void*到其它指针类型的隐式转换，但C++不允许。另一个比较常见的问题是，C++中的一些关键字，比如new和class，在C中是可以用作标识符的。C99中新纳入的几个特性，如可变长度数组、原生复数类型和复合逐字常数也与C++冲突。</p>
+
+<p>若要混用C和C++的代码，则所有在C++中调用的C代码，必须放在extern “C” { /* statement */ }之内。</p>
+
+<h2 id="hello-world">Hello World</h2>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>&lt;code&gt;#include &lt;iostream&gt;
+
+int main(){
+    std::cout &lt;&lt; "Hello, World" &lt;&lt; std::endl;
+    return 0;
+}
+&lt;/code&gt;
+</code></pre>
+</div>
+
+
+  </div>
+</article>
+
+
+    <footer class="c-footer">
+  <div class="u-container c-footer__container">
+    <p>&copy; Gao Xu 2016</p>
+    <p>
+      <a href="https://twitter.com/gavin_china">Twitter</a>
+      <a href="https://github.com/gaoxuxu">Github</a>
+      
+      
+    </p>
+  </div>
+</footer>
+
+  </body>
+</html>
