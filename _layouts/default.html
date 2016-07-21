@@ -1,6 +1,11 @@
----
-theme :
-  name : mark-reid
----
-{% include JB/setup %}
-{% include themes/mark-reid/default.html %}
+<!DOCTYPE html>
+<html class="t-{{ site.theme }}">
+  {% include head.html %}
+  <body>
+    {% include navigation.html %}
+
+    {{ content }}
+
+    {% include footer.html %}
+  </body>
+</html>
