@@ -6,15 +6,13 @@
 </description>
     <link>http://gaoxuxu.github.io/</link>
     <atom:link href="http://gaoxuxu.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Thu, 21 Jul 2016 23:09:17 +0800</pubDate>
-    <lastBuildDate>Thu, 21 Jul 2016 23:09:17 +0800</lastBuildDate>
+    <pubDate>Thu, 21 Jul 2016 23:15:10 +0800</pubDate>
+    <lastBuildDate>Thu, 21 Jul 2016 23:15:10 +0800</lastBuildDate>
     <generator>Jekyll v3.1.6</generator>
     
       <item>
-        <title>Javapoet</title>
-        <description>&lt;p&gt;JavaPoet学习&lt;/p&gt;
-
-&lt;blockquote&gt;
+        <title>JavaPoet学习</title>
+        <description>&lt;blockquote&gt;
   &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;JavaPoet&lt;/code&gt; is a Java API for generating &lt;code class=&quot;highlighter-rouge&quot;&gt;.java&lt;/code&gt; source files.&lt;/p&gt;
 &lt;/blockquote&gt;
 
@@ -120,10 +118,14 @@ javaFile.writeTo(System.out);
 &lt;p&gt;###Import static&lt;/p&gt;
 
 </description>
-        <pubDate>Sun, 10 Apr 2016 00:00:00 +0800</pubDate>
+        <pubDate>Mon, 11 Apr 2016 01:21:09 +0800</pubDate>
         <link>http://gaoxuxu.github.io/2016/04/javapoet</link>
         <guid isPermaLink="true">http://gaoxuxu.github.io/2016/04/javapoet</guid>
         
+        
+        <category>Java</category>
+        
+        <category>Android</category>
         
       </item>
     
@@ -232,10 +234,14 @@ javaFile.writeTo(System.out);
 &lt;p&gt;##绘制（Drawing）&lt;/p&gt;
 
 </description>
-        <pubDate>Mon, 07 Dec 2015 00:00:00 +0800</pubDate>
+        <pubDate>Tue, 08 Dec 2015 01:21:09 +0800</pubDate>
         <link>http://gaoxuxu.github.io/2015/12/view</link>
         <guid isPermaLink="true">http://gaoxuxu.github.io/2015/12/view</guid>
         
+        
+        <category>Java</category>
+        
+        <category>Android</category>
         
       </item>
     
