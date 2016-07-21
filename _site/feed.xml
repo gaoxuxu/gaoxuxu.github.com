@@ -4,10 +4,10 @@
     <title>Gao Xu</title>
     <description>Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search results) and in your feed.xml site description.
 </description>
-    <link>http://gaoxuxu.github.io/material-jekyll-theme/</link>
-    <atom:link href="http://gaoxuxu.github.io/material-jekyll-theme/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Thu, 21 Jul 2016 22:58:45 +0800</pubDate>
-    <lastBuildDate>Thu, 21 Jul 2016 22:58:45 +0800</lastBuildDate>
+    <link>http://gaoxuxu.github.io/</link>
+    <atom:link href="http://gaoxuxu.github.io/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Thu, 21 Jul 2016 23:09:17 +0800</pubDate>
+    <lastBuildDate>Thu, 21 Jul 2016 23:09:17 +0800</lastBuildDate>
     <generator>Jekyll v3.1.6</generator>
     
       <item>
@@ -121,8 +121,8 @@ javaFile.writeTo(System.out);
 
 </description>
         <pubDate>Sun, 10 Apr 2016 00:00:00 +0800</pubDate>
-        <link>http://gaoxuxu.github.io/material-jekyll-theme/2016/04/javapoet</link>
-        <guid isPermaLink="true">http://gaoxuxu.github.io/material-jekyll-theme/2016/04/javapoet</guid>
+        <link>http://gaoxuxu.github.io/2016/04/javapoet</link>
+        <guid isPermaLink="true">http://gaoxuxu.github.io/2016/04/javapoet</guid>
         
         
       </item>
@@ -233,8 +233,8 @@ javaFile.writeTo(System.out);
 
 </description>
         <pubDate>Mon, 07 Dec 2015 00:00:00 +0800</pubDate>
-        <link>http://gaoxuxu.github.io/material-jekyll-theme/2015/12/view</link>
-        <guid isPermaLink="true">http://gaoxuxu.github.io/material-jekyll-theme/2015/12/view</guid>
+        <link>http://gaoxuxu.github.io/2015/12/view</link>
+        <guid isPermaLink="true">http://gaoxuxu.github.io/2015/12/view</guid>
         
         
       </item>
@@ -649,8 +649,8 @@ view.animate().translationX(20f).withLayer().start();
 &lt;p&gt;Start a trace, or enable some of the relevant Developer Options, and just go from there. You’re welcome to share some of the things you’ve found in the comments or in the Android Performance Patterns Google+ community.&lt;/p&gt;
 </description>
         <pubDate>Fri, 09 Oct 2015 01:21:09 +0800</pubDate>
-        <link>http://gaoxuxu.github.io/material-jekyll-theme/2015/10/speed-up-your-app</link>
-        <guid isPermaLink="true">http://gaoxuxu.github.io/material-jekyll-theme/2015/10/speed-up-your-app</guid>
+        <link>http://gaoxuxu.github.io/2015/10/speed-up-your-app</link>
+        <guid isPermaLink="true">http://gaoxuxu.github.io/2015/10/speed-up-your-app</guid>
         
         
         <category>Java</category>
@@ -729,8 +729,8 @@ view.animate().translationX(20f).withLayer().start();
 &lt;p&gt;上面只是Android文件结构的一个简单描述。要理解桌面之下Android的工作，你需要了解Linux的基本知识和Linux命令行。对于内核参数，你需要知道Linux内核的工作知识。在以后的文章中我将详细探讨Android文件层次。&lt;/p&gt;
 </description>
         <pubDate>Sun, 16 Nov 2014 22:28:09 +0800</pubDate>
-        <link>http://gaoxuxu.github.io/material-jekyll-theme/2014/11/understanding-android-file-hierarchy</link>
-        <guid isPermaLink="true">http://gaoxuxu.github.io/material-jekyll-theme/2014/11/understanding-android-file-hierarchy</guid>
+        <link>http://gaoxuxu.github.io/2014/11/understanding-android-file-hierarchy</link>
+        <guid isPermaLink="true">http://gaoxuxu.github.io/2014/11/understanding-android-file-hierarchy</guid>
         
         
         <category>Java</category>
@@ -830,8 +830,8 @@ try {
 &lt;p&gt;翻译自&lt;a href=&quot;https://www.securecoding.cert.org/confluence/display/java/DRD00-J.+Do+not+store+sensitive+information+on+external+storage+%28SD+card%29+unless+encrypted+first&quot;&gt;CERT&lt;/a&gt;&lt;/p&gt;
 </description>
         <pubDate>Sat, 20 Sep 2014 22:11:30 +0800</pubDate>
-        <link>http://gaoxuxu.github.io/material-jekyll-theme/2014/09/do-not-store-sensitive-information-on-external-storage-unless-encrypted-first</link>
-        <guid isPermaLink="true">http://gaoxuxu.github.io/material-jekyll-theme/2014/09/do-not-store-sensitive-information-on-external-storage-unless-encrypted-first</guid>
+        <link>http://gaoxuxu.github.io/2014/09/do-not-store-sensitive-information-on-external-storage-unless-encrypted-first</link>
+        <guid isPermaLink="true">http://gaoxuxu.github.io/2014/09/do-not-store-sensitive-information-on-external-storage-unless-encrypted-first</guid>
         
         
         <category>Java</category>
@@ -1009,8 +1009,8 @@ try {
 
 </description>
         <pubDate>Wed, 23 Apr 2014 06:17:25 +0800</pubDate>
-        <link>http://gaoxuxu.github.io/material-jekyll-theme/2014/04/idea-keymap</link>
-        <guid isPermaLink="true">http://gaoxuxu.github.io/material-jekyll-theme/2014/04/idea-keymap</guid>
+        <link>http://gaoxuxu.github.io/2014/04/idea-keymap</link>
+        <guid isPermaLink="true">http://gaoxuxu.github.io/2014/04/idea-keymap</guid>
         
         
         <category>Java</category>
@@ -1379,8 +1379,8 @@ public final class PRNGFixes {
 &lt;/div&gt;
 </description>
         <pubDate>Mon, 21 Apr 2014 06:43:25 +0800</pubDate>
-        <link>http://gaoxuxu.github.io/material-jekyll-theme/2014/04/android-prng-fixed</link>
-        <guid isPermaLink="true">http://gaoxuxu.github.io/material-jekyll-theme/2014/04/android-prng-fixed</guid>
+        <link>http://gaoxuxu.github.io/2014/04/android-prng-fixed</link>
+        <guid isPermaLink="true">http://gaoxuxu.github.io/2014/04/android-prng-fixed</guid>
         
         
         <category>Java</category>
@@ -1615,8 +1615,8 @@ public static BigInteger computeRecursivelyFasterUsingBigIntegerAndTable(int n)	
 &lt;/blockquote&gt;
 </description>
         <pubDate>Tue, 18 Mar 2014 06:43:25 +0800</pubDate>
-        <link>http://gaoxuxu.github.io/material-jekyll-theme/2014/03/optimizing-android-code-fibonacci</link>
-        <guid isPermaLink="true">http://gaoxuxu.github.io/material-jekyll-theme/2014/03/optimizing-android-code-fibonacci</guid>
+        <link>http://gaoxuxu.github.io/2014/03/optimizing-android-code-fibonacci</link>
+        <guid isPermaLink="true">http://gaoxuxu.github.io/2014/03/optimizing-android-code-fibonacci</guid>
         
         
         <category>算法</category>
@@ -1691,8 +1691,8 @@ public static BigInteger computeRecursivelyFasterUsingBigIntegerAndTable(int n)	
 &lt;/blockquote&gt;
 </description>
         <pubDate>Thu, 21 Nov 2013 01:28:25 +0800</pubDate>
-        <link>http://gaoxuxu.github.io/material-jekyll-theme/2013/11/Java-Collection-framework-Set-List-Queue</link>
-        <guid isPermaLink="true">http://gaoxuxu.github.io/material-jekyll-theme/2013/11/Java-Collection-framework-Set-List-Queue</guid>
+        <link>http://gaoxuxu.github.io/2013/11/Java-Collection-framework-Set-List-Queue</link>
+        <guid isPermaLink="true">http://gaoxuxu.github.io/2013/11/Java-Collection-framework-Set-List-Queue</guid>
         
         
         <category>算法</category>
@@ -1899,8 +1899,8 @@ synchronized(m) {  // Synchronizing on m, not s!
 &lt;/blockquote&gt;
 </description>
         <pubDate>Mon, 18 Nov 2013 02:20:25 +0800</pubDate>
-        <link>http://gaoxuxu.github.io/material-jekyll-theme/2013/11/Java-Collection-framework-Collections</link>
-        <guid isPermaLink="true">http://gaoxuxu.github.io/material-jekyll-theme/2013/11/Java-Collection-framework-Collections</guid>
+        <link>http://gaoxuxu.github.io/2013/11/Java-Collection-framework-Collections</link>
+        <guid isPermaLink="true">http://gaoxuxu.github.io/2013/11/Java-Collection-framework-Collections</guid>
         
         
         <category>算法</category>
