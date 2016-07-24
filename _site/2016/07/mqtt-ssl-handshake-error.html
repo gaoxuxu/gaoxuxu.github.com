@@ -5,13 +5,13 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>java.lang.Void类</title>
-  <meta name="description" content="java.lang.Void类是基本类型（primitive type）void的包装类型（wrapped type），final修饰符修饰，不可修改。">
+  <title>mqtt传输加密ssl握手失败</title>
+  <meta name="description" content="前几天在接入mqtt的传输加密时，使用5.1系统的手机测试通过，但在使用一款4.2.2系统的平板时，遇到了个一异常：">
 
   <link href='https://fonts.googleapis.com/css?family=Roboto:400,400italic,700|Roboto+Mono:400,500' rel='stylesheet' type='text/css'>
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="http://gaoxuxu.github.io/2013/02/java-lang-void-e7-b1-bb">
+  <link rel="canonical" href="http://gaoxuxu.github.io/2016/07/mqtt-ssl-handshake-error">
   <link rel="alternate" type="application/rss+xml" title="Gao Xu" href="http://gaoxuxu.github.io/feed.xml">
 </head>
 
@@ -28,22 +28,30 @@
     <article class="c-article">
   <header class="c-header c-article__header">
     <div class="u-container">
-      <h1 class="c-header__title">java.lang.Void类</h1>
+      <h1 class="c-header__title">mqtt传输加密ssl握手失败</h1>
     </div>
   </header>
 
   <div class="c-article__main">
-    <p>java.lang.Void类是基本类型（primitive type）void的包装类型（wrapped type），final修饰符修饰，不可修改。</p>
+    <p>前几天在接入mqtt的传输加密时，使用5.1系统的手机测试通过，但在使用一款4.2.2系统的平板时，遇到了个一异常：</p>
 
-<p>唯一属性：</p>
-
-<div class="highlighter-rouge"><pre class="highlight"><code>public static final Class&lt;Void&gt; TYPE = Class.getPrimitiveClass("void");  
+<div class="highlighter-rouge"><pre class="highlight"><code>handshake unkonw error
 </code></pre>
 </div>
 
-<p>在Android中，这个值取的是Thread类run()的返回值类型。</p>
+<p>当时第一反应就是Cipher Suites不支持，于是</p>
 
-<p>无参构造函数私有。</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>openssl s_client -connect testim.weibangong.com:8883 -showcerts
+</code></pre>
+</div>
+
+<p>结果看到</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>New, TLSv1/SSLv3, Cipher is ECDHE-RSA-AES256-GCM-SHA384
+</code></pre>
+</div>
+
+<p>而GCM Cipher在Android5.0以上才支持，所以问题就很明确了</p>
 
   </div>
 </article>

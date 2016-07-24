@@ -99,7 +99,6 @@
 
 <p>高潮来了，上面说过，Looper的mQueue是Handler使用的消息队列，loop方法启动一个死循环从队列中获取数据，当队列中没有数据时，queue.next()会阻塞。当有数据时，msg.target（即Handler）就会调用dispatchMessage方法，进而调用Handler的handleCallback或者handlerMessage方法。从这些也可以知道，如果Handler是在子线程的run方法中创建（之前必须调用Looper.prepare()）的，那么这个Handler的handleMessage或者handleCallback方法就是运行在子线程的。</p>
 
-
   </div>
 </article>
 
